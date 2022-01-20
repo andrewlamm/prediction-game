@@ -388,10 +388,11 @@ async function check_live_game_id(game_id) {
                     const team2 = parsed.dire_team_id
 
                     console.log(`${game_id} game done!`)
+                    to_be_removed.add(game_id)
                     // console.log(parsed)
 
                     if (match_table[parsed.league.leagueid][team1][team2] === 2 || match_table[parsed.league.leagueid][team2][team1] === 2) { // tiebreak game
-
+                        console.log("tiebreak")
                     }
                     else {
                         if (parsed.radiant_win) {
@@ -400,8 +401,6 @@ async function check_live_game_id(game_id) {
                         else {
                             match_table[parsed.league.leagueid][team2][team1] += 1
                         }
-
-                        to_be_removed.add(game_id)
 
                         if (match_table[parsed.league.leagueid][team1][team2] === 2 || match_table[parsed.league.leagueid][team2][team1] === 2) {
                             console.log("match complete")

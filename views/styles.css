@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .noUi-horizontal .noUi-handle {
     height: 20px;
     width: 20px;
