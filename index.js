@@ -4,7 +4,7 @@ const axios = require('axios')
 const cors = require('cors')
 let hbs = require('hbs')
 const passport = require('passport')
-const session = require('express-session')
+const session = require('cookie-session')
 const SteamStrategy = require('passport-steam').Strategy
 const { MongoClient } = require('mongodb');
 const port = 4000
@@ -696,6 +696,4 @@ app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: 
     res.redirect('/');
 })
 
-app.listen(port, () => {
-    console.log(`App listening at http://localhost:${port}`)
-})
+app.listen(process.env.PORT || 4000, () => console.log("Server is running..."));
