@@ -1,0 +1,68 @@
+<!DOCTYPE >
+<html>
+	{{> head_tag title="Complete Matches"}}
+	<body class="min-h-full flex flex-col bg-gray-400">
+        {{> header page_name="Complete Matches"}}
+		<div class="px-4 py-2 flex flex-col flex-grow">
+            <div class="w-full flex items-center justify-center">
+                <div class="w-4/5 flex flex-col">
+                    {{#each completed_games}}
+                    <div class="w-full flex flex-col py-2">
+                        <div class="flex flex-col text-4xl font-bold">
+                            <div class="pb-2">{{@key}}</div>
+                            <hr class="bg-black h-px border-0">
+                        </div>
+                        <div class="w-full pt-2">
+                            <table class="w-full">
+                                <tr class="border-b-2 border-zinc-600">
+                                    <td colspan=3 class="text-left px-1 font-bold pb-1">Match</td>
+                                    <td class="px-1 text-center font-bold pb-1">Average<br> Guess</td>
+                                    <td class="px-1 text-center font-bold pb-1">Your<br> Guess</td>
+                                    <td class="px-1 border-gray-700 text-center font-bold pb-1">Final Score</td>
+                                    <td class="px-1 text-center font-bold pb-1">Average<br> Points</td>
+                                    <td class="px-1 text-center font-bold pb-1">Your<br> Points</td>
+                                </tr>
+                                {{#each this}}
+                                <tr>
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score true)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
+                                    <td class="px-4 py-1">vs</td>
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score true)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
+                                    <td class="text-center py-1 px-1">
+                                        <div class="flex flex-row items-center justify-center">
+                                            {{#if average_guess}}
+                                                {{#if (check_not50 average_guess)}}
+                                                <div style="width: 40px;" class="flex items-center justify-center">
+                                                    <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;">
+                                                </div>
+                                                {{/if}}
+                                                {{display_average average_guess}}%
+                                            {{/if}}
+                                        </div>
+                                    </td>
+                                    <td class="text-center py-1 px-1">
+                                        <div class="flex flex-row items-center justify-center">
+                                            {{#if your_guess}}
+                                                {{#if (check_not50 your_guess)}}
+                                                <div style="width: 40px;" class="flex items-center justify-center">
+                                                    <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;">
+                                                </div>
+                                                {{/if}}
+                                                {{display_average your_guess}}%
+                                            {{/if}}
+                                        </div>
+                                    </td>
+                                    <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else}}<span class="{{#if (check_win team1score true)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score true)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
+                                    <td class="text-center py-1 px-1">{{#if average_guess}}{{{display_score average_guess team1score team2score}}}{{/if}}</td>
+                                    <td class="text-center py-1 px-1">{{#if your_guess}}{{{display_score your_guess team1score team2score}}}{{/if}}</td>
+                                </tr>
+                                {{/each}}
+                            </table>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+		{{> footer}}
+    </body>
+</html>

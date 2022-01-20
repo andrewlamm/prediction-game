@@ -1,0 +1,163 @@
+<!DOCTYPE >
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontSize: {
+							'midxl': '1.35rem'
+						},
+					}
+				}
+			}
+		</script>
+		<title>Dota Predictions</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.css">
+		<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.js"></script>
+		<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"></script>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body class="min-h-full flex flex-col">
+		<div class="px-4 py-2 flex flex-col flex-grow">
+			<div class="w-full items-center justify-center flex flex-col" id="match_1">
+				<div class="flex flex-row text-center font-bold text-4xl">
+					Team 1 vs Team 2
+				</div>
+				<div class="flex flex-row mt-8 py-8">
+					<div class="flex flex-row items-center justify-center">
+						<div class="px-2 w-1/4 text-right flex items-center justify-center" id="match_1_team1">
+							Team 1
+						</div>
+						<div class="px-2" style="width: 300px">
+							<div id="match_1_slider" style="height: 1px; top:38px;" class="flex items-center justify-center"></div>
+							<div class="relative px-px text-center text-xs text-gray-300 select-none" style="top:27.5px">|</div>
+							<div class="relative w-full px-px text-center flex flex-col items-center justify-center select-none">
+								<div class="relative text-midxl w-1/2 items-center justify-center" style="top:3px; left:25%">
+									<div>|</div>
+								</div>
+							</div>
+							<div class="relative w-full px-px text-center flex flex-col items-center justify-center select-none">
+								<div class="relative flex flex-col w-1/2 items-center justify-center" style="left:25%">
+									<div>75%</div>
+									<div>Average Guess</div>
+								</div>
+							</div>
+							<!-- <div id="match_1_slider" style="height: 1px;" class="flex items-center justify-center"></div> -->
+						</div>
+						<div class="px-2 w-1/4 text-left flex items-center justify-center" id="match_1_team2">
+							Team 2
+						</div>
+					</div>
+					<div class="pl-6 flex flex-col items-center justify-center" style="width: 300px;">
+						<div class="w-full">
+							You'll <span id="match_1_team1_text">gain</span> <span id="match_1_team1_points" class="text-lg font-bold">0.0</span> points if <span id="match_1_team1_name">Team 1</span> wins.
+						</div>
+						<div class="w-full">
+							You'll <span id="match_1_team2_text">gain</span> <span id="match_1_team2_points" class="text-lg font-bold">0.0</span> points if <span id="match_1_team2_name">Team 2</span> wins.
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="w-full flex-shrink-0">
+			<div class="text-center font-normal pt-4 pb-2 flex flex-row items-center justify-center">
+				<div class="pl-4">
+					API Data from <a target="_blank" rel="noopener noreferrer" href="https://docs.opendota.com/" class="text-blue-700">OpenDota</a>
+				</div>
+				<div class="pl-4">
+					<a target="_blank" rel="noopener noreferrer" href="https://github.com/superandybean/dpc-simulator" class="text-blue-700">Open Source</a>
+				</div>
+			</div>
+		</div>
+    </body>
+	<script>
+		let match_1_slider = document.getElementById('match_1_slider');
+		noUiSlider.create(match_1_slider, {
+			start: 50,
+			step: 1,
+			range: {
+				'min': 0,
+				'max': 100
+			},
+			tooltips: {
+				to: function(val) {
+					let display_val = val
+					if (val < 50) {
+						display_val = 100 - val
+					}
+					return `<div class="flex flex-col bg-transparent items-center justify-center text-center"><div class="font-semibold">Your guess:<div class="flex flex-col items-center justify-center text-center"><div class="flex flex-row"><div style="width:13.45px"></div><div class="font-bold text-4xl">${Math.round(display_val)}</div><div>%</div></div></div>`
+				}
+			},
+		});
+		match_1_slider.noUiSlider.on('update', function (values, handle) {
+			change_score(match_1_slider.id)
+		});
+
+		function change_score(id) {
+			const match_num = id.substring(0, 7)
+			const prob = parseInt(document.getElementById(id).noUiSlider.get())
+			let team1_probs = (100-prob).toFixed(1)
+			let team2_probs = prob.toFixed(1)
+
+			if (prob < 50) {
+				team1_probs = (100-prob).toFixed(1)
+				team2_probs = prob.toFixed(1)
+			}
+
+			const team1_score = calc_score(team1_probs)
+			const team2_score = calc_score(team2_probs)
+
+			if (team1_score < 0) {
+				document.getElementById(`${match_num}_team1_text`).innerHTML = "lose"
+				document.getElementById(`${match_num}_team1_points`).classList.remove("text-green-600")
+				document.getElementById(`${match_num}_team1_points`).classList.add("text-red-600")
+				document.getElementById(`${match_num}_team1_points`).innerHTML = Math.abs(team1_score).toFixed(1)
+				document.getElementById(`${match_num}_team1_name`).classList.remove("font-bold")
+				document.getElementById(`${match_num}_team1`).classList.remove("font-bold")
+
+				document.getElementById(`${match_num}_team2_text`).innerHTML = "gain"
+				document.getElementById(`${match_num}_team2_points`).classList.remove("text-red-600")
+				document.getElementById(`${match_num}_team2_points`).classList.add("text-green-600")
+				document.getElementById(`${match_num}_team2_points`).innerHTML = Math.abs(team2_score).toFixed(1)
+				document.getElementById(`${match_num}_team2_name`).classList.add("font-bold")
+				document.getElementById(`${match_num}_team2`).classList.add("font-bold")
+			}
+			else if (team1_score > 0) {
+				document.getElementById(`${match_num}_team1_text`).innerHTML = "gain"
+				document.getElementById(`${match_num}_team1_points`).classList.add("text-green-600")
+				document.getElementById(`${match_num}_team1_points`).classList.remove("text-red-600")
+				document.getElementById(`${match_num}_team1_points`).innerHTML = Math.abs(team1_score).toFixed(1)
+				document.getElementById(`${match_num}_team1_name`).classList.add("font-bold")
+				document.getElementById(`${match_num}_team1`).classList.add("font-bold")
+
+				document.getElementById(`${match_num}_team2_text`).innerHTML = "lose"
+				document.getElementById(`${match_num}_team2_points`).classList.add("text-red-600")
+				document.getElementById(`${match_num}_team2_points`).classList.remove("text-green-600")
+				document.getElementById(`${match_num}_team2_points`).innerHTML = Math.abs(team2_score).toFixed(1)
+				document.getElementById(`${match_num}_team2_name`).classList.remove("font-bold")
+				document.getElementById(`${match_num}_team2`).classList.remove("font-bold")
+			}
+			else {
+				document.getElementById(`${match_num}_team1_text`).innerHTML = "gain"
+				document.getElementById(`${match_num}_team1_points`).classList.remove("text-green-600", "text-red-600")
+				document.getElementById(`${match_num}_team1_points`).innerHTML = "0.0"
+				document.getElementById(`${match_num}_team1_name`).classList.remove("font-bold")
+				document.getElementById(`${match_num}_team1`).classList.remove("font-bold")
+
+				document.getElementById(`${match_num}_team2_text`).innerHTML = "gain"
+				document.getElementById(`${match_num}_team2_points`).classList.remove("text-green-600", "text-red-600")
+				document.getElementById(`${match_num}_team2_points`).innerHTML = "0.0"
+				document.getElementById(`${match_num}_team2_name`).classList.remove("font-bold")
+				document.getElementById(`${match_num}_team2`).classList.remove("font-bold")
+			}
+		}
+		function calc_score(prob) {
+			return 25 - (Math.pow(prob - 100, 2) / 100)
+		}
+	</script>
+</html>
