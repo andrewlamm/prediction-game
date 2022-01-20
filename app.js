@@ -406,6 +406,7 @@ async function check_live_game_id(game_id) {
                             console.log("match complete")
                             await collection.find().forEach(async function(doc) { // check again
                                 const query = {"_id": doc._id}
+                                console.log(doc._id)
                                 if (team1 > team2) { //'5' > '15', '15' is team2, '5' is team 1
                                     const field = `match_${team2}_${team1}`
 
@@ -421,7 +422,7 @@ async function check_live_game_id(game_id) {
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                        console.log("victory doc updated! 1")
                                     }
                                     else {
                                         if (parseInt(doc[field]) < 50) {
@@ -433,7 +434,7 @@ async function check_live_game_id(game_id) {
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                        console.log("victory doc updated! 2")
                                     }
                                 }
                                 else { // '15' is team1, '5' is team 2
@@ -451,7 +452,7 @@ async function check_live_game_id(game_id) {
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                        console.log("victory doc updated! 3")
                                     }
                                     else {
                                         if (parseInt(doc[field]) < 50) {
@@ -463,7 +464,7 @@ async function check_live_game_id(game_id) {
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                        console.log("victory doc updated! 4")
                                     }
                                 }
                             })
