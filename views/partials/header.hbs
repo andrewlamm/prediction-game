@@ -1,14 +1,14 @@
 <div class="relative w-full flex flex-col bg-gray-700">
-    <div class="font-bold text-7xl py-6 text-center text-white">
+    <div class="font-bold text-5xl lg:text-7xl py-6 text-center text-white">
         Predictions Game
     </div>
-    <div class="w-full pb-1 pr-1 text-white text-xl flex justify-end">
+    <div class="w-full pb-1 pr-1 text-white text-lg lg:text-xl flex justify-end">
         {{#if user}} Hello, {{user.displayName}}.&nbsp;<a class="text-blue-300 cursor-pointer" href="/logout">Logout.</a>{{else}}<a href="/auth/steam"><img class="float-right" src="/imgs/steam_login.png"></a>{{/if}}
     </div>
-    <div class="w-full flex flex-row items-center justify-center py-2 bg-gray-600 text-white">
-        <div class="w-1/4 text-2xl text-center {{#if (if_equals "Home" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/" class="w-full">Home</a></div>
-        <div class="w-1/4 text-2xl text-center {{#if (if_equals "Upcoming Matches" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/upcoming_matches" class="w-full">Upcoming Matches</a></div>
-        <div class="w-1/4 text-2xl text-center {{#if (if_equals "Complete Matches" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/complete_matches" class="w-full">Complete Matches</a></div>
-        <div class="w-1/4 text-2xl text-center {{#if (if_equals "Leaderboard" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/leaderboard" class="w-full">Leaderboard</a></div>
+    <div class="w-full grid grid-cols-2 gap-y-2 lg:flex lg:flex-row place-items-center items-center justify-center py-2 bg-gray-600 text-white">
+        <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center {{#if (if_equals "Home" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/" class="w-full">Home</a></div>
+        <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center {{#if (if_equals "Upcoming Matches" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/upcoming_matches" class="w-full">Upcoming Matches</a></div>
+        <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center {{#if (if_equals "Complete Matches" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/complete_matches" class="w-full">Complete Matches</a></div>
+        <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center {{#if (if_equals "Leaderboard" page_name)}}font-bold{{/if}} hover:font-bold"><a href="/leaderboard" class="w-full">Leaderboard</a></div>
     </div>
 </div>

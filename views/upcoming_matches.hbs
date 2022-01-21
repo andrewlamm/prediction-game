@@ -6,25 +6,28 @@
 		<div class="px-4 py-2 flex flex-col flex-grow">
 			{{#if user}}
 			<div class="w-full flex items-center justify-center">
-				<div class="w-4/5 flex flex-col">
+				<div class="w-full lg:w-4/5 flex flex-col">
 					{{#each upcoming_matches}}
 					<div class="w-full flex flex-col py-2">
-						<div class="flex flex-col text-4xl font-bold">
+						<div class="flex flex-col text-xl md:text-4xl font-bold">
 							<div class="pb-2">{{@key}}</div>
 							<hr class="bg-black h-px border-0">
 						</div>
 						<div class="w-full pt-2">
 							{{#each this}}
 							<div class="w-full items-center justify-center flex flex-col" id="match.{{team1id}}.{{team2id}}_match">
-								<div class="flex flex-row text-center font-bold text-4xl justify-center items-center">
-									<img src={{team1image}} style="height: 40px;" class="pr-2">{{team1}} vs {{team2}}<img src={{team2image}} style="height: 40px;" class="pl-2">
+								<div class="flex flex-row text-center font-bold text-xl md:text-4xl justify-center items-center">
+									<img src={{team1image}} class="pr-2 logo_image_height">{{team1}} vs {{team2}}<img src={{team2image}} class="pl-2 logo_image_height">
 								</div>
-								<div class="flex flex-row mt-8 py-8">
+								<div class="flex flex-col lg:flex-row mt-8 py-8 items-center justify-center">
 									<div class="flex flex-row items-center justify-center">
-										<div class="px-2 w-1/4 text-right flex items-center justify-center" id="match.{{team1id}}.{{team2id}}_team1">
+										<div class="hidden md:px-2 w-1/4 text-right md:flex items-center justify-center relative" id="match.{{team1id}}.{{team2id}}_team1" style="top: -10px">
 											{{team1}}
 										</div>
-										<div class="px-2" style="width: 300px">
+										<div class="flex md:px-2 text-right md:hidden items-center justify-center relative" style="top: -15px;">
+											<img src={{team1image}} style="width: 40px;">
+										</div>
+										<div class="px-2 slide_width">
 											<div id="match.{{team1id}}.{{team2id}}_slider" style="height: 1px; top:38px;" class="flex items-center justify-center w-full"></div>
 											<div class="relative px-px text-center text-xs text-gray-300 select-none" style="top:27.5px">|</div>
 											<div class="relative w-full px-px text-center flex flex-col items-center justify-center select-none">
@@ -39,15 +42,18 @@
 												</div>
 											</div>
 										</div>
-										<div class="px-2 w-1/4 text-left flex items-center justify-center" id="match.{{team1id}}.{{team2id}}_team2">
+										<div class="flex md:px-2 text-right md:hidden items-center justify-center relative" style="top: -15px;">
+											<img src={{team2image}} style="width: 40px;">
+										</div>
+										<div class="hidden md:px-2 w-1/4 text-left md:flex items-center justify-center relative" id="match.{{team1id}}.{{team2id}}_team2" style="top: -10px">
 											{{team2}}
 										</div>
 									</div>
-									<div class="pl-6 flex flex-col items-center justify-center" style="width: 400px;">
-										<div class="w-full">
+									<div class="pl-6 md:flex flex-col items-center justify-center text-center lg:text-left pt-2 lg:pt-0 points_text">
+										<div class="md:w-full">
 											You'll <span id="match.{{team1id}}.{{team2id}}_team1_text">gain</span> <span id="match.{{team1id}}.{{team2id}}_team1_points" class="text-lg font-bold">0.0</span> points if <span id="match.{{team1id}}.{{team2id}}_team1_name">{{team1}}</span> wins.
 										</div>
-										<div class="w-full">
+										<div class="md:w-full">
 											You'll <span id="match.{{team1id}}.{{team2id}}_team2_text">gain</span> <span id="match.{{team1id}}.{{team2id}}_team2_points" class="text-lg font-bold">0.0</span> points if <span id="match.{{team1id}}.{{team2id}}_team2_name">{{team2}}</span> wins.
 										</div>
 									</div>

@@ -5,14 +5,14 @@
         {{> header page_name="Complete Matches"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full flex items-center justify-center z-0">
-                <div class="w-4/5 flex flex-col">
+                <div class="w-full lg:w-4/5 flex flex-col">
                     {{#each completed_games}}
                     <div class="w-full flex flex-col py-2">
                         <div class="flex flex-col text-4xl font-bold">
                             <div class="pb-2">{{@key}}</div>
                             <hr class="bg-black h-px border-0">
                         </div>
-                        <div class="w-full pt-2">
+                        <div class="w-full pt-2 overflow-x-auto">
                             <table class="w-full">
                                 <tr class="border-b-2 border-zinc-600">
                                     <td colspan=3 class="text-left px-1 font-bold pb-1">Match</td>

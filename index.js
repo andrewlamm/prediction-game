@@ -584,6 +584,8 @@ function get_complete_matches(req, res, next) {
         }
 
         res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].sort(function(a, b) {
+            if (a.is_live) return -1
+            if (b.is_live) return 1
             return a.match_start < b.match_start ? 1 : -1
         })
     }
