@@ -54,8 +54,8 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new SteamStrategy({
-        returnURL: 'http://localhost:4000/auth/steam/return',
-        realm: 'http://localhost:4000/',
+        returnURL: `${process.env.WEBSITE_LINK}auth/steam/return`,
+        realm: process.env.WEBSITE_LINK,
         apiKey: process.env.STEAM_KEY
     },
     function(identifier, profile, done) {
@@ -162,6 +162,21 @@ hbs.registerHelper('replace_invalid_char', function(s) {
     s = s.replace(/\./g, "_")
     s = s.replace(/ /g, "_")
     return s
+})
+
+hbs.registerHelper('turn_to_ordinal', function(num) {
+    let ones = num % 10
+    let tens = num % 100
+    if (ones == 1 && tens != 11) {
+      return num + "st";
+    }
+    if (ones == 2 && tens != 12) {
+      return num + "nd";
+    }
+    if (ones == 3 && tens != 13) {
+      return num + "rd";
+    }
+    return num + "th";
 })
 
 const LEAGUE_IDS = [13738, 13716, 13741, 13747, 13709, 13712, 13740, 13717, 13742, 13748, 13710, 13713]
@@ -503,12 +518,14 @@ async function check_document_exists(req, res, next) {
         // console.log(results)
 
         res.locals.user_doc = results
+        req.user.points = results.score
 
         if (results === null) {
             const doc = {"_id": req.user._json.steamid, "display_name": req.user._json.personaname, "steam_url": req.user._json.profileurl, "score": 0.0, "correct": 0}
             const result = await collection.insertOne(doc)
 
             res.locals.user_doc = doc
+            req.user.points = 0
 
             console.log(`A document was inserted with the _id: ${result.insertedId}`)
             next()
@@ -639,7 +656,9 @@ async function insert_guess(req, res, next) {
 
 async function get_leaderboard(req, res, next) {
     const leaderboard = []
+    res.locals.total_users = 0
     await collection.find().forEach(async function(doc) {
+        res.locals.total_users += 1
         leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1})
     })
     leaderboard.sort(function(a, b){
@@ -650,12 +669,21 @@ async function get_leaderboard(req, res, next) {
     })
     res.locals.leaderboard = leaderboard
 
+    if (res.locals.leaderboard[0].user_id === req.user._json.steamid) {
+        req.user.user_rank = 1
+    }
     for (let i = 1; i < res.locals.leaderboard.length; i++) {
         if (res.locals.leaderboard[i].correct === res.locals.leaderboard[i-1].correct && res.locals.leaderboard[i].score === res.locals.leaderboard[i-1].score) {
             res.locals.leaderboard[i].rank = res.locals.leaderboard[i-1].rank
+            if (res.locals.leaderboard[i].user_id === req.user._json.steamid) {
+                req.user.user_rank = res.locals.leaderboard[i].rank
+            }
         }
         else {
             res.locals.leaderboard[i].rank = i+1
+            if (res.locals.leaderboard[i].user_id === req.user._json.steamid) {
+                req.user.user_rank = res.locals.leaderboard[i].rank
+            }
         }
     }
 
@@ -666,16 +694,16 @@ app.get('/', (req, res) => {
     res.render('index', {user: req.user})
 })
 
-app.get('/upcoming_matches', [check_document_exists, find_averages, get_upcoming_matches], (req, res) => {
-    res.render('upcoming_matches', {user: req.user, upcoming_matches: res.locals.upcoming_matches})
+app.get('/upcoming_matches', [check_document_exists, find_averages, get_upcoming_matches, get_leaderboard], (req, res) => {
+    res.render('upcoming_matches', {user: req.user, upcoming_matches: res.locals.upcoming_matches, total_users: res.locals.total_users})
 })
 
-app.get('/complete_matches', [check_document_exists, find_averages, get_complete_matches], (req, res) => {
-    res.render('complete_matches', {user: req.user, completed_games: res.locals.complete_matches})
+app.get('/complete_matches', [check_document_exists, find_averages, get_complete_matches, get_leaderboard], (req, res) => {
+    res.render('complete_matches', {user: req.user, completed_games: res.locals.complete_matches, total_users: res.locals.total_users})
 })
 
 app.get('/leaderboard', [check_document_exists, get_leaderboard], (req, res) => {
-    res.render('leaderboard', {user: req.user, leaderboard: res.locals.leaderboard})
+    res.render('leaderboard', {user: req.user, leaderboard: res.locals.leaderboard, total_users: res.locals.total_users})
 })
 
 app.post('/insert_guess', [insert_guess], (req, res) => {

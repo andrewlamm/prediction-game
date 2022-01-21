@@ -1,0 +1,22 @@
+{{#if user}}
+<div class="w-full py-2 fixed z-10 text-center bottom-0 bg-gray-200 drop-shadow-2xl" id="user_footer">
+    You currently have <b>{{user.points}}</b> points. <br>
+    That's enough to be ranked <b>{{turn_to_ordinal user.user_rank}}</b> out of {{total_users}}!
+</div>
+{{/if}}
+<script>
+    if (document.body.scrollTop > document.body.offsetHeight-window.innerHeight-48 || document.documentElement.scrollTop > document.body.offsetHeight-window.innerHeight-48) {
+        document.getElementById('user_footer').classList.add("hidden")
+    }
+    else {
+        document.getElementById('user_footer').classList.remove("hidden")
+    }
+    window.onscroll = function () {
+        if (document.body.scrollTop > document.body.offsetHeight-window.innerHeight-48 || document.documentElement.scrollTop > document.body.offsetHeight-window.innerHeight-48) {
+            document.getElementById('user_footer').classList.add("hidden")
+        }
+        else {
+            document.getElementById('user_footer').classList.remove("hidden")
+        }
+    }
+</script>
