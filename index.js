@@ -426,6 +426,7 @@ async function check_live_game_id(game_id) {
                             console.log("match complete")
                             await collection.find().forEach(async function(doc) { // check again
                                 const query = {"_id": doc._id}
+                                console.log(doc._id)
                                 if (team1 > team2) { //'5' > '15', '15' is team2, '5' is team 1
                                     const field = `match_${team2}_${team1}`
 
@@ -433,10 +434,10 @@ async function check_live_game_id(game_id) {
 
                                     if (match_table[parsed.league.leagueid][team1][team2] === 2) {
                                         if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
                                         }
                                         else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
                                             update_doc.$set.correct = doc.correct+1
                                         }
 
@@ -445,11 +446,11 @@ async function check_live_game_id(game_id) {
                                     }
                                     else {
                                         if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
                                             update_doc.$set.correct = doc.correct+1
                                         }
                                         else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
@@ -463,11 +464,11 @@ async function check_live_game_id(game_id) {
 
                                     if (match_table[parsed.league.leagueid][team1][team2] === 2) {
                                         if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
                                             update_doc.$set.correct = doc.correct+1
                                         }
                                         else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
@@ -475,10 +476,10 @@ async function check_live_game_id(game_id) {
                                     }
                                     else {
                                         if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
                                         }
                                         else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = doc.score + Math.round(calc_score(doc[field]) * 10) / 10
+                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
                                             update_doc.$set.correct = doc.correct+1
                                         }
 
