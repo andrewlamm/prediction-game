@@ -284,8 +284,8 @@ async function get_match_scores(id) {
                         continue
                     }
 
-                    match_times_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = parsed[i].start_time
-                    match_times_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = parsed[i].start_time
+                    match_times_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = parsed[i].match_seq_num
+                    match_times_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = parsed[i].match_seq_num
                     if (match_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] === -1) {
                         match_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = 0
                         match_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = 0
@@ -334,7 +334,7 @@ async function get_match_scores(id) {
                 else if (id === 13741) {
                     match_table[id][8260983][39] = 0 // Undying 0-2 EG
                     match_table[id][7819028][8376426] = 2 // 4Zoomers 2-0 Wildcard Gaming
-                    match_times_table[id][7819028][8376426] = 1642540562
+                    match_times_table[id][7819028][8376426] = 5336565500
                 }
                 else if (id === 13738) {
                     match_table[id][2586976][7554697] = 2 // OG 2 - 0 Nigma (tiebreak)
