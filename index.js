@@ -331,6 +331,11 @@ async function get_match_scores(id) {
                     match_table[id][1061269][6767209] = 2 // Our Way (Wolf Team) 2 - 1 Inverse
                     match_table[id][6767209][1061269] = 1 // Inverse 1 - 2 Our Way
                 }
+                else if (id === 13741) {
+                    match_table[id][8260983][39] = 0 // Undying 0-2 EG
+                    match_table[id][7819028][8376426] = 2 // 4Zoomers 2-0 Wildcard Gaming
+                    match_id_table[id][7819028][8376426] = 6384734705
+                }
 
                 resolve(1)
             }, (error) => {
