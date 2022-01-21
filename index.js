@@ -336,6 +336,14 @@ async function get_match_scores(id) {
                     match_table[id][7819028][8376426] = 2 // 4Zoomers 2-0 Wildcard Gaming
                     match_times_table[id][7819028][8376426] = 1642540562
                 }
+                else if (id === 13738) {
+                    match_table[id][2586976][7554697] = 2 // OG 2 - 0 Nigma (tiebreak)
+                    match_table[id][1838315][7554697] = 0 // Secret 0 - 2 Nigma (tiebreak)
+                    match_table[id][8291895][2586976] = 2 // Tundra 2 - 0 OG (tiebreak)
+                    match_table[id][2586976][1838315] = 2 // OG 2 - 0 Secret (tiebreak)
+                    match_table[id][8291895][7554697] = 2 // Tundra 2 - 0 Nigma (tiebreak)
+                    match_table[id][8291895][1838315] = 1 // Tundra 1 - 2 Secret (tiebreak)
+                }
 
                 resolve(1)
             }, (error) => {
@@ -503,7 +511,7 @@ async function check_live_game_id(game_id) {
 }
 
 function repeated_functions() {
-    console.log("repeat - ", new Date().toString())
+    console.log("repeat - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
     console.log(current_live)
     find_live_matches()
     check_live_games()
@@ -678,6 +686,15 @@ async function get_leaderboard(req, res, next) {
     res.locals.leaderboard = leaderboard
 
     if (req.user === undefined) {
+        for (let i = 1; i < res.locals.leaderboard.length; i++) {
+            if (res.locals.leaderboard[i].correct === res.locals.leaderboard[i-1].correct && res.locals.leaderboard[i].score === res.locals.leaderboard[i-1].score) {
+                res.locals.leaderboard[i].rank = res.locals.leaderboard[i-1].rank
+            }
+            else {
+                res.locals.leaderboard[i].rank = i+1
+            }
+        }
+
         next()
     }
     else {
