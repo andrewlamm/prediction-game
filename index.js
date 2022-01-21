@@ -187,7 +187,7 @@ const team_to_img = {}
 const id_to_team = {}
 const team_to_id = {}
 const valid_teams = new Set()
-const match_id_table = {}
+const match_times_table = {}
 
 // WEU Div2
 valid_teams.add(8261397)
@@ -223,7 +223,7 @@ async function loop_leagues() {
 
 async function get_league_teams(id) {
     match_table[id] = {}
-    match_id_table[id] = {}
+    match_times_table[id] = {}
     return new Promise(function(resolve, reject) {
         axios.get(`https://api.opendota.com/api/leagues/${id}/teams`).then(
             function(response) {
@@ -244,7 +244,7 @@ async function get_league_teams(id) {
                     id_to_team[parsed[i].team_id] = parsed[i].name
                     team_to_id[parsed[i].name] = parsed[i].team_id
                     match_table[id][parsed[i].team_id] = {}
-                    match_id_table[id][parsed[i].team_id] = {}
+                    match_times_table[id][parsed[i].team_id] = {}
                     for (let j = 0; j < parsed.length; j++) {
                         if (id === 13740 || id === 13742) {
                             if (!valid_teams.has(parsed[j].team_id)) {
@@ -253,7 +253,7 @@ async function get_league_teams(id) {
                         }
                         if (i !== j) {
                             match_table[id][parsed[i].team_id][parsed[j].team_id] = -1
-                            match_id_table[id][parsed[i].team_id][parsed[j].team_id] = -1
+                            match_times_table[id][parsed[i].team_id][parsed[j].team_id] = -1
                         }
                     }
 
@@ -284,8 +284,8 @@ async function get_match_scores(id) {
                         continue
                     }
 
-                    match_id_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = parsed[i].match_id
-                    match_id_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = parsed[i].match_id
+                    match_times_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = parsed[i].start_time
+                    match_times_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = parsed[i].start_time
                     if (match_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] === -1) {
                         match_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = 0
                         match_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = 0
@@ -334,7 +334,7 @@ async function get_match_scores(id) {
                 else if (id === 13741) {
                     match_table[id][8260983][39] = 0 // Undying 0-2 EG
                     match_table[id][7819028][8376426] = 2 // 4Zoomers 2-0 Wildcard Gaming
-                    match_id_table[id][7819028][8376426] = 6384734705
+                    match_times_table[id][7819028][8376426] = 1642540562
                 }
 
                 resolve(1)
@@ -575,7 +575,7 @@ function get_complete_matches(req, res, next) {
                 if (match_table[LEAGUE_IDS[i]][team1][team2] === -1) continue
 
                 if (match_table[LEAGUE_IDS[i]][team1][team2] === 2 || match_table[LEAGUE_IDS[i]][team2][team1] === 2) {
-                    res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[LEAGUE_IDS[i]][team1][team2], "team2score": match_table[LEAGUE_IDS[i]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_id": match_id_table[LEAGUE_IDS[i]][team1][team2], "is_live": false, "average_guess": res.locals.average_guess[`match_${team1}_${team2}`], "your_guess": res.locals.user_doc[`match_${team1}_${team2}`]})
+                    res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[LEAGUE_IDS[i]][team1][team2], "team2score": match_table[LEAGUE_IDS[i]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_start": match_times_table[LEAGUE_IDS[i]][team1][team2], "is_live": false, "average_guess": res.locals.average_guess[`match_${team1}_${team2}`], "your_guess": res.locals.user_doc[`match_${team1}_${team2}`]})
                 }
                 else {
                     res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[LEAGUE_IDS[i]][team1][team2], "team2score": match_table[LEAGUE_IDS[i]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_id": 9999999999, "is_live": true, "average_guess": res.locals.average_guess[`match_${team1}_${team2}`], "your_guess": res.locals.user_doc[`match_${team1}_${team2}`]})
@@ -584,7 +584,7 @@ function get_complete_matches(req, res, next) {
         }
 
         res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].sort(function(a, b) {
-            return a.match_id < b.match_id ? 1 : -1
+            return a.match_start < b.match_start ? 1 : -1
         })
     }
     next()
@@ -675,25 +675,30 @@ async function get_leaderboard(req, res, next) {
     })
     res.locals.leaderboard = leaderboard
 
-    if (res.locals.leaderboard[0].user_id === req.user._json.steamid) {
-        req.user.user_rank = 1
+    if (req.user === undefined) {
+        next()
     }
-    for (let i = 1; i < res.locals.leaderboard.length; i++) {
-        if (res.locals.leaderboard[i].correct === res.locals.leaderboard[i-1].correct && res.locals.leaderboard[i].score === res.locals.leaderboard[i-1].score) {
-            res.locals.leaderboard[i].rank = res.locals.leaderboard[i-1].rank
-            if (res.locals.leaderboard[i].user_id === req.user._json.steamid) {
-                req.user.user_rank = res.locals.leaderboard[i].rank
+    else {
+        if (res.locals.leaderboard[0].user_id === req.user._json.steamid) {
+            req.user.user_rank = 1
+        }
+        for (let i = 1; i < res.locals.leaderboard.length; i++) {
+            if (res.locals.leaderboard[i].correct === res.locals.leaderboard[i-1].correct && res.locals.leaderboard[i].score === res.locals.leaderboard[i-1].score) {
+                res.locals.leaderboard[i].rank = res.locals.leaderboard[i-1].rank
+                if (res.locals.leaderboard[i].user_id === req.user._json.steamid) {
+                    req.user.user_rank = res.locals.leaderboard[i].rank
+                }
+            }
+            else {
+                res.locals.leaderboard[i].rank = i+1
+                if (res.locals.leaderboard[i].user_id === req.user._json.steamid) {
+                    req.user.user_rank = res.locals.leaderboard[i].rank
+                }
             }
         }
-        else {
-            res.locals.leaderboard[i].rank = i+1
-            if (res.locals.leaderboard[i].user_id === req.user._json.steamid) {
-                req.user.user_rank = res.locals.leaderboard[i].rank
-            }
-        }
-    }
 
-    next()
+        next()
+    }
 }
 
 app.get('/', (req, res) => {
