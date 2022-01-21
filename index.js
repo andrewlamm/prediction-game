@@ -524,7 +524,6 @@ async function check_document_exists(req, res, next) {
         // console.log(results)
 
         res.locals.user_doc = results
-        req.user.points = results.score
 
         if (results === null) {
             const doc = {"_id": req.user._json.steamid, "display_name": req.user._json.personaname, "steam_url": req.user._json.profileurl, "score": 0.0, "correct": 0}
@@ -537,6 +536,7 @@ async function check_document_exists(req, res, next) {
             next()
         }
         else {
+            req.user.points = results.score
             next()
         }
     }
