@@ -440,29 +440,34 @@ async function check_live_game_id(game_id) {
 
                                     const update_doc = { $set : {} }
 
-                                    if (match_table[parsed.league.leagueid][team1][team2] === 2) {
-                                        if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
-                                        }
-                                        else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
-                                            update_doc.$set.correct = doc.correct+1
-                                        }
-
-                                        const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                    if (doc[field] === undefined) {
+                                        console.log("prediction missing, skipping...")
                                     }
                                     else {
-                                        if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
-                                            update_doc.$set.correct = doc.correct+1
-                                        }
-                                        else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
-                                        }
+                                        if (match_table[parsed.league.leagueid][team1][team2] === 2) {
+                                            if (parseInt(doc[field]) < 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                            }
+                                            else if (parseInt(doc[field]) > 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.correct = doc.correct+1
+                                            }
 
-                                        const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                            const result = await collection.updateOne(query, update_doc)
+                                            console.log("victory doc updated!")
+                                        }
+                                        else {
+                                            if (parseInt(doc[field]) < 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.correct = doc.correct+1
+                                            }
+                                            else if (parseInt(doc[field]) > 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                            }
+
+                                            const result = await collection.updateOne(query, update_doc)
+                                            console.log("victory doc updated!")
+                                        }
                                     }
                                 }
                                 else { // '15' is team1, '5' is team 2
@@ -470,29 +475,34 @@ async function check_live_game_id(game_id) {
 
                                     const update_doc = { $set : {} }
 
-                                    if (match_table[parsed.league.leagueid][team1][team2] === 2) {
-                                        if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
-                                            update_doc.$set.correct = doc.correct+1
-                                        }
-                                        else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
-                                        }
-
-                                        const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                    if (doc[field] === undefined) {
+                                        console.log("prediction missing, skipping...")
                                     }
                                     else {
-                                        if (parseInt(doc[field]) < 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
-                                        }
-                                        else if (parseInt(doc[field]) > 50) {
-                                            update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
-                                            update_doc.$set.correct = doc.correct+1
-                                        }
+                                        if (match_table[parsed.league.leagueid][team1][team2] === 2) {
+                                            if (parseInt(doc[field]) < 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.correct = doc.correct+1
+                                            }
+                                            else if (parseInt(doc[field]) > 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                            }
 
-                                        const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                            const result = await collection.updateOne(query, update_doc)
+                                            console.log("victory doc updated!")
+                                        }
+                                        else {
+                                            if (parseInt(doc[field]) < 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                            }
+                                            else if (parseInt(doc[field]) > 50) {
+                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.correct = doc.correct+1
+                                            }
+
+                                            const result = await collection.updateOne(query, update_doc)
+                                            console.log("victory doc updated!")
+                                        }
                                     }
                                 }
                             })
@@ -545,6 +555,16 @@ async function check_document_exists(req, res, next) {
         }
         else {
             req.user.points = results.score
+
+            const query = {"_id": req.user._json.steamid}
+            const update_doc = {
+                $set : {
+                    "display_name": req.user._json.personaname
+                }
+            }
+            const result = await collection.updateOne(query, update_doc);
+            console.log("name updated!");
+
             next()
         }
     }
