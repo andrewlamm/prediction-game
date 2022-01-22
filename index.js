@@ -96,6 +96,11 @@ hbs.registerHelper('check_win', function(score, bo3) {
     return false
 })
 
+hbs.registerHelper('check_exists', function(s) {
+    if (s === undefined || s === null) return false
+    return true
+})
+
 hbs.registerHelper('display_average', function(score) {
     if (score > 50) return score
     return 100-score
@@ -137,12 +142,37 @@ hbs.registerHelper('check_team1', function(score) {
     return true
 })
 
+hbs.registerHelper('determine_win', function(score, team1score, team2score) {
+    if (score > 50 && team2score === 2) return true
+    else if (score < 50 && team1score === 2) return true
+    return false
+})
+
 hbs.registerHelper('find_left', function(score) {
     return score-50
 })
 
 hbs.registerHelper('round_tenth', function(s) {
     return s.toFixed(1)
+})
+
+hbs.registerHelper('positive_plus', function(n) {
+    if (n >= 0) {
+        return '+'
+    }
+})
+
+hbs.registerHelper('find_color', function(n) {
+    if (n > 0) {
+        return 'text-green-700'
+    }
+    else if (n < 0) {
+        return 'text-red-700'
+    }
+})
+
+hbs.registerHelper('if_incorrect', function(n) {
+    if (n > 0) return 'text-red-700'
 })
 
 hbs.registerHelper('replace_spaces', function(s) {
@@ -188,6 +218,7 @@ const id_to_team = {}
 const team_to_id = {}
 const valid_teams = new Set()
 const match_times_table = {}
+const team_to_league = {}
 
 // WEU Div2
 valid_teams.add(8261397)
@@ -240,6 +271,7 @@ async function get_league_teams(id) {
                     }
 
                     valid_team_id.add(parsed[i].team_id)
+                    team_to_league[parsed[i].team_id] = id
 
                     id_to_team[parsed[i].team_id] = parsed[i].name
                     team_to_id[parsed[i].name] = parsed[i].team_id
@@ -284,8 +316,8 @@ async function get_match_scores(id) {
                         continue
                     }
 
-                    match_times_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = parsed[i].match_seq_num
-                    match_times_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = parsed[i].match_seq_num
+                    match_times_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = parsed[i].start_time
+                    match_times_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = parsed[i].start_time
                     if (match_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] === -1) {
                         match_table[id][parsed[i].radiant_team_id][parsed[i].dire_team_id] = 0
                         match_table[id][parsed[i].dire_team_id][parsed[i].radiant_team_id] = 0
@@ -334,7 +366,7 @@ async function get_match_scores(id) {
                 else if (id === 13741) {
                     match_table[id][8260983][39] = 0 // Undying 0-2 EG
                     match_table[id][7819028][8376426] = 2 // 4Zoomers 2-0 Wildcard Gaming
-                    match_times_table[id][7819028][8376426] = 5336565500
+                    match_times_table[id][7819028][8376426] = 1642540562
                 }
                 else if (id === 13738) {
                     match_table[id][2586976][7554697] = 2 // OG 2 - 0 Nigma (tiebreak)
@@ -432,6 +464,8 @@ async function check_live_game_id(game_id) {
 
                         if (match_table[parsed.league.leagueid][team1][team2] === 2 || match_table[parsed.league.leagueid][team2][team1] === 2) {
                             console.log("match complete")
+                            match_times_table[parsed.league.leagueid][team1][team2] = parsed.start_time
+                            match_times_table[parsed.league.leagueid][team2][team1] = parsed.start_time
                             await collection.find().forEach(async function(doc) { // check again
                                 const query = {"_id": doc._id}
                                 console.log(doc._id)
@@ -446,10 +480,11 @@ async function check_live_game_id(game_id) {
                                     else {
                                         if (match_table[parsed.league.leagueid][team1][team2] === 2) {
                                             if (parseInt(doc[field]) < 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                                update_doc.$set.incorrect = doc.incorrect+1
                                             }
                                             else if (parseInt(doc[field]) > 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
                                                 update_doc.$set.correct = doc.correct+1
                                             }
 
@@ -458,11 +493,12 @@ async function check_live_game_id(game_id) {
                                         }
                                         else {
                                             if (parseInt(doc[field]) < 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
                                                 update_doc.$set.correct = doc.correct+1
                                             }
                                             else if (parseInt(doc[field]) > 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                                update_doc.$set.incorrect = doc.incorrect+1
                                             }
 
                                             const result = await collection.updateOne(query, update_doc)
@@ -481,11 +517,12 @@ async function check_live_game_id(game_id) {
                                     else {
                                         if (match_table[parsed.league.leagueid][team1][team2] === 2) {
                                             if (parseInt(doc[field]) < 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
                                                 update_doc.$set.correct = doc.correct+1
                                             }
                                             else if (parseInt(doc[field]) > 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(100-doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                                update_doc.$set.incorrect = doc.incorrect+1
                                             }
 
                                             const result = await collection.updateOne(query, update_doc)
@@ -493,10 +530,11 @@ async function check_live_game_id(game_id) {
                                         }
                                         else {
                                             if (parseInt(doc[field]) < 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                                update_doc.$set.incorrect = doc.incorrect+1
                                             }
                                             else if (parseInt(doc[field]) > 50) {
-                                                update_doc.$set.score = parseFloat((doc.score + Math.round(calc_score(doc[field]) * 10) / 10).toFixed(1))
+                                                update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
                                                 update_doc.$set.correct = doc.correct+1
                                             }
 
@@ -544,7 +582,7 @@ async function check_document_exists(req, res, next) {
         res.locals.user_doc = results
 
         if (results === null) {
-            const doc = {"_id": req.user._json.steamid, "display_name": req.user._json.personaname, "steam_url": req.user._json.profileurl, "score": 0.0, "correct": 0}
+            const doc = {"_id": req.user._json.steamid, "display_name": req.user._json.personaname, "steam_url": req.user._json.profileurl, "profile_picture": req.user.photos[2].value, "score": 0.0, "correct": 0, "incorrect": 0}
             const result = await collection.insertOne(doc)
 
             res.locals.user_doc = doc
@@ -559,7 +597,8 @@ async function check_document_exists(req, res, next) {
             const query = {"_id": req.user._json.steamid}
             const update_doc = {
                 $set : {
-                    "display_name": req.user._json.personaname
+                    "display_name": req.user._json.personaname,
+                    "profile_picture": req.user.photos[2].value,
                 }
             }
             const result = await collection.updateOne(query, update_doc);
@@ -575,7 +614,7 @@ async function find_averages(req, res, next) {
     const field_numbers = {}
     await collection.find().forEach(async function(doc) {
         for (const [key, val] of Object.entries(doc)) {
-            if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct") {
+            if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect") {
                 if (!(key in field_totals)) {
                     field_totals[key] = 0
                     field_numbers[key] = 0
@@ -606,14 +645,14 @@ function get_complete_matches(req, res, next) {
                     res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[LEAGUE_IDS[i]][team1][team2], "team2score": match_table[LEAGUE_IDS[i]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_start": match_times_table[LEAGUE_IDS[i]][team1][team2], "is_live": false, "average_guess": res.locals.average_guess[`match_${team1}_${team2}`], "your_guess": res.locals.user_doc[`match_${team1}_${team2}`]})
                 }
                 else {
-                    res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[LEAGUE_IDS[i]][team1][team2], "team2score": match_table[LEAGUE_IDS[i]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_id": 9999999999, "is_live": true, "average_guess": res.locals.average_guess[`match_${team1}_${team2}`], "your_guess": res.locals.user_doc[`match_${team1}_${team2}`]})
+                    res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[LEAGUE_IDS[i]][team1][team2], "team2score": match_table[LEAGUE_IDS[i]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_start": 9999999999, "is_live": true, "average_guess": res.locals.average_guess[`match_${team1}_${team2}`], "your_guess": res.locals.user_doc[`match_${team1}_${team2}`]})
                 }
             }
         }
 
         res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].sort(function(a, b) {
-            if (a.is_live) return -1
-            if (b.is_live) return 1
+            // if (a.is_live) return -1
+            // if (b.is_live) return 1
             return a.match_start < b.match_start ? 1 : -1
         })
     }
@@ -740,6 +779,120 @@ async function get_leaderboard(req, res, next) {
     }
 }
 
+async function get_user_info(req, res, next) {
+    const query = {"_id": req.params.userID}
+    const results = await collection.findOne(query)
+
+    if (results === null) {
+        res.locals.user_info = undefined
+        next()
+    }
+    else {
+        const threshold = (Date.now() / 1000) - 84000
+        let day_score = 0
+        let day_picks = 0
+        let day_incorrect = 0
+
+        res.locals.user_info = results
+
+        res.locals.user_info.matches = []
+
+        for (const [key, val] of Object.entries(results)) {
+            if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "matches" && key !== "incorrect") {
+                const team1 = key.substring(6, key.indexOf("_", 6))
+                const team2 = key.substring(key.indexOf("_", 6)+1)
+
+                if (match_times_table[team_to_league[team1]][team1][team2] > threshold) {
+                    if (match_table[team_to_league[team1]][team1][team2] === 2) {
+                        const points = parseFloat(calc_score(100-val).toFixed(1))
+                        day_score += points
+                        if (val < 50) {
+                            day_picks += 1
+                        }
+                        else if (val > 50) {
+                            day_incorrect += 1
+                        }
+                    }
+                    else if (match_table[team_to_league[team1]][team2][team1] === 2) {
+                        const points = parseFloat(calc_score(val).toFixed(1))
+                        day_score += points
+                        if (val > 50) {
+                            day_picks += 1
+                        }
+                        else if (val < 50) {
+                            day_incorrect += 1
+                        }
+                    }
+                }
+
+                if (match_table[team_to_league[team1]][team1][team2] !== -1) {
+                    if (match_table[team_to_league[team1]][team1][team2] === 2 || match_table[team_to_league[team1]][team2][team1] === 2) {
+                        res.locals.user_info.matches.push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[team_to_league[team1]][team1][team2], "team2score": match_table[team_to_league[team1]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_time": match_times_table[team_to_league[team1]][team1][team2], "is_live": false, "user_guess": val})
+                    }
+                    else {
+                        res.locals.user_info.matches.push({"team1": id_to_team[team1], "team2": id_to_team[team2], "team1score": match_table[team_to_league[team1]][team1][team2], "team2score": match_table[team_to_league[team1]][team2][team1], "team1image": team_to_img[team1], "team2image": team_to_img[team2], "match_time": 9999999999, "is_live": true, "user_guess": val})
+                    }
+                }
+            }
+        }
+
+
+        res.locals.user_info.matches.sort(function(a, b) {
+            return a.match_time < b.match_time ? 1 : -1
+        })
+
+        res.locals.user_info.day_score = day_score
+        res.locals.user_info.day_picks = day_picks
+        res.locals.user_info.day_incorrect = day_incorrect
+
+        next()
+    }
+}
+
+async function get_user_rank(req, res, next) {
+    const leaderboard = []
+    if (res.locals.user_info === undefined) {
+        next()
+    }
+    else {
+        res.locals.total_users = 0
+        await collection.find().forEach(async function(doc) {
+            res.locals.total_users += 1
+            leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1})
+        })
+        leaderboard.sort(function(a, b){
+            if (a.score === b.score) {
+                return a.correct < b.correct ? 1 : -1
+            }
+            return a.score < b.score ? 1 : -1
+        })
+        res.locals.leaderboard = leaderboard
+        res.locals.user_info.total_players = leaderboard.length
+
+        if (res.locals.leaderboard[0].user_id === res.locals.user_info._id) {
+            res.locals.user_info.rank = 1
+        }
+        for (let i = 1; i < res.locals.leaderboard.length; i++) {
+            if (res.locals.leaderboard[i].correct === res.locals.leaderboard[i-1].correct && res.locals.leaderboard[i].score === res.locals.leaderboard[i-1].score) {
+                res.locals.leaderboard[i].rank = res.locals.leaderboard[i-1].rank
+                if (res.locals.leaderboard[i].user_id === res.locals.user_info._id) {
+                    res.locals.user_info.rank = res.locals.leaderboard[i].rank
+                    break
+                }
+            }
+            else {
+                res.locals.leaderboard[i].rank = i+1
+                if (res.locals.leaderboard[i].user_id === res.locals.user_info._id) {
+                    res.locals.user_info.rank = res.locals.leaderboard[i].rank
+                    break
+                }
+            }
+        }
+
+        next()
+    }
+}
+
 app.get('/', (req, res) => {
     res.render('index', {user: req.user})
 })
@@ -754,6 +907,10 @@ app.get('/complete_matches', [check_document_exists, find_averages, get_complete
 
 app.get('/leaderboard', [check_document_exists, get_leaderboard], (req, res) => {
     res.render('leaderboard', {user: req.user, leaderboard: res.locals.leaderboard, total_users: res.locals.total_users})
+})
+
+app.get('/user/:userID', [get_user_info, get_user_rank], (req, res) => {
+    res.render('user_info', {user: req.user, user_info: res.locals.user_info})
 })
 
 app.post('/insert_guess', [insert_guess], (req, res) => {

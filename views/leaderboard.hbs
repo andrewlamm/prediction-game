@@ -16,7 +16,7 @@
                     {{#each leaderboard}}
                     <tr>
                         <td class="text-center px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{this.rank}}</td>
-                        <td class="px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}" style="width: 400px;">{{this.display_name}}</td>
+                        <td class="px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}} hover:underline" style="width: 400px;"><a href="/user/{{this.user_id}}">{{this.display_name}}</a></td>
                         <td class="text-center px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{round_tenth this.score}}</td>
                         <td class="text-center px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{this.correct}}</td>
                         <td><a target="_blank" rel="noopener noreferrer" href={{this.steam_url}} class="text-blue-700 px-4 py-1 newtab_symbol">Profile</a></td>
