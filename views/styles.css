@@ -64,3 +64,49 @@ a[target="_blank"]::after {
         width: auto
     }
 }
+
+.plusminus {
+    color: #ecf0f1;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    position: relative;
+}
+
+.plusminus_class {
+    color: black;
+    width: 20;
+    height: 20px;
+    border: 0;
+    position: relative;
+}
+
+.plusminusspan {
+    position: absolute;
+    transition: 300ms;
+    background: white;
+    border-radius: 2px;
+  }
+
+.plusminusspanfirst {
+    top: 25%;
+    bottom: 25%;
+    width: 10%;
+    left: 45%;
+}
+
+.plusminusspansecond {
+    left: 25%;
+    right: 25%;
+    height: 10%;
+    top: 45%;
+}
+
+.toggle_button_animation .plusminusspan {
+    transform: rotate(-90deg);
+}
+
+.toggle_button_animation .plusminusspansecond {
+    left: 50%;
+    right: 50%;
+}

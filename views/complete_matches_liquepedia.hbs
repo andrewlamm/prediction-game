@@ -8,11 +8,17 @@
                 <div class="w-full lg:w-4/5 flex flex-col">
                     {{#each completed_games}}
                     <div class="w-full flex flex-col py-2">
-                        <div class="flex flex-col text-4xl font-bold">
-                            <div class="pb-2">{{@key}}</div>
+                        <div class="flex flex-col text-xl md:text-4xl font-bold">
+                            <div class="pb-2 flex flex-row">
+                                <span class="flex-grow cursor-pointer" id="{{@key}}_text" onclick="toggle_division_list(this.id)">{{@key}}</span>
+                                <button class="plusminus z-10 toggle_button_animation" id="{{@key}}_toggle_button" onclick="toggle_division_list(this.id)">
+                                    <span class="plusminusspan plusminusspanfirst"></span>
+                                    <span class="plusminusspan plusminusspansecond"></span>
+                                </button>
+                            </div>
                             <hr class="bg-black h-px border-0">
                         </div>
-                        <div class="w-full pt-2 overflow-x-auto">
+                        <div class="w-full pt-2 overflow-x-auto" id="{{@key}}_match_list">
                             <table class="w-full">
                                 <tr class="border-b-2 border-zinc-600">
                                     <td colspan=3 class="text-left px-1 font-bold pb-1">Match</td>
@@ -32,7 +38,7 @@
                                             {{#if (check_exists average_guess)}}
                                                 {{#if (check_not50 average_guess)}}
                                                 <div style="width: 40px;" class="flex items-center justify-center">
-                                                    <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;">
+                                                    <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
                                                 </div>
                                                 {{/if}}
                                                 {{display_average average_guess}}%
@@ -44,7 +50,7 @@
                                             {{#if (check_exists your_guess)}}
                                                 {{#if (check_not50 your_guess)}}
                                                 <div style="width: 40px;" class="flex items-center justify-center">
-                                                    <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;">
+                                                    <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
                                                 </div>
                                                 {{/if}}
                                                 {{display_average your_guess}}%
@@ -66,4 +72,11 @@
         {{> user_footer}}
 		{{> footer}}
     </body>
+    <script>
+        function toggle_division_list(id) {
+            const key_id = id.substring(0, id.indexOf('_'))
+            document.getElementById(`${key_id}_toggle_button`).classList.toggle("toggle_button_animation")
+            document.getElementById(`${key_id}_match_list`).classList.toggle("hidden")
+        }
+    </script>
 </html>

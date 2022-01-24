@@ -6,7 +6,7 @@
 		<div class="px-4 py-2 flex flex-col flex-grow">
             {{#if user_info}}
             <div class="w-full flex flex-col items-center justify-center">
-                <div class="w-full lg:w-2/3 flex flex-col items-center justify-center pt-2">
+                <div class="w-full xl:w-2/3 flex flex-col items-center justify-center pt-2">
                     <div class="w-full flex flex-row items-center justify-center">
                         <div class="px-2 ">
                             <img src={{user_info.profile_picture}} class="pt-1">
@@ -46,7 +46,7 @@
                                     <div class="flex flex-row items-center justify-center {{#if (determine_win user_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                         {{#if (check_not50 user_guess)}}
                                         <div style="width: 40px;" class="flex items-center justify-center">
-                                            <img src={{#if (check_team1 user_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;">
+                                            <img src={{#if (check_team1 user_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 user_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 user_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
                                         </div>
                                         {{/if}}
                                         {{display_average user_guess}}%

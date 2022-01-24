@@ -885,6 +885,52 @@ a[target="_blank"]::after {
   }
 }
 
+.plusminus {
+  color: #ecf0f1;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  position: relative;
+}
+
+.plusminus_class {
+  color: black;
+  width: 20;
+  height: 20px;
+  border: 0;
+  position: relative;
+}
+
+.plusminusspan {
+  position: absolute;
+  transition: 300ms;
+  background: white;
+  border-radius: 2px;
+}
+
+.plusminusspanfirst {
+  top: 25%;
+  bottom: 25%;
+  width: 10%;
+  left: 45%;
+}
+
+.plusminusspansecond {
+  left: 25%;
+  right: 25%;
+  height: 10%;
+  top: 45%;
+}
+
+.toggle_button_animation .plusminusspan {
+  transform: rotate(-90deg);
+}
+
+.toggle_button_animation .plusminusspansecond {
+  left: 50%;
+  right: 50%;
+}
+
 .hover\:font-bold:hover {
   font-weight: 700;
 }
@@ -895,10 +941,6 @@ a[target="_blank"]::after {
 }
 
 @media (min-width: 768px) {
-  .md\:block {
-    display: block;
-  }
-
   .md\:flex {
     display: flex;
   }
@@ -933,11 +975,6 @@ a[target="_blank"]::after {
     line-height: 2.5rem;
   }
 
-  .md\:text-2xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
-  }
-
   .md\:text-5xl {
     font-size: 3rem;
     line-height: 1;
@@ -946,6 +983,11 @@ a[target="_blank"]::after {
   .md\:text-3xl {
     font-size: 1.875rem;
     line-height: 2.25rem;
+  }
+
+  .md\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
   }
 }
 
@@ -964,10 +1006,6 @@ a[target="_blank"]::after {
 
   .lg\:w-1\/4 {
     width: 25%;
-  }
-
-  .lg\:w-3\/4 {
-    width: 75%;
   }
 
   .lg\:flex-row {
@@ -990,5 +1028,11 @@ a[target="_blank"]::after {
   .lg\:text-xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:w-2\/3 {
+    width: 66.666667%;
   }
 }

@@ -356,11 +356,11 @@ async function find_teams() {
                             }
                             if (match_list[i].contents[1].contents[0]._text === "FF") {
                                 // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 0, "team2score": 2, "is_completed": true, "is_live": false, "is_bo3": 3}
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "FF", "team2score": "W", "is_completed": true, "is_live": false, "is_bo3": 3}
+                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "FF", "team2score": "W", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
                             }
                             else {
                                 // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 2, "team2score": 0, "is_completed": true, "is_live": false, "is_bo3": 3}
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "W", "team2score": "FF", "is_completed": true, "is_live": false, "is_bo3": 3}
+                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "W", "team2score": "FF", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
                             }
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
@@ -379,10 +379,10 @@ async function find_teams() {
                                 dota_match_id_to_match[last_match_id] = new_match_id
 
                                 if (parseInt(match_list[i].contents[1].contents[0]._text) === 2 || parseInt(match_list[i].contents[2].contents[0]._text) === 2) {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 3}
+                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
                                 }
                                 else {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 1}
+                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 1, "total_guess": 0, "number_guesses": 0}
                                 }
                                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
                                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
@@ -392,7 +392,7 @@ async function find_teams() {
                                 while (new_match_id in all_match_list) {
                                     new_match_id = parseInt(Math.random()*1000000)
                                 }
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": true, "is_bo3": undefined}
+                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": true, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
                                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
                                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
                             }
@@ -407,7 +407,7 @@ async function find_teams() {
                             while (new_match_id in all_match_list) {
                                 new_match_id = parseInt(Math.random()*1000000)
                             }
-                            all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": 3}
+                            all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
                         }
@@ -500,10 +500,34 @@ async function get_match_scores(id) {
     })
 }
 
+async function get_averages() {
+    await collection.find().forEach(async function(doc) {
+        for (const [key, val] of Object.entries(doc)) {
+            if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect") {
+                let underscore_count = 0
+                for (let i = 0; i < key.length; i++) {
+                    if (key[i] === "_") underscore_count += 1
+                }
+                if (underscore_count !== 3) continue
+                const team1 = id_to_team[parseInt(key.substring(6, key.indexOf("_", 6)))]
+                const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
+                const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
+
+                // console.log(team1, team2, index)
+                const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
+
+                all_match_list[match_id].number_guesses += 1
+                all_match_list[match_id].total_guess += val
+            }
+        }
+    })
+}
+
 async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
+    await get_averages()
     // console.log("complete, waiting 30 seconds")
     // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
@@ -578,7 +602,10 @@ async function get_live_matches() {
                 if (team1 === "King of Kings") team1 = "APU King of Kings"
                 if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                if (team1 === "TBD" || team2 === "TBD") continue
+                if (team1 === "TBD" || team2 === "TBD") {
+                    console.log("TBD spotted")
+                    continue
+                }
 
                 // console.log(team1, team2)
 
@@ -589,7 +616,7 @@ async function get_live_matches() {
                     while (new_match_id in all_match_list) {
                         new_match_id = parseInt(Math.random()*1000000)
                     }
-                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"], "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined}
+                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"], "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
                     match_table[team_to_league_id[team1]][team1][team2].push(new_match_id)
                     match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
 
@@ -612,6 +639,7 @@ async function get_live_matches() {
                     else {
                         console.log(`Live: ${team1} vs ${team2}`)
                         all_match_list[match_id].is_live = true
+                        curr_live_matches.add(match_id)
                     }
 
                     if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
@@ -624,7 +652,6 @@ async function get_live_matches() {
                         all_match_list[match_id].is_bo3 = 1
                     }
                     all_match_list[match_id].start_time = match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]
-                    curr_live_matches.add(match_id)
                 }
             }
         }
@@ -841,7 +868,12 @@ function get_complete_matches(req, res, next) {
             //     console.log(`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`)
             //     console.log(`${val.team1} ${val.team1score} - ${val.team2score} ${val.team2} (avg: ${res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]}, user: ${res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})`)
             // }
-            res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3})
+            if (val.number_guesses === 0) {
+                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": undefined, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3})
+            }
+            else {
+                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": Math.round(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3})
+            }
         }
     }
 
@@ -864,15 +896,21 @@ function get_upcoming_matches(req, res, next) {
 
     for (const [match_id, val] of Object.entries(all_match_list)) {
         if (!val.is_completed && !val.is_live) {
-            if (res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] = 50
-            }
-
-            if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "average_guess": res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "your_guess": 50})
+            if (val.number_guesses === 0) {
+                if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "average_guess": 50, "your_guess": 50})
+                }
+                else {
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "average_guess": 50, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})
+                }
             }
             else {
-                res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "average_guess": res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})
+                if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": 50})
+                }
+                else {
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})
+                }
             }
         }
     }
@@ -920,6 +958,17 @@ async function insert_guess(req, res, next) {
             }
             else {
                 const query = {"_id": req.user._json.steamid}
+
+                const results = await collection.findOne(query)
+
+                if (results[`match_${req.body.team1id}_${req.body.team2id}_${index}`] !== undefined) {
+                    all_match_list[match_id].total_guess -= results[`match_${req.body.team1id}_${req.body.team2id}_${index}`]
+                }
+                else {
+                    all_match_list[match_id].number_guesses += 1
+                }
+                all_match_list[match_id].total_guess += parseInt(req.body.guess) // need to test these lines and up
+
                 const update_doc = { $set : {} }
 
                 update_doc.$set[`match_${req.body.team1id}_${req.body.team2id}_${index}`] = parseInt(req.body.guess)

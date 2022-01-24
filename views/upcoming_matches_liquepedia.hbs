@@ -10,10 +10,16 @@
 					{{#each upcoming_matches}}
 					<div class="w-full flex flex-col py-2">
 						<div class="flex flex-col text-xl md:text-4xl font-bold">
-							<div class="pb-2">{{@key}}</div>
-							<hr class="bg-black h-px border-0">
+							<div class="pb-2 flex flex-row">
+                                <span class="flex-grow cursor-pointer" id="{{@key}}_text" onclick="toggle_division_list(this.id)">{{@key}}</span>
+                                <button class="plusminus z-10 toggle_button_animation" id="{{@key}}_toggle_button" onclick="toggle_division_list(this.id)">
+                                    <span class="plusminusspan plusminusspanfirst"></span>
+                                    <span class="plusminusspan plusminusspansecond"></span>
+                                </button>
+                            </div>
+                            <hr class="bg-black h-px border-0">
 						</div>
-						<div class="w-full pt-2">
+						<div class="w-full pt-2" id="{{@key}}_match_list">
 							{{#each this}}
 							<div class="w-full items-center justify-center flex flex-col" id="match:{{team1id}}:{{team2id}}:{{index}}_match">
 								<div class="flex flex-row text-center font-bold text-xl md:text-4xl justify-center items-center">
@@ -75,6 +81,12 @@
 		{{> footer}}
     </body>
 	<script>
+        function toggle_division_list(id) {
+            const key_id = id.substring(0, id.indexOf('_'))
+            document.getElementById(`${key_id}_toggle_button`).classList.toggle("toggle_button_animation")
+            document.getElementById(`${key_id}_match_list`).classList.toggle("hidden")
+        }
+
 		{{#each upcoming_matches}}
 			{{#each this}}
 				let match_{{turn_id_to_text team1id}}_{{turn_id_to_text team2id}}_{{turn_id_to_text index}}_slider = document.getElementById('match:{{team1id}}:{{team2id}}:{{index}}_slider');
