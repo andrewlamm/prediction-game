@@ -565,7 +565,7 @@ async function get_live_matches() {
         const match_list = soup.findAll("div", {"class": "matches-list"})[0]
 
         for (let i = 0; i < match_list.contents[1].contents[1].contents.length; i++) {
-            if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].attrs.style === "background-color:#ffffcc;" && match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) { // remember to add check for (page does not exist)
+            if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0] !== undefined && match_list.contents[1].contents[1].contents[i].contents[0].contents[0].attrs.style === "background-color:#ffffcc;" && match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) { // remember to add check for (page does not exist)
                 let team1 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
                 if (team1.indexOf("(") !== -1) {
                     team1 = team1.substring(0, team1.indexOf("(")-1)
