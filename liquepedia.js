@@ -96,14 +96,11 @@ hbs.registerHelper('if_equals', function(arg1, arg2) {
 })
 
 hbs.registerHelper('check_win', function(score, bo3) {
-    if (bo3) {
-        if (score === 2) return true
-        return false
+    if (score === "W") return true
+    if (score === Math.floor(bo3 / 2)+1) {
+        return true
     }
-    else {
-        if (score === 1) return true
-        return false
-    }
+    return false
 })
 
 hbs.registerHelper('check_exists', function(s) {
@@ -120,11 +117,11 @@ function calc_score(score) {
     return 25 - (Math.pow(score - 100, 2) / 100)
 }
 
-hbs.registerHelper('display_score', function(score, team1score, team2score) {
-    if (score === 50) {
+hbs.registerHelper('display_score', function(score, team1score, team2score, bo3) {
+    if (score === 50 || team1score === "W" || team2score === "W") {
         return `<span class="font-semibold">0.0</span>`
     }
-    if (team1score === 2) {
+    if (team1score === Math.floor(bo3/2)+1) {
         if (score < 50) {
             return `<span class="text-green-700 font-semibold">+${calc_score(100-score).toFixed(1)}</span>`
         }
@@ -132,7 +129,7 @@ hbs.registerHelper('display_score', function(score, team1score, team2score) {
             return `<span class="text-red-700 font-semibold">${calc_score(100-score).toFixed(1)}</span>`
         }
     }
-    else if (team2score === 2) {
+    else if (team2score === Math.floor(bo3/2)+1) {
         if (score < 50) {
             return `<span class="text-red-700 font-semibold">${calc_score(score).toFixed(1)}</span>`
         }
@@ -153,8 +150,9 @@ hbs.registerHelper('check_team1', function(score) {
 })
 
 hbs.registerHelper('determine_win', function(score, team1score, team2score, is_bo3) {
-    if (score > 50 && ((is_bo3 && team2score === 2) || !is_bo3 && team2score === 1)) return true
-    else if (score < 50 && ((is_bo3 && team1score === 2) || !is_bo3 && team1score === 1)) return true
+    if (team1score === "W" || team2score === "W") return false
+    if (score > 50 && team2score === Math.floor(is_bo3 / 2)+1) return true
+    else if (score < 50 && team1score === Math.floor(is_bo3 / 2)+1) return true
     return false
 })
 
@@ -357,10 +355,12 @@ async function find_teams() {
                                 new_match_id = parseInt(Math.random()*1000000)
                             }
                             if (match_list[i].contents[1].contents[0]._text === "FF") {
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 0, "team2score": 2, "is_completed": true, "is_live": false, "is_bo3": true}
+                                // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 0, "team2score": 2, "is_completed": true, "is_live": false, "is_bo3": 3}
+                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "FF", "team2score": "W", "is_completed": true, "is_live": false, "is_bo3": 3}
                             }
                             else {
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 2, "team2score": 0, "is_completed": true, "is_live": false, "is_bo3": true}
+                                // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 2, "team2score": 0, "is_completed": true, "is_live": false, "is_bo3": 3}
+                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "W", "team2score": "FF", "is_completed": true, "is_live": false, "is_bo3": 3}
                             }
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
@@ -379,10 +379,10 @@ async function find_teams() {
                                 dota_match_id_to_match[last_match_id] = new_match_id
 
                                 if (parseInt(match_list[i].contents[1].contents[0]._text) === 2 || parseInt(match_list[i].contents[2].contents[0]._text) === 2) {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": true}
+                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 3}
                                 }
                                 else {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": false}
+                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 1}
                                 }
                                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
                                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
@@ -407,7 +407,7 @@ async function find_teams() {
                             while (new_match_id in all_match_list) {
                                 new_match_id = parseInt(Math.random()*1000000)
                             }
-                            all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": true}
+                            all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": 3}
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
                             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
                         }
@@ -488,7 +488,7 @@ async function get_match_scores(id) {
 
                 for (let i = 0; i < parsed.length; i++) {
                     if (parsed[i].match_id in dota_match_id_to_match) {
-                        all_match_list[dota_match_id_to_match[parsed[i].match_id]].end_time = parsed[i].match_id + parsed[i].duration
+                        all_match_list[dota_match_id_to_match[parsed[i].match_id]].end_time = parsed[i].start_time + parsed[i].duration
                     }
                 }
 
@@ -504,13 +504,13 @@ async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
-    console.log("complete, waiting 30 seconds")
-    await new Promise(resolve => setTimeout(resolve, 30000))
+    // console.log("complete, waiting 30 seconds")
+    // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
-    console.log(team_to_id)
+    // console.log(team_to_id)
     repeated_functions()
-    const repeated_timer = setInterval(repeated_functions, 120000) // 120000
+    const repeated_timer = setInterval(repeated_functions, 60000) // 120000
 }
 
 start()
@@ -576,10 +576,13 @@ async function get_live_matches() {
                 if (team1 === "King of Kings") team1 = "APU King of Kings"
                 if (team2 === "King of Kings") team2 = "APU King of Kings"
 
+                if (team1 === "TBD" || team2 === "TBD") continue
+
                 // console.log(team1, team2)
 
                 const match_id = match_table[team_to_league_id[team1]][team1][team2][match_table[team_to_league_id[team1]][team1][team2].length-1]
                 if (all_match_list[match_id].is_completed) {
+                    console.log(`new match - ${team1} vs ${team2}`)
                     let new_match_id = parseInt(Math.random()*1000000)
                     while (new_match_id in all_match_list) {
                         new_match_id = parseInt(Math.random()*1000000)
@@ -589,10 +592,13 @@ async function get_live_matches() {
                     match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
 
                     if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
-                        all_match_list[new_match_id].is_bo3 = true
+                        all_match_list[new_match_id].is_bo3 = 3
+                    }
+                    else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
+                        all_match_list[new_match_id].is_bo3 = 5
                     }
                     else {
-                        all_match_list[new_match_id].is_bo3 = false
+                        all_match_list[new_match_id].is_bo3 = 1
                     }
                 }
                 else {
@@ -605,10 +611,13 @@ async function get_live_matches() {
                     }
 
                     if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
-                        all_match_list[match_id].is_bo3 = true
+                        all_match_list[match_id].is_bo3 = 3
+                    }
+                    else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
+                        all_match_list[match_id].is_bo3 = 5
                     }
                     else {
-                        all_match_list[match_id].is_bo3 = false
+                        all_match_list[match_id].is_bo3 = 1
                     }
                     all_match_list[match_id].start_time = match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]
                 }
@@ -639,9 +648,11 @@ async function completed_matches_data(game_id) {
                 if (team1 === "King of Kings") team1 = "APU King of Kings"
                 if (team2 === "King of Kings") team2 = "APU King of Kings"
 
+                // console.log(team1, team2)
+
                 let match_index = -1
                 for (let i = 0; i < match_table[team_to_league_id[team1]][team1][team2].length; i++) {
-                    if (match_table[team_to_league_id[team1]][team1][team2][i].is_live) {
+                    if (all_match_list[match_table[team_to_league_id[team1]][team1][team2][i]].is_live) {
                         match_index = i
                         break
                     }
@@ -660,21 +671,38 @@ async function completed_matches_data(game_id) {
 
                     if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === undefined) {
                         team1_win = false
-                        all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0]._text.substring(0, 1))
-                        all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
+                        if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text === "W") {
+                            all_match_list[match_id].team1score = "FF" // 0
+                            all_match_list[match_id].team2score = "W" // 2
+                            console.log("forfeited match, skip")
+                            continue
+                        }
+                        else {
+                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0]._text.substring(0, 1))
+                            all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
+                        }
                     }
                     else {
-                        all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text)
+                        if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === "W") {
+                            all_match_list[match_id].team1score = "W" // 2
+                            all_match_list[match_id].team2score = "FF" // 0
+                            console.log("forfeited match, skip")
+                            continue
+                        }
+                        else {
+                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text)
 
-                        const team2text = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
-                        const team2score = parseInt(team2text.substring(1, 2))
-                        all_match_list[match_id].team2score = team2score
+                            const team2text = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
+                            const team2score = parseInt(team2text.substring(1, 2))
+                            all_match_list[match_id].team2score = team2score
+                        }
+
                     }
 
                     await collection.find().forEach(async function(doc) {
                         const query = {"_id": doc._id}
                         console.log(doc._id)
-                        const field = `match_${team1}_${team2}_${all_match_list[match_id].index}`
+                        const field = `match_${team_to_id[team1]}_${team_to_id[team2]}_${all_match_list[match_id].index}`
 
                         const update_doc = { $set : {} }
 
@@ -683,12 +711,12 @@ async function completed_matches_data(game_id) {
                         }
                         else {
                             if (team1_win) {
-                                if (parseInt(doc[field]) < 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                if (parseInt(doc[field]) > 50) {
+                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
                                     update_doc.$set.incorrect = doc.incorrect+1
                                 }
-                                else if (parseInt(doc[field]) > 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                else if (parseInt(doc[field]) < 50) {
+                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
                                     update_doc.$set.correct = doc.correct+1
                                 }
 
@@ -696,12 +724,12 @@ async function completed_matches_data(game_id) {
                                 console.log("victory doc updated!")
                             }
                             else {
-                                if (parseInt(doc[field]) < 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                if (parseInt(doc[field]) > 50) {
+                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
                                     update_doc.$set.correct = doc.correct+1
                                 }
-                                else if (parseInt(doc[field]) > 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                else if (parseInt(doc[field]) < 50) {
+                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
                                     update_doc.$set.incorrect = doc.incorrect+1
                                 }
 
@@ -974,9 +1002,10 @@ async function get_user_info(req, res, next) {
                 const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
                 const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
 
-                console.log(team1, team2, index)
+                // console.log(team1, team2, index)
                 const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
 
+                // console.log(all_match_list[match_id].end_time, threshold)
                 if (all_match_list[match_id].end_time > threshold) {
                     if (all_match_list[match_id].is_completed) {
                         if (all_match_list[match_id].team1score > all_match_list[match_id].team2score) {
@@ -1003,13 +1032,15 @@ async function get_user_info(req, res, next) {
                 }
 
                 if (all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
-                    res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "user_guess": val})
+                    res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
                 }
             }
         }
 
 
         res.locals.user_info.matches.sort(function(a, b) {
+            if (a.is_live) return -1
+            if (b.is_live) return 1
             return a.end_time < b.end_time ? 1 : -1
         })
 
@@ -1065,7 +1096,7 @@ async function get_user_rank(req, res, next) {
     }
 }
 
-app.get('/', (req, res) => {
+app.get('/', [check_document_exists], (req, res) => {
     res.render('index', {user: req.user})
 })
 
@@ -1083,10 +1114,6 @@ app.get('/leaderboard', [check_document_exists, get_leaderboard], (req, res) => 
 
 app.get('/user/:userID', [get_user_info, get_user_rank], (req, res) => {
     res.render('user_info_liquepedia', {user: req.user, user_info: res.locals.user_info})
-})
-
-app.get('/testing', (req, res) => { // remember to remove
-    res.send(all_match_list)
 })
 
 app.post('/insert_guess', [insert_guess], (req, res) => {

@@ -19,11 +19,11 @@ Find the top scorers and your rank on the [leaderboard](https://dpc-predictions-
 
 ## Technologies Used
 
-This site uses [ExpressJS](https://expressjs.com/) and is hosted on [Heroku](https://www.heroku.com/). [mongoDB](https://www.mongodb.com/) was used for the database. Account authentication uses [Steam](https://steamcommunity.com/dev) and [OpenID](https://openid.net/connect/). Completed match data is found from the [OpenDota API](https://docs.opendota.com/) and live match data is from the [Steam Web API](https://steamcommunity.com/dev/apikey).        
+This site uses [ExpressJS](https://expressjs.com/) and is hosted on [Heroku](https://www.heroku.com/). [mongoDB](https://www.mongodb.com/) was used for the database. Account authentication uses [Steam](https://steamcommunity.com/dev) and [OpenID](https://openid.net/connect/). Team logos are from the [OpenDota API](https://docs.opendota.com/) and the match data is from the [Liquipedia API](https://liquipedia.net/api-terms-of-use).        
 [handlebars](https://handlebarsjs.com/) and [Tailwind CSS](https://tailwindcss.com/) was used for the frontend. The sliders were from the [noUISlider](https://refreshless.com/nouislider/) library.
 
 ## Possible Improvements
 
-- [ ] Sort upcoming matches by start time (need API)
-- [ ] Add predictions for tiebreaker matches (need API)
+- [x] Sort upcoming matches by start time
+- [x] Add predictions for tiebreaker matches
 - [ ] Add league filtering on the leaderboard

@@ -40,7 +40,7 @@
                                         </div>
                                     </td>
                                     <td class="text-center py-1 px-1">
-                                        <div class="flex flex-row items-center justify-center {{#if (determine_win your_guess team1score team2score)}}font-bold{{/if}}">
+                                        <div class="flex flex-row items-center justify-center {{#if (determine_win your_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                             {{#if (check_exists your_guess)}}
                                                 {{#if (check_not50 your_guess)}}
                                                 <div style="width: 40px;" class="flex items-center justify-center">
@@ -52,8 +52,8 @@
                                         </div>
                                     </td>
                                     <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else}}<span class="{{#if (check_win team1score is_bo3)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score is_bo3)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
-                                    <td class="text-center py-1 px-1">{{#if (check_exists average_guess)}}{{{display_score average_guess team1score team2score}}}{{/if}}</td>
-                                    <td class="text-center py-1 px-1">{{#if (check_exists your_guess)}}{{{display_score your_guess team1score team2score}}}{{/if}}</td>
+                                    <td class="text-center py-1 px-1">{{#if (check_exists average_guess)}}{{{display_score average_guess team1score team2score is_bo3}}}{{/if}}</td>
+                                    <td class="text-center py-1 px-1">{{#if (check_exists your_guess)}}{{{display_score your_guess team1score team2score is_bo3}}}{{/if}}</td>
                                 </tr>
                                 {{/each}}
                             </table>
