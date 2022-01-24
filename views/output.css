@@ -1035,4 +1035,8 @@ a[target="_blank"]::after {
   .xl\:w-2\/3 {
     width: 66.666667%;
   }
+
+  .xl\:w-4\/5 {
+    width: 80%;
+  }
 }

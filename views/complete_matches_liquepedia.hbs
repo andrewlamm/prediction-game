@@ -5,7 +5,7 @@
         {{> header page_name="Complete Matches"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full flex items-center justify-center z-0">
-                <div class="w-full lg:w-4/5 flex flex-col">
+                <div class="w-full xl:w-4/5 flex flex-col">
                     {{#each completed_games}}
                     <div class="w-full flex flex-col py-2">
                         <div class="flex flex-col text-xl md:text-4xl font-bold">
@@ -21,7 +21,7 @@
                         <div class="w-full pt-2 overflow-x-auto" id="{{@key}}_match_list">
                             <table class="w-full">
                                 <tr class="border-b-2 border-zinc-600">
-                                    <td colspan=3 class="text-left px-1 font-bold pb-1">Match</td>
+                                    <td colspan=3 class="text-left px-1 font-bold pb-1" style="width:450px">Match</td>
                                     <td class="px-1 text-center font-bold pb-1">Average<br> Guess</td>
                                     <td class="px-1 text-center font-bold pb-1">Your<br> Guess</td>
                                     <td class="px-1 border-gray-700 text-center font-bold pb-1">Final Score</td>

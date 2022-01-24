@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({
 
 const valid_team_id = new Set()
 
-const url = process.env.MONGO_DB_URL
+const url = process.env.MONGO_CSGO
 const client = new MongoClient(url)
 
 let database = undefined
@@ -38,7 +38,7 @@ async function connect_to_db() {
             await client.connect();
             console.log("Connected correctly to server")
 
-            database = client.db("picks_db")
+            database = client.db("csgo_picks")
             collection = database.collection("users")
 
             resolve(1)
@@ -237,15 +237,12 @@ hbs.registerHelper('turn_id_to_text', function(n) {
 
 let parsed_data = {}
 
-const regions = ["Western_Europe", "China", "North_America", "Southeast_Asia", "Eastern_Europe", "South_America"]
-const divisions = ["Division_I", "Division_II"]
-
-function retrieve_data(region, division) {
+function retrieve_data() {
     return new Promise(async function(resolve, reject) {
         const options = {
             hostname: 'liquipedia.net',
             port: 443,
-            path: `/dota2/api.php?action=parse&format=json&page=Dota_Pro_Circuit/2021-22/1/${region}/${division}`,
+            path: `/counterstrike/api.php?action=parse&format=json&page=BLAST/Premier/2022/Spring/Groups`,
             method: 'GET',
             headers: {
                 'User-Agent': 'DPCScenarios',
@@ -273,9 +270,9 @@ function retrieve_data(region, division) {
     })
 }
 
-const LEAGUE_IDS = [13738, 13716, 13741, 13747, 13709, 13712, 13740, 13717, 13742, 13748, 13710, 13713]
+const LEAGUE_IDS = [1]
 // WEU, CN, NA, SEA, EEU, SA
-const leagueid_to_name = {13738: "Western Europe Division I", 13716: "China Division I", 13741: "North America Division I", 13747: "Southeast Asia Division I", 13709: "Eastern Europe Division I", 13712: "South America Division I", 13740: "Western Europe Division II", 13717: "China Division II", 13742: "North America Division II", 13748: "Southeast Asia Division II", 13710: "Eastern Europe Division II", 13713: "South America Division II"}
+const leagueid_to_name = {1: "BLAST Premier Spring Groups"}
 const team_to_logo = {}
 const match_table = {}
 const all_match_list = {}
@@ -287,132 +284,41 @@ let curr_id = 0
 
 async function find_teams() {
     return new Promise(async function(resolve, reject) {
-        for (let divisions_j = 0; divisions_j < divisions.length; divisions_j++) {
-            for (let region_i = 0; region_i < regions.length; region_i++) {
-                console.log(regions[region_i], divisions[divisions_j])
+        for (let divisions_j = 0; divisions_j < 1; divisions_j++) {
 
-                await new Promise(resolve => setTimeout(resolve, 30000))
+            // await new Promise(resolve => setTimeout(resolve, 30000))
 
-                await retrieve_data(regions[region_i], divisions[divisions_j])
+            await retrieve_data()
 
-                const soup = new JSSoup(parsed_data["*"])
-                const team_list = soup.findAll("div", {"class": "teamcard"})
-                const logo_list = soup.findAll("span", "logo-darkmode")
+            const soup = new JSSoup(parsed_data["*"])
+            const team_list = soup.findAll("div", {"class": "teamcard"})
 
-                match_table[LEAGUE_IDS[divisions_j*6+region_i]] = {}
+            match_table[LEAGUE_IDS[divisions_j]] = {}
 
-                for (let i = 0; i < team_list.length; i++) {
-                    let team1 = `${team_list[i].contents[0].contents[0].attrs.title}`
-                    if (team1.indexOf("(") !== -1) {
-                        team1 = team1.substring(0, team1.indexOf("(")-1)
-                    }
-
-                    match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1] = {}
-
-                    team_to_id[team1] = curr_id
-                    id_to_team[curr_id] = team1
-
-                    curr_id += 1
-
-                    for (let j = 0; j < team_list.length; j++) {
-                        if (i === j) continue
-                        let team2 = `${team_list[j].contents[0].contents[0].attrs.title}`
-                        if (team2.indexOf("(") !== -1) {
-                            team2 = team2.substring(0, team2.indexOf("(")-1)
-                        }
-                        match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2] = []
-                    }
-                    team_to_league_id[team1] = LEAGUE_IDS[divisions_j*6+region_i]
-                    // team_to_logo[team1] = `https://liquipedia.net${logo_list[i].contents[0].contents[0].contents[0].attrs.src}`
+            for (let i = 0; i < team_list.length; i++) {
+                let team1 = `${team_list[i].contents[0].contents[0].contents[0].attrs.title}`
+                if (team1.indexOf("(") !== -1) {
+                    team1 = team1.substring(0, team1.indexOf("(")-1)
                 }
+                // console.log(team1)
 
-                const match_list = soup.findAll("tr", {"class": "match-row"})
+                match_table[LEAGUE_IDS[divisions_j]][team1] = {}
 
-                for (let i = 0; i < match_list.length; i++) {
-                    if (match_list[i].contents[1].contents[0]._text !== "-") {
-                        // console.log(match_table[LEAGUE_IDS[divisions_j*6+region_i]])
+                team_to_id[team1] = curr_id
+                id_to_team[curr_id] = team1
 
-                        let team1 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
-                        let team2 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[1].contents[0].contents[2].contents[0].attrs.title
+                curr_id += 1
 
-                        if (team1.indexOf("(") !== -1) {
-                            team1 = team1.substring(0, team1.indexOf("(")-1)
-                        }
-                        if (team2.indexOf("(") !== -1) {
-                            team2 = team2.substring(0, team2.indexOf("(")-1)
-                        }
-
-                        if (team1 === "Team Unique") team1 = "Mind Games"
-                        if (team2 === "Team Unique") team2 = "Mind Games"
-
-                        // console.log(team1, team2)
-
-                        if (match_list[i].contents[1].contents[0]._text === "FF" || match_list[i].contents[2].contents[0]._text === "FF") {
-                            end_time = -1
-
-                            let new_match_id = parseInt(Math.random()*1000000)
-                            while (new_match_id in all_match_list) {
-                                new_match_id = parseInt(Math.random()*1000000)
-                            }
-                            if (match_list[i].contents[1].contents[0]._text === "FF") {
-                                // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 0, "team2score": 2, "is_completed": true, "is_live": false, "is_bo3": 3}
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "FF", "team2score": "W", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                            }
-                            else {
-                                // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 2, "team2score": 0, "is_completed": true, "is_live": false, "is_bo3": 3}
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "W", "team2score": "FF", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                            }
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                        }
-                        else {
-                            if (match_list[i].contents[1].attrs.style === "font-weight:bold" || match_list[i].contents[2].attrs.style === "font-weight:bold") {
-                                const matches_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents.length
-                                const links_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents.length
-                                const title_string = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents[links_num-2].attrs.title
-                                const last_match_id = title_string.substring(title_string.indexOf(":")+2)
-
-                                let new_match_id = parseInt(Math.random()*1000000)
-                                while (new_match_id in all_match_list) {
-                                    new_match_id = parseInt(Math.random()*1000000)
-                                }
-                                dota_match_id_to_match[last_match_id] = new_match_id
-
-                                if (parseInt(match_list[i].contents[1].contents[0]._text) === 2 || parseInt(match_list[i].contents[2].contents[0]._text) === 2) {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                                }
-                                else {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 1, "total_guess": 0, "number_guesses": 0}
-                                }
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                            }
-                            else {
-                                let new_match_id = parseInt(Math.random()*1000000)
-                                while (new_match_id in all_match_list) {
-                                    new_match_id = parseInt(Math.random()*1000000)
-                                }
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": true, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                            }
-                        }
+                for (let j = 0; j < team_list.length; j++) {
+                    if (i === j) continue
+                    let team2 = `${team_list[j].contents[0].contents[0].contents[0].attrs.title}`
+                    if (team2.indexOf("(") !== -1) {
+                        team2 = team2.substring(0, team2.indexOf("(")-1)
                     }
+                    match_table[LEAGUE_IDS[divisions_j]][team1][team2] = []
                 }
-
-                for (const [team1, val] of Object.entries(match_table[LEAGUE_IDS[divisions_j*6+region_i]])) {
-                    for (const [team2, val2] of Object.entries(val)) {
-                        if (match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length === 0) {
-                            let new_match_id = parseInt(Math.random()*1000000)
-                            while (new_match_id in all_match_list) {
-                                new_match_id = parseInt(Math.random()*1000000)
-                            }
-                            all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                        }
-                    }
-                }
+                team_to_league_id[team1] = LEAGUE_IDS[divisions_j]
+                // team_to_logo[team1] = `https://liquipedia.net${logo_list[i].contents[0].contents[0].contents[0].attrs.src}`
             }
         }
         resolve(1)
@@ -424,80 +330,24 @@ async function loop_leagues() {
         for (let i = 0; i < LEAGUE_IDS.length; i++) {
             console.log(LEAGUE_IDS[i])
             await get_team_logos(LEAGUE_IDS[i])
-            await get_match_scores(LEAGUE_IDS[i])
         }
         resolve(1)
     })
 }
 
 async function get_team_logos(id) {
-    return new Promise(function(resolve, reject) {
-        axios.get(`https://api.opendota.com/api/leagues/${id}/teams`).then(
-            function(response) {
-                var parsed = response.data
-
-                for (let i = 0; i < parsed.length; i++) {
-                    if (parsed[i].team_id === 8261500) { //because xtreme gaming is cringe
-                        parsed[i].name = "Xtreme Gaming"
-                    }
-
-                    if (parsed[i].name === "Tundra Esports ") parsed[i].name = "Tundra Esports"
-                    if (parsed[i].name === "INVICTUS GAMING") parsed[i].name = "Invictus Gaming"
-                    if (parsed[i].name === "phoenix gaming") parsed[i].name = "Phoenix Gaming"
-                    if (parsed[i].name === "Undying") parsed[i].name = "Team Undying"
-                    if (parsed[i].name === "Lava BestPc") parsed[i].name = "Lava"
-                    if (parsed[i].name === "beastcoast") parsed[i].name = "Beastcoast"
-                    if (parsed[i].name === "Noping VPN") parsed[i].name = "NoPing e-sports"
-                    if (parsed[i].name === "Infamous U.esports.") parsed[i].name = "Infamous"
-                    if (parsed[i].name === "Ybb gaming") parsed[i].name = "Ybb Gaming"
-                    if (parsed[i].name === "CDEC ") parsed[i].name = "CDEC Gaming"
-                    if (parsed[i].name === "SHENZHEN") parsed[i].name = "ShenZhen"
-                    if (parsed[i].name === "Team Magma") parsed[i].name = "Team MagMa"
-                    if (parsed[i].name === "felt") parsed[i].name = "Felt"
-                    if (parsed[i].name === "DogChamp") parsed[i].name = "Team DogChamp"
-                    if (parsed[i].name === "Talon") parsed[i].name = "Talon Esports"
-                    if (parsed[i].name === "Spawn.496") parsed[i].name = "SPAWN.496"
-                    if (parsed[i].name === "Balrogs e-Sport") parsed[i].name = "Balrogs"
-                    if (parsed[i].name === "OB.Neon") parsed[i].name = "Neon Esports"
-                    if (parsed[i].name === "Lilgun ") parsed[i].name = "Lilgun"
-                    if (parsed[i].name === "Our Way") parsed[i].name = "Wolf Team"
-
-
-                    // console.log(parsed[i].name)
-                    if (parsed[i].name in team_to_id) {
-                        // console.log("pog")
-                        team_to_logo[parsed[i].name] = parsed[i].logo_url
-                    }
-                    // else {
-                    //     console.log(`"${parsed[i].name}"`)
-                    // }
-                }
-                resolve(1)
-            }, (error) => {
-                reject(error)
-            }
-        )
-    })
-}
-
-async function get_match_scores(id) {
-    return new Promise(function(resolve, reject) {
-        axios.get(`https://api.opendota.com/api/leagues/${id}/matches`).then(
-            function(response) {
-                var parsed = response.data
-
-                for (let i = 0; i < parsed.length; i++) {
-                    if (parsed[i].match_id in dota_match_id_to_match) {
-                        all_match_list[dota_match_id_to_match[parsed[i].match_id]].end_time = parsed[i].start_time + parsed[i].duration
-                    }
-                }
-
-                resolve(1)
-            }, (error) => {
-                reject(error)
-            }
-        )
-    })
+    team_to_logo["Astralis"] = "/imgs/astralis.png"
+    team_to_logo["BIG"] = "/imgs/big.png"
+    team_to_logo["Complexity Gaming"] = "/imgs/col.png"
+    team_to_logo["Evil Geniuses"] = "/imgs/eg.png"
+    team_to_logo["FaZe Clan"] = "/imgs/faze.png"
+    team_to_logo["G2 Esports"] = "/imgs/g2.png"
+    team_to_logo["MIBR"] = "/imgs/mibr.png"
+    team_to_logo["Natus Vincere"] = "/imgs/navi.png"
+    team_to_logo["Ninjas in Pyjamas"] = "/imgs/nip.png"
+    team_to_logo["OG"] = "/imgs/og.png"
+    team_to_logo["Team Liquid"] = "/imgs/liquid.png"
+    team_to_logo["Team Vitality"] = "/imgs/vitality.png"
 }
 
 async function get_averages() {
@@ -527,12 +377,12 @@ async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
-    // console.log("complete, waiting 30 seconds")
-    // await new Promise(resolve => setTimeout(resolve, 30000))
-    // for (let i = 0; i < LEAGUE_IDS.length; i++)
-    //     console.log(match_table[LEAGUE_IDS[i]])
+    console.log("complete, waiting 30 seconds")
+    await new Promise(resolve => setTimeout(resolve, 30000))
     // console.log(team_to_id)
     await repeated_functions()
+    // for (let i = 0; i < LEAGUE_IDS.length; i++)
+    //     console.log(match_table[LEAGUE_IDS[i]])
     await get_averages()
     const repeated_timer = setInterval(repeated_functions, 60000) // 120000
 }
@@ -558,7 +408,7 @@ async function get_matches_data() {
         const options = {
             hostname: 'liquipedia.net',
             port: 443,
-            path: '/dota2/api.php?action=parse&format=json&page=Liquipedia:Upcoming_and_ongoing_matches',
+            path: '/counterstrike/api.php?action=parse&format=json&page=Liquipedia:Matches',
             method: 'GET',
             headers: {
               'User-Agent': 'DPCScenarios',
@@ -591,17 +441,19 @@ async function get_live_matches() {
         const soup = new JSSoup(live_matches_data["*"])
         const match_list = soup.findAll("div", {"class": "matches-list"})[0]
 
-        for (let i = 0; i < match_list.contents[1].contents[1].contents.length; i++) {
-            if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0] !== undefined && match_list.contents[1].contents[1].contents[i].contents[0].contents[0].attrs.style === "background-color:#ffffcc;" && match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) { // remember to add check for (page does not exist)
-                let team1 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
+        for (let i = 0; i < match_list.contents[1].contents[1].contents.length; i += 2) {
+            // console.log(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[1].contents[0].contents[0].contents[0]._text)
+            if (match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0] !== undefined && match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[1].contents[0].contents[0].contents[0]._text.indexOf("BLAST Premier") !== -1) { // remember to add check for (page does not exist)
+                let team1 = match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
                 if (team1.indexOf("(") !== -1) {
                     team1 = team1.substring(0, team1.indexOf("(")-1)
                 }
-                if (team1 === "TBD" || team1 === "To Be Determined") {
-                    console.log("TBD spotted")
+                if (team1 === "To Be Determined" || team1 === "TBD") {
+                    // console.log("TBD spotted")
                     continue
                 }
-                let team2 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
+
+                let team2 = match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
                 if (team2.indexOf("(") !== -1) {
                     team2 = team2.substring(0, team2.indexOf("(")-1)
                 }
@@ -609,7 +461,7 @@ async function get_live_matches() {
                 if (team1 === "King of Kings") team1 = "APU King of Kings"
                 if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                if (team1 === "TBD" || team2 === "TBD") {
+                if (team2 === "TBD" || team2 === "To Be Determined") {
                     console.log("TBD spotted")
                     continue
                 }
@@ -617,30 +469,23 @@ async function get_live_matches() {
                 // console.log(team1, team2)
 
                 const match_id = match_table[team_to_league_id[team1]][team1][team2][match_table[team_to_league_id[team1]][team1][team2].length-1]
-                if (all_match_list[match_id].is_completed) {
+                if (all_match_list[match_id] === undefined || all_match_list[match_id].is_completed) {
                     console.log(`new match - ${team1} vs ${team2}`)
                     let new_match_id = parseInt(Math.random()*1000000)
                     while (new_match_id in all_match_list) {
                         new_match_id = parseInt(Math.random()*1000000)
                     }
-                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"], "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
+                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"], "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
                     match_table[team_to_league_id[team1]][team1][team2].push(new_match_id)
                     match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
 
                     curr_live_matches.add(new_match_id)
 
-                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
-                        all_match_list[new_match_id].is_bo3 = 3
-                    }
-                    else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
-                        all_match_list[new_match_id].is_bo3 = 5
-                    }
-                    else {
-                        all_match_list[new_match_id].is_bo3 = 1
-                    }
+                    all_match_list[new_match_id].is_bo3 = 3
                 }
                 else {
-                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[0].contents[0]._text === "vs") {
+                    // console.log(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text)
+                    if (match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text.indexOf("vs") !== -1) {
                         all_match_list[match_id].is_live = false
                     }
                     else {
@@ -649,16 +494,9 @@ async function get_live_matches() {
                         curr_live_matches.add(match_id)
                     }
 
-                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
-                        all_match_list[match_id].is_bo3 = 3
-                    }
-                    else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
-                        all_match_list[match_id].is_bo3 = 5
-                    }
-                    else {
-                        all_match_list[match_id].is_bo3 = 1
-                    }
-                    all_match_list[match_id].start_time = match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]
+                    all_match_list[match_id].is_bo3 = 3
+
+                    all_match_list[match_id].start_time = match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]
                 }
             }
         }
@@ -666,16 +504,17 @@ async function get_live_matches() {
     })
 }
 
-async function completed_matches_data(game_id) {
+async function completed_matches_data() {
     return new Promise(async function(resolve, reject) {
         // console.log("completed")
         const soup = new JSSoup(live_matches_data["*"])
         const match_list = soup.findAll("div", {"class": "matches-list"})[0]
 
-        for (let i = 0; i < match_list.contents[1].contents[2].contents.length; i++) {
-            if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) {
-                let team1 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
-                let team2 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
+        for (let i = 0; i < match_list.contents[1].contents[3].contents.length; i += 2) {
+            // console.log(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[1].contents[0].contents[1].contents[0].contents[0].contents[0]._text)
+            if (match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[1].contents[0].contents[1].contents[0].contents[0].contents[0]._text.indexOf("BLAST Premier") !== -1) {
+                let team1 = match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
+                let team2 = match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
 
                 if (team1.indexOf("(") !== -1) {
                     team1 = team1.substring(0, team1.indexOf("(")-1)
@@ -713,30 +552,30 @@ async function completed_matches_data(game_id) {
                     all_match_list[match_id].is_completed = true
                     all_match_list[match_id].end_time = Math.floor(Date.now() / 1000)
 
-                    if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === undefined) {
+                    if (match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement._text === undefined) {
                         team1_win = false
-                        if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text === "W") {
+                        if (match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text === "W") {
                             all_match_list[match_id].team1score = "FF" // 0
                             all_match_list[match_id].team2score = "W" // 2
                             console.log("forfeited match, skip")
                             continue
                         }
                         else {
-                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0]._text.substring(0, 1))
-                            all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
+                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text.substring(0, 1))
+                            all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
                         }
                     }
                     else {
-                        if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === "W") {
+                        if (match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement._text === "W") {
                             all_match_list[match_id].team1score = "W" // 2
                             all_match_list[match_id].team2score = "FF" // 0
                             console.log("forfeited match, skip")
                             continue
                         }
                         else {
-                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text)
+                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement._text)
 
-                            const team2text = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
+                            const team2text = match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
                             const team2score = parseInt(team2text.substring(1, 2))
                             all_match_list[match_id].team2score = team2score
                         }
@@ -789,7 +628,7 @@ async function completed_matches_data(game_id) {
     })
 }
 
-function repeated_functions() {
+async function repeated_functions() {
     return new Promise(async function(resolve, reject) {
         console.log("repeat - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
         await find_live_matches()
