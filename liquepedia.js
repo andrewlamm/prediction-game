@@ -519,6 +519,7 @@ let live_matches_data = {}
 const curr_live_matches = new Set()
 
 async function find_live_matches() {
+    live_matches_data = {}
     curr_live_matches.clear()
     await get_matches_data()
     await get_live_matches()
