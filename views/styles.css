@@ -45,6 +45,16 @@ a[target="_blank"]::after {
     }
 }
 
+.awesome_slider_class {
+    width: calc(100% - 300px);
+}
+
+@media (max-width: 767px) {
+    .awesome_slider_class {
+        width: auto
+    }
+}
+
 .logo_image_height {
     height: 40px
 }
