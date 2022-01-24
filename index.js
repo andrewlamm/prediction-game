@@ -338,6 +338,8 @@ async function get_match_scores(id) {
                 }
                 else if (id === 13709) {
                     match_table[id][7422789][8255888] = 2 // Unique (Mind Games) forfeit game 1 vs HellRaisers
+
+                    match_table[id][1883502][7422789] = 1
                 }
                 else if (id === 13716) {
                     match_table[id][6209804][5] = 2 // RNG 2-1 iG
@@ -354,6 +356,11 @@ async function get_match_scores(id) {
                     match_table[id][8261397][8390848] = 0  // NoBountyHunter FF-W Chicken Fighters
                     match_table[id][8605863][8261397] = 2 // Entity W-FF NoBountyHunter
                     match_table[id][8261397][8605863] = 0  // NoBountyHunter FF-W Entity
+
+                    match_table[id][8598715][8343488] = 2 // ITB 2 - 0 GF (tiebreaks)
+                    match_table[id][8605863][8390848] = 2 // Entity 2 - 0 CF (tiebreaks)
+                    match_table[id][8112124][8390848] = 1 // Brame 1 - 2 CF (tiebreaks)
+                    match_table[id][8605863][8112124] = 1 // Entity 0 - 2 Brame (tiebreaks)
                 }
                 else if (id === 13717) {
                     match_table[id][1520578][7356881] = 0 // CDEC FF-W SHENZHEN
@@ -375,6 +382,37 @@ async function get_match_scores(id) {
                     match_table[id][2586976][1838315] = 2 // OG 2 - 0 Secret (tiebreak)
                     match_table[id][8291895][7554697] = 2 // Tundra 2 - 0 Nigma (tiebreak)
                     match_table[id][8291895][1838315] = 1 // Tundra 1 - 2 Secret (tiebreak)
+                }
+                else if (id === 13738) {
+                    match_table[id][2586976][7554697] = 2 // OG 2 - 0 Nigma (tiebreak)
+                    match_table[id][1838315][7554697] = 0 // Secret 0 - 2 Nigma (tiebreak)
+                    match_table[id][8291895][2586976] = 2 // Tundra 2 - 0 OG (tiebreak)
+                    match_table[id][2586976][1838315] = 2 // OG 2 - 0 Secret (tiebreak)
+                    match_table[id][8291895][7554697] = 2 // Tundra 2 - 0 Nigma (tiebreak)
+                    match_table[id][8291895][1838315] = 1 // Tundra 1 - 2 Secret (tiebreak)
+                }
+                else if (id === 13747) {
+                    match_table[id][8360138][8261197] = 2 // Neon 2 - 1 Motivate
+                    match_table[id][8360138][8254145] = 1 // Neon 1 - 2 Execration
+                    match_table[id][8254145][8261197] = 0 // Execration 0 - 2 Motivate
+
+                    match_table[id][350190][8244493] = 0 // Fnatic 0 - 2 SMG
+                    match_table[id][350190][8214850] = 2 // Fnatic 2 - 1 T1
+                    match_table[id][8214850][8244493] = 2 // T1 2 - 0 SMG
+                }
+                else if (id === 13748) {
+                    match_table[id][8572181][8571960] = 2 // Nigma 2 - 1 Ragdoll
+                    match_table[id][8261554][8605296] = 2 // AG 2 - 0 Spawn
+                }
+                else if (id === 13710) {
+                    match_table[id][8598633][7118032] = 1
+                    match_table[id][8598633][8588969] = 2
+                    match_table[id][8588969][8261774] = 0
+                    match_table[id][7118032][8261774] = 2
+                    match_table[id][7118032][8588969] = 0
+                }
+                else if (id === 13742) {
+                    match_table[id][8604954][8606828] = 0
                 }
 
                 resolve(1)
@@ -799,6 +837,12 @@ async function get_user_info(req, res, next) {
 
         for (const [key, val] of Object.entries(results)) {
             if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "matches" && key !== "incorrect") {
+                let underscore_count = 0
+                for (let i = 0; i < key.length; i++) {
+                    if (key[i] === "_") underscore_count += 1
+                }
+                if (underscore_count !== 2) continue
+
                 const team1 = key.substring(6, key.indexOf("_", 6))
                 const team2 = key.substring(key.indexOf("_", 6)+1)
 
