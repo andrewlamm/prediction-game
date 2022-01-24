@@ -515,10 +515,11 @@ async function start() {
 
 start()
 
-let live_matches_data = new Set()
+let live_matches_data = {}
+const curr_live_matches = new Set()
 
 async function find_live_matches() {
-    live_matches_data.clear()
+    curr_live_matches.clear()
     await get_matches_data()
     await get_live_matches()
     await completed_matches_data()
@@ -591,7 +592,7 @@ async function get_live_matches() {
                     match_table[team_to_league_id[team1]][team1][team2].push(new_match_id)
                     match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
 
-                    live_matches_data.add(new_match_id)
+                    curr_live_matches.add(new_match_id)
 
                     if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
                         all_match_list[new_match_id].is_bo3 = 3
@@ -622,7 +623,7 @@ async function get_live_matches() {
                         all_match_list[match_id].is_bo3 = 1
                     }
                     all_match_list[match_id].start_time = match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]
-                    live_matches_data.add(match_id)
+                    curr_live_matches.add(match_id)
                 }
             }
         }
@@ -666,7 +667,7 @@ async function completed_matches_data(game_id) {
 
                     const match_id = match_table[team_to_league_id[team1]][team1][team2][match_index]
 
-                    if (live_matches_data.has(match_id)) {
+                    if (curr_live_matches.has(match_id)) {
                         console.log("just kidding")
                         continue
                     }
