@@ -854,7 +854,7 @@ function get_upcoming_matches(req, res, next) {
 
     for (const [match_id, val] of Object.entries(all_match_list)) {
         if (!val.is_completed && !val.is_live) {
-            if (res.locals.average_guess[`match_${val.team1}_${val.team2}_${val.index}`] === undefined) {
+            if (res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
                 res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] = 50
             }
 
