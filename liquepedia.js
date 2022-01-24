@@ -661,12 +661,15 @@ async function completed_matches_data(game_id) {
                     }
                 }
 
-                if (live_matches_data.has(match_table[team_to_league_id[team1]][team1][team2][i])) continue
-
                 if (match_index !== -1) {
                     console.log(`${team1} vs ${team2} match complete`)
 
                     const match_id = match_table[team_to_league_id[team1]][team1][team2][match_index]
+
+                    if (live_matches_data.has(match_id)) {
+                        console.log("just kidding")
+                        continue
+                    }
 
                     let team1_win = true
 
