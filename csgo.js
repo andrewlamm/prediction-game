@@ -95,11 +95,12 @@ hbs.registerHelper('if_equals', function(arg1, arg2) {
     return false
 })
 
-hbs.registerHelper('check_win', function(score, bo3) {
+hbs.registerHelper('check_win', function(score, bo3, score2) {
     if (score === "W") return true
     if (score === Math.floor(bo3 / 2)+1) {
         return true
     }
+    if (bo3 === 1) return score > score2 ? 1 : 0
     return false
 })
 
@@ -153,6 +154,12 @@ hbs.registerHelper('determine_win', function(score, team1score, team2score, is_b
     if (team1score === "W" || team2score === "W") return false
     if (score > 50 && team2score === Math.floor(is_bo3 / 2)+1) return true
     else if (score < 50 && team1score === Math.floor(is_bo3 / 2)+1) return true
+
+    if (is_bo3 === 1) {
+        if (score > 50 && team2score > team1score) return true
+        else if (score < 50 && team1score > team2score) return true
+    }
+
     return false
 })
 
@@ -234,6 +241,40 @@ hbs.registerHelper('turn_id_to_text', function(n) {
     }
     return new_s
 })
+
+hbs.registerHelper('convert_time', function(time) {
+    time *= 1000
+    const s = new Date(time).toLocaleTimeString()
+    return s.substring(0, s.indexOf(":", 3)) + s.substring(s.indexOf(" "))
+})
+
+hbs.registerHelper('convert_date', function(time) {
+    time *= 1000
+    const s = new Date(time).toLocaleDateString()
+
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    const mon = MONTHS[parseInt(s.substring(0, s.indexOf("/")))-1]
+    const date = turn_to_ordinal(parseInt(s.substring(s.indexOf("/")+1, s.indexOf("/", 3))))
+    const year = s.substring(s.indexOf("/", 3)+1)
+
+    return `${mon} ${date}, ${year}`
+})
+
+function turn_to_ordinal(num) {
+    let ones = num % 10
+    let tens = num % 100
+    if (ones == 1 && tens != 11) {
+      return num + "st";
+    }
+    if (ones == 2 && tens != 12) {
+      return num + "nd";
+    }
+    if (ones == 3 && tens != 13) {
+      return num + "rd";
+    }
+    return num + "th";
+}
 
 let parsed_data = {}
 
@@ -384,7 +425,7 @@ async function start() {
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
     await get_averages()
-    const repeated_timer = setInterval(repeated_functions, 60000) // 120000
+    const repeated_timer = setInterval(repeated_functions, 120000) // 120000
 }
 
 start()
@@ -475,13 +516,18 @@ async function get_live_matches() {
                     while (new_match_id in all_match_list) {
                         new_match_id = parseInt(Math.random()*1000000)
                     }
-                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"], "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
+                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]), "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
                     match_table[team_to_league_id[team1]][team1][team2].push(new_match_id)
                     match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
 
                     curr_live_matches.add(new_match_id)
 
-                    all_match_list[new_match_id].is_bo3 = 3
+                    if (parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]) > 1643673600000) {
+                        all_match_list[new_match_id].is_bo3 = 3
+                    }
+                    else {
+                        all_match_list[new_match_id].is_bo3 = 1
+                    }
                 }
                 else {
                     // console.log(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text)
@@ -494,9 +540,14 @@ async function get_live_matches() {
                         curr_live_matches.add(match_id)
                     }
 
-                    all_match_list[match_id].is_bo3 = 3
+                    if (parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]) > 1643673600000) {
+                        all_match_list[match_id].is_bo3 = 3
+                    }
+                    else {
+                        all_match_list[match_id].is_bo3 = 1
+                    }
 
-                    all_match_list[match_id].start_time = match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]
+                    all_match_list[match_id].start_time = parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
                 }
             }
         }
@@ -561,7 +612,7 @@ async function completed_matches_data() {
                             continue
                         }
                         else {
-                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text.substring(0, 1))
+                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text)
                             all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
                         }
                     }
@@ -576,7 +627,7 @@ async function completed_matches_data() {
                             all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement._text)
 
                             const team2text = match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
-                            const team2score = parseInt(team2text.substring(1, 2))
+                            const team2score = parseInt(team2text.substring(1))
                             all_match_list[match_id].team2score = team2score
                         }
 
@@ -944,16 +995,20 @@ async function get_user_info(req, res, next) {
                     }
                 }
 
-                if (all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
-                    res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
+                if (req.params.userID === req.user._json.steamid || all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
+                    res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "start_time": all_match_list[match_id].start_time, "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
                 }
             }
         }
 
-
         res.locals.user_info.matches.sort(function(a, b) {
             if (a.is_live) return -1
             if (b.is_live) return 1
+            if (a.end_time === b.end_time) {
+                return a.start_time < b.start_time ? -1 : 1
+            }
+            if (!a.is_completed) return -1
+            if (!a.is_completed) return 1
             return a.end_time < b.end_time ? 1 : -1
         })
 
@@ -1031,6 +1086,10 @@ app.get('/user/:userID', [get_user_info, get_user_rank], (req, res) => {
 
 app.post('/insert_guess', [insert_guess], (req, res) => {
     res.send()
+})
+
+app.get('/testing', (req, res) => {
+    res.send(all_match_list)
 })
 
 app.get('/logout', function(req, res){

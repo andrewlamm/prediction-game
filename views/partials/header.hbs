@@ -1,6 +1,6 @@
 <div class="relative w-full flex flex-col bg-gray-700">
     <div class="font-bold text-5xl lg:text-7xl py-6 text-center text-white">
-        Predictions Game
+        <a href="/">Predictions Game</a>
     </div>
     <div class="w-full pb-1 pr-1 text-white text-lg lg:text-xl flex justify-end">
         {{#if user}} Hello, {{user.displayName}}.&nbsp;<a href="/user/{{user.id}}" class="text-blue-300 cursor-pointer">Profile</a>&nbsp;|&nbsp;<a class="text-blue-300 cursor-pointer" href="/logout">Logout</a>{{else}}<a href="/auth/steam"><img class="float-right" src="/imgs/steam_login.png"></a>{{/if}}

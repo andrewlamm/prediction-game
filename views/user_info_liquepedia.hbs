@@ -1,7 +1,7 @@
 <!DOCTYPE >
 <html>
 	{{> head_tag title="User Information"}}
-	<body class="min-h-full flex flex-col bg-gray-400">
+	<body class="min-h-full flex flex-col">
         {{> header page_name=""}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             {{#if user_info}}
@@ -39,9 +39,9 @@
                             </tr>
                             {{#each user_info.matches}}
                             <tr>
-                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
+                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
                                 <td class="px-4 py-1">vs</td>
-                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
+                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
                                 <td class="text-center py-1 px-1">
                                     <div class="flex flex-row items-center justify-center {{#if (determine_win user_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                         {{#if (check_not50 user_guess)}}
@@ -52,7 +52,7 @@
                                         {{display_average user_guess}}%
                                     </div>
                                 </td>
-                                <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else}}<span class="{{#if (check_win team1score is_bo3)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score is_bo3)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
+                                <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else is_completed}}<span class="{{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
                                 <td class="text-center py-1 px-1">{{#if (check_exists user_guess)}}{{{display_score user_guess team1score team2score is_bo3}}}{{/if}}</td>
                             </tr>
                             {{/each}}
