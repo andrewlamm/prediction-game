@@ -995,7 +995,7 @@ async function get_user_info(req, res, next) {
                     }
                 }
 
-                if (req.params.userID === req.user._json.steamid || all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
+                if ((req.user !== undefined && req.params.userID === req.user._json.steamid) || all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
                     res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "start_time": all_match_list[match_id].start_time, "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
                 }
             }
