@@ -1102,6 +1102,10 @@ a[target="_blank"]::after {
     padding-left: 1.5rem;
   }
 
+  .lg\:pr-6 {
+    padding-right: 1.5rem;
+  }
+
   .lg\:text-left {
     text-align: left;
   }

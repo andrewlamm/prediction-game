@@ -23,7 +23,7 @@
 							{{#each this}}
 							<div class="w-full items-center justify-center flex flex-col" id="match:{{team1id}}:{{team2id}}:{{index}}_match">
 								<div class="flex flex-row text-center font-bold text-2xl md:text-4xl justify-center items-center">
-									<img src={{team1image}} class="pr-2 logo_image_height">{{team1}} vs {{team2}}<img src={{team2image}} class="pl-2 logo_image_height">
+									<img src={{team1image}} class="pr-2 lg:pr-6 logo_image_height">{{team1}} vs {{team2}}<img src={{team2image}} class="pl-2 lg:pl-6 logo_image_height">
 								</div>
 								<div class="flex flex-col lg:flex-row mt-8 py-8 items-center justify-center w-full">
                                     <div class="hidden lg:flex flex-col items-center justify-center w-full lg:w-1/6">
@@ -31,7 +31,7 @@
                                             {{convert_date start_time}}
                                         </div>
                                         <div>
-                                            {{convert_time start_time}}
+                                            {{convert_time start_time}} Eastern
                                         </div>
                                     </div>
 									<div class="flex flex-row items-center justify-center lg:justify-end w-full lg:w-3/5">
@@ -89,7 +89,7 @@
 			</div>
 			{{else}}
 			<div class="w-full flex justify-center items-center text-3xl font-bold">
-				Please <a href="/auth/steam"><img src="imgs/steam_login.png" class="px-3"></a> to predict matches.
+				Please&nbsp;<a href="/auth/steam" class="text-blue-700">login with Steam</a>&nbsp;to predict matches.
 			</div>
 			{{/if}}
 		</div>

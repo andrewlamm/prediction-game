@@ -244,13 +244,13 @@ hbs.registerHelper('turn_id_to_text', function(n) {
 
 hbs.registerHelper('convert_time', function(time) {
     time *= 1000
-    const s = new Date(time).toLocaleTimeString()
+    const s = new Date(time).toLocaleTimeString("en-US", {timeZone: "America/New_York"})
     return s.substring(0, s.indexOf(":", 3)) + s.substring(s.indexOf(" "))
 })
 
 hbs.registerHelper('convert_date', function(time) {
     time *= 1000
-    const s = new Date(time).toLocaleDateString()
+    const s = new Date(time).toLocaleDateString("en-US", {timeZone: "America/New_York"})
 
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -1086,10 +1086,6 @@ app.get('/user/:userID', [get_user_info, get_user_rank], (req, res) => {
 
 app.post('/insert_guess', [insert_guess], (req, res) => {
     res.send()
-})
-
-app.get('/testing', (req, res) => {
-    res.send(all_match_list)
 })
 
 app.get('/logout', function(req, res){
