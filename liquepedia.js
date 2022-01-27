@@ -254,6 +254,37 @@ hbs.registerHelper('convert_date', function(time) {
     return `${mon} ${date}, ${year}`
 })
 
+hbs.registerHelper('check_diff_negative', function(start) {
+    const now = new Date().getTime()
+
+    const diff = (start*1000) - now
+
+    if (diff < 0) {
+        return true
+    }
+    return false
+})
+
+hbs.registerHelper('set_timer', function(start) {
+    const now = new Date().getTime()
+
+    const diff = (start*1000) - now
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / (3600000));
+    const minutes = Math.floor((diff % 3600000) / (60000));
+    const seconds = Math.floor((diff % 60000) / 1000);
+
+    if (diff < 0) {
+        return "LIVE"
+    }
+    else if (days > 0) {
+        return `${days}d ${hours}h ${minutes}m`
+    }
+    else {
+        return `${hours}h ${minutes}m ${seconds}s`
+    }
+})
+
 function turn_to_ordinal(num) {
     let ones = num % 10
     let tens = num % 100

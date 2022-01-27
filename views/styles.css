@@ -27,7 +27,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 
 .noUi-tooltip {
     border: 0;
-    background-color: rgb(156 163 175);
+    background-color: transparent;
 }
 
 .noUi-handle:hover {
@@ -60,12 +60,12 @@ a[target="_blank"]::after {
 }
 
 .logo_image_height {
-    height: 40px
+    width: 70px
 }
 
 @media (max-width: 767px) {
     .logo_image_height {
-        height: 30px
+        width: 40px
     }
 }
 
