@@ -129,7 +129,7 @@ hbs.registerHelper('display_score', function(score, team1score, team2score, bo3)
             return `<span class="text-red-700 font-semibold">${calc_score(100-score).toFixed(1)}</span>`
         }
     }
-    else if (team2score === Math.floor(bo3/2)+1 || (bo3 === 1 && team1score > team2score)) {
+    else if (team2score === Math.floor(bo3/2)+1 || (bo3 === 1 && team2score > team1score)) {
         if (score < 50) {
             return `<span class="text-red-700 font-semibold">${calc_score(score).toFixed(1)}</span>`
         }
@@ -395,7 +395,7 @@ async function find_teams() {
             //hard coded matches
             match_table[1]["G2 Esports"]["Complexity Gaming"] = [450009]
             match_table[1]["Complexity Gaming"]["G2 Esports"] = [450009]
-            all_match_list[450009] = {"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":true,"is_bo3":1,"total_guess":298,"number_guesses":6}
+            all_match_list[450009] = {"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":298,"number_guesses":6}
         }
         resolve(1)
     })
