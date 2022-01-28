@@ -396,6 +396,10 @@ async function find_teams() {
             match_table[1]["G2 Esports"]["Complexity Gaming"] = [450009]
             match_table[1]["Complexity Gaming"]["G2 Esports"] = [450009]
             all_match_list[450009] = {"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":298,"number_guesses":6}
+
+            match_table[1]["BIG"]["Ninjas in Pyjamas"] = [947040]
+            match_table[1]["Ninjas in Pyjamas"]["BIG"] = [947040]
+            all_match_list[947040] = {"team1":"BIG","team2":"Ninjas in Pyjamas","index":0,"start_time":1643383200,"end_time":1643387833,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":356,"number_guesses":6}
         }
         resolve(1)
     })
