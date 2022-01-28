@@ -391,6 +391,10 @@ async function find_teams() {
                 team_to_league_id[team1] = LEAGUE_IDS[divisions_j]
                 // team_to_logo[team1] = `https://liquipedia.net${logo_list[i].contents[0].contents[0].contents[0].attrs.src}`
             }
+
+            match_table[1][5][2] = 450009
+            match_table[1][2][5] = 450009
+            all_match_list[450009] = {"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":true,"is_bo3":1,"total_guess":298,"number_guesses":6}
         }
         resolve(1)
     })
@@ -521,6 +525,10 @@ async function get_live_matches() {
                     continue
                 }
 
+                if (match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents === undefined) {
+                    console.log("tbd ...")
+                    continue
+                }
                 let team2 = match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
                 if (team2.indexOf("(") !== -1) {
                     team2 = team2.substring(0, team2.indexOf("(")-1)
