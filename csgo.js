@@ -455,7 +455,7 @@ async function start() {
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
     await get_averages()
-    const repeated_timer = setInterval(repeated_functions, 120000) // 120000
+    const repeated_timer = setInterval(repeated_functions, 60000) // 120000
 }
 
 start()
