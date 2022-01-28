@@ -118,10 +118,10 @@ function calc_score(score) {
 }
 
 hbs.registerHelper('display_score', function(score, team1score, team2score, bo3) {
-    if (score === 50 || team1score === "W" || team2score === "W") {
+    if ((score === 50 && (team1score !== 0 || team2score !== 0)) || team1score === "W" || team2score === "W") {
         return `<span class="font-semibold">0.0</span>`
     }
-    if (team1score === Math.floor(bo3/2)+1) {
+    if (team1score === Math.floor(bo3/2)+1 || (bo3 === 1 && team1score > team2score)) {
         if (score < 50) {
             return `<span class="text-green-700 font-semibold">+${calc_score(100-score).toFixed(1)}</span>`
         }
@@ -129,7 +129,7 @@ hbs.registerHelper('display_score', function(score, team1score, team2score, bo3)
             return `<span class="text-red-700 font-semibold">${calc_score(100-score).toFixed(1)}</span>`
         }
     }
-    else if (team2score === Math.floor(bo3/2)+1) {
+    else if (team2score === Math.floor(bo3/2)+1 || (bo3 === 1 && team1score > team2score)) {
         if (score < 50) {
             return `<span class="text-red-700 font-semibold">${calc_score(score).toFixed(1)}</span>`
         }
@@ -559,6 +559,7 @@ async function get_live_matches() {
                 else {
                     // console.log(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text)
                     if (match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text.indexOf("vs") !== -1) {
+                        if (Date().now / 1000 > parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]) )
                         all_match_list[match_id].is_live = false
                     }
                     else {
