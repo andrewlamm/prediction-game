@@ -439,7 +439,7 @@ async function get_averages() {
                 const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
                 const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
 
-                // console.log(team1, team2, index)
+                console.log(team1, team2, index)
                 const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
 
                 all_match_list[match_id].number_guesses += 1
@@ -614,7 +614,7 @@ async function completed_matches_data() {
                 if (team1 === "King of Kings") team1 = "APU King of Kings"
                 if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                // console.log(team1, team2)
+                console.log(team1, team2)
 
                 let match_index = -1
                 for (let i = 0; i < match_table[team_to_league_id[team1]][team1][team2].length; i++) {
@@ -1137,6 +1137,10 @@ app.get('/logout', function(req, res){
 
 app.get('/testing', function(req, res) {
     res.send(all_match_list)
+})
+
+app.get('/testing2', function(req, res) {
+    res.send(match_table)
 })
 
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }), function(req, res) {
