@@ -66,7 +66,7 @@
 											{{team2}}
 										</div>
 									</div>
-									<div class="lg:pl-6 md:flex flex-col items-center justify-center text-center md:text-left pt-2 lg:pt-0 w-full lg:w-2/5">
+									<div class="lg:pl-6 md:flex flex-col items-center justify-center text-center md:text-left pt-4 lg:pt-0 w-full lg:w-2/5">
 										<div class="lg:w-full">
 											You'll <span id="match:{{team1id}}:{{team2id}}:{{index}}_team1_text">gain</span> <span id="match:{{team1id}}:{{team2id}}:{{index}}_team1_points" class="text-lg font-bold">0.0</span> points if <span id="match:{{team1id}}:{{team2id}}:{{index}}_team1_name">{{team1}}</span> wins.
 										</div>
@@ -189,7 +189,7 @@
 				document.getElementById(`${match_num}_team1_name`).classList.remove("font-bold")
 				document.getElementById(`${match_num}_team1`).classList.remove("font-bold")
                 // document.getElementById(`${match_num}_team1image`).style.width = '40px'
-                document.getElementById(`${match_num}_team1image`).style.filter = ''
+                document.getElementById(`${match_num}_team1image`).classList.remove("drop-shadow-lg")
 
 				document.getElementById(`${match_num}_team2_text`).innerHTML = "gain"
 				document.getElementById(`${match_num}_team2_points`).classList.remove("text-red-700")
@@ -198,7 +198,7 @@
 				document.getElementById(`${match_num}_team2_name`).classList.add("font-bold")
 				document.getElementById(`${match_num}_team2`).classList.add("font-bold")
                 // document.getElementById(`${match_num}_team2image`).style.width = '60px'
-                document.getElementById(`${match_num}_team2image`).style.filter = 'drop-shadow(0px 0px 8px #facc15)'
+                document.getElementById(`${match_num}_team2image`).classList.add("drop-shadow-lg")
 			}
 			else if (team1_score > 0) {
 				document.getElementById(`${match_num}_team1_text`).innerHTML = "gain"
@@ -208,7 +208,7 @@
 				document.getElementById(`${match_num}_team1_name`).classList.add("font-bold")
 				document.getElementById(`${match_num}_team1`).classList.add("font-bold")
                 // document.getElementById(`${match_num}_team1image`).style.width = '60px'
-                document.getElementById(`${match_num}_team1image`).style.filter = 'drop-shadow(0px 0px 8px #facc15)'
+                document.getElementById(`${match_num}_team1image`).classList.add("drop-shadow-lg")
 
 				document.getElementById(`${match_num}_team2_text`).innerHTML = "lose"
 				document.getElementById(`${match_num}_team2_points`).classList.add("text-red-700")
@@ -217,7 +217,7 @@
 				document.getElementById(`${match_num}_team2_name`).classList.remove("font-bold")
 				document.getElementById(`${match_num}_team2`).classList.remove("font-bold")
                 // document.getElementById(`${match_num}_team2image`).style.width = '40px'
-                document.getElementById(`${match_num}_team2image`).style.filter = ''
+                document.getElementById(`${match_num}_team2image`).classList.remove("drop-shadow-lg")
 			}
 			else {
 				document.getElementById(`${match_num}_team1_text`).innerHTML = "gain"
@@ -226,7 +226,7 @@
 				document.getElementById(`${match_num}_team1_name`).classList.remove("font-bold")
 				document.getElementById(`${match_num}_team1`).classList.remove("font-bold")
                 // document.getElementById(`${match_num}_team1image`).style.width = '40px'
-                document.getElementById(`${match_num}_team1image`).style.filter = ''
+                document.getElementById(`${match_num}_team1image`).classList.remove("drop-shadow-lg")
 
 				document.getElementById(`${match_num}_team2_text`).innerHTML = "gain"
 				document.getElementById(`${match_num}_team2_points`).classList.remove("text-green-700", "text-red-700")
@@ -234,7 +234,7 @@
 				document.getElementById(`${match_num}_team2_name`).classList.remove("font-bold")
 				document.getElementById(`${match_num}_team2`).classList.remove("font-bold")
                 // document.getElementById(`${match_num}_team2image`).style.width = '40px'
-                document.getElementById(`${match_num}_team2image`).style.filter = ''
+                document.getElementById(`${match_num}_team2image`).classList.remove("drop-shadow-lg")
 			}
 		}
 		function calc_score(prob) {

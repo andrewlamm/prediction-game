@@ -714,10 +714,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-left: 1.5rem;
 }
 
-.pb-8 {
-  padding-bottom: 2rem;
-}
-
 .pb-10 {
   padding-bottom: 2.5rem;
 }
@@ -730,12 +726,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-left: 0.25rem;
 }
 
-.pt-1 {
-  padding-top: 0.25rem;
-}
-
 .pt-4 {
   padding-top: 1rem;
+}
+
+.pt-1 {
+  padding-top: 0.25rem;
 }
 
 .pl-4 {
@@ -793,11 +789,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   line-height: 1;
 }
 
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
 .font-bold {
   font-weight: 700;
 }
@@ -840,17 +831,13 @@ Ensure the default browser behavior of the `hidden` attribute.
   color: rgb(147 197 253 / var(--tw-text-opacity));
 }
 
-.drop-shadow {
-  --tw-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
+.drop-shadow-lg {
+  --tw-drop-shadow: drop-shadow(0px 0px 8px #facc15);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
 .drop-shadow-2xl {
   --tw-drop-shadow: drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-
-.filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
@@ -1001,20 +988,12 @@ a[target="_blank"]::after {
     width: 100%;
   }
 
-  .md\:w-1\/5 {
-    width: 20%;
-  }
-
-  .md\:w-3\/5 {
-    width: 60%;
-  }
-
   .md\:w-1\/6 {
     width: 16.666667%;
   }
 
-  .md\:w-1\/4 {
-    width: 25%;
+  .md\:w-3\/5 {
+    width: 60%;
   }
 
   .md\:flex-row {
@@ -1060,10 +1039,6 @@ a[target="_blank"]::after {
 }
 
 @media (min-width: 1024px) {
-  .lg\:mt-4 {
-    margin-top: 1rem;
-  }
-
   .lg\:flex {
     display: flex;
   }
@@ -1120,12 +1095,12 @@ a[target="_blank"]::after {
     padding-top: 2rem;
   }
 
-  .lg\:pb-0 {
-    padding-bottom: 0px;
-  }
-
   .lg\:pb-8 {
     padding-bottom: 2rem;
+  }
+
+  .lg\:pb-0 {
+    padding-bottom: 0px;
   }
 
   .lg\:text-left {

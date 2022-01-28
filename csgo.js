@@ -19,7 +19,6 @@ app.set('trust proxy', 1)
 require('dotenv').config()
 
 let bodyParser = require('body-parser')
-const { object } = require('webidl-conversions')
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -452,7 +451,7 @@ async function start() {
     console.log("complete, waiting 30 seconds")
     await new Promise(resolve => setTimeout(resolve, 30000))
     // console.log(team_to_id)
-    await repeated_functions()
+    await start_find_live_matches()
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
     await get_averages()
@@ -465,14 +464,11 @@ let live_matches_data = {}
 const curr_live_matches = new Set()
 
 async function find_live_matches() {
-    return new Promise(async function(resolve, reject) {
-        live_matches_data = {}
-        curr_live_matches.clear()
-        await get_matches_data()
-        await get_live_matches()
-        await completed_matches_data()
-        resolve(1)
-    })
+    live_matches_data = {}
+    curr_live_matches.clear()
+    await get_matches_data()
+    await get_live_matches()
+    await completed_matches_data()
 }
 
 async function get_matches_data() {
@@ -553,7 +549,7 @@ async function get_live_matches() {
 
                     curr_live_matches.add(new_match_id)
 
-                    if (parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]) > 1643673600000) {
+                    if (parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]) > 1643673600) {
                         all_match_list[new_match_id].is_bo3 = 3
                     }
                     else {
@@ -571,7 +567,7 @@ async function get_live_matches() {
                         curr_live_matches.add(match_id)
                     }
 
-                    if (parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]) > 1643673600000) {
+                    if (parseInt(match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]) > 1643673600) {
                         all_match_list[match_id].is_bo3 = 3
                     }
                     else {
@@ -710,12 +706,17 @@ async function completed_matches_data() {
     })
 }
 
-async function repeated_functions() {
+async function start_find_live_matches() {
     return new Promise(async function(resolve, reject) {
-        console.log("repeat - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
+        console.log("start - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
         await find_live_matches()
         resolve(1)
     })
+}
+
+async function repeated_functions() {
+    console.log("repeat - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
+    await find_live_matches()
 }
 
 async function check_document_exists(req, res, next) {
@@ -1122,6 +1123,10 @@ app.post('/insert_guess', [insert_guess], (req, res) => {
 app.get('/logout', function(req, res){
     req.logout();
     res.redirect('/');
+})
+
+app.get('/testing', function(req, res) {
+    res.send(all_match_list)
 })
 
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }), function(req, res) {

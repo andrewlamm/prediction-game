@@ -19,7 +19,6 @@ app.set('trust proxy', 1)
 require('dotenv').config()
 
 let bodyParser = require('body-parser')
-const { object } = require('webidl-conversions')
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -237,13 +236,13 @@ hbs.registerHelper('turn_id_to_text', function(n) {
 
 hbs.registerHelper('convert_time', function(time) {
     time *= 1000
-    const s = new Date(time).toLocaleTimeString()
+    const s = new Date(time).toLocaleTimeString("en-US", {timeZone: "America/New_York"})
     return s.substring(0, s.indexOf(":", 3)) + s.substring(s.indexOf(" "))
 })
 
 hbs.registerHelper('convert_date', function(time) {
     time *= 1000
-    const s = new Date(time).toLocaleDateString()
+    const s = new Date(time).toLocaleDateString("en-US", {timeZone: "America/New_York"})
 
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -597,7 +596,7 @@ async function start() {
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
     // console.log(team_to_id)
-    await repeated_functions()
+    await start_find_live_matches()
     await get_averages()
     const repeated_timer = setInterval(repeated_functions, 60000) // 120000
 }
@@ -608,14 +607,11 @@ let live_matches_data = {}
 const curr_live_matches = new Set()
 
 async function find_live_matches() {
-    return new Promise(async function(resolve, reject) {
-        live_matches_data = {}
-        curr_live_matches.clear()
-        await get_matches_data()
-        await get_live_matches()
-        await completed_matches_data()
-        resolve(1)
-    })
+    live_matches_data = {}
+    curr_live_matches.clear()
+    await get_matches_data()
+    await get_live_matches()
+    await completed_matches_data()
 }
 
 async function get_matches_data() {
@@ -682,7 +678,7 @@ async function get_live_matches() {
                 // console.log(team1, team2)
 
                 const match_id = match_table[team_to_league_id[team1]][team1][team2][match_table[team_to_league_id[team1]][team1][team2].length-1]
-                if (all_match_list[match_id].is_completed) {
+                if (all_match_list[match_id] === undefined || all_match_list[match_id].is_completed) {
                     console.log(`new match - ${team1} vs ${team2}`)
                     let new_match_id = parseInt(Math.random()*1000000)
                     while (new_match_id in all_match_list) {
@@ -854,12 +850,17 @@ async function completed_matches_data(game_id) {
     })
 }
 
-function repeated_functions() {
+async function start_find_live_matches() {
     return new Promise(async function(resolve, reject) {
-        console.log("repeat - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
+        console.log("start - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
         await find_live_matches()
         resolve(1)
     })
+}
+
+async function repeated_functions() {
+    console.log("repeat - ", new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))
+    await find_live_matches()
 }
 
 async function check_document_exists(req, res, next) {
@@ -1108,6 +1109,11 @@ async function get_leaderboard(req, res, next) {
 }
 
 async function get_user_info(req, res, next) {
+    if (isNaN(req.params.userID)) {
+        res.locals.user_info = undefined
+        next()
+    }
+
     const query = {"_id": req.params.userID}
     const results = await collection.findOne(query)
 
