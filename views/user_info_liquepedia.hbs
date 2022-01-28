@@ -52,7 +52,7 @@
                                         {{display_average user_guess}}%
                                     </div>
                                 </td>
-                                <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else is_completed}}<span class="{{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
+                                <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else if is_completed}}<span class="{{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
                                 <td class="text-center py-1 px-1">{{#if (check_exists user_guess)}}{{{display_score user_guess team1score team2score is_bo3}}}{{/if}}</td>
                             </tr>
                             {{/each}}

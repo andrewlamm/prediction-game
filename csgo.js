@@ -613,7 +613,7 @@ async function completed_matches_data() {
                 if (team1 === "King of Kings") team1 = "APU King of Kings"
                 if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                console.log(team1, team2)
+                // console.log(team1, team2)
 
                 let match_index = -1
                 for (let i = 0; i < match_table[team_to_league_id[team1]][team1][team2].length; i++) {
