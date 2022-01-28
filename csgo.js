@@ -526,7 +526,7 @@ async function get_live_matches() {
                     continue
                 }
 
-                if (match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents === undefined) {
+                if (match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
                     console.log("tbd ...")
                     continue
                 }
