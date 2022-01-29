@@ -29,7 +29,7 @@
                                     <td class="px-1 text-center font-bold pb-1">Your<br> Points</td>
                                 </tr>
                                 {{#each this}}
-                                <tr>
+                                <tr id="{{league_id}}_{{@index}}">
                                     <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
                                     <td class="px-4 py-1">vs</td>
                                     <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
@@ -73,10 +73,24 @@
 		{{> footer}}
     </body>
     <script>
+        const array_lengths = {}
+        {{#each completed_games}}
+            array_lengths["{{@key}}"] = {{this.length}}
+        {{/each}}
         function toggle_division_list(id) {
             const key_id = id.substring(0, id.indexOf('_'))
             document.getElementById(`${key_id}_toggle_button`).classList.toggle("toggle_button_animation")
             document.getElementById(`${key_id}_match_list`).classList.toggle("hidden")
+
+            for (let i = 0; i < array_lengths[`${key_id}`]; i++) {
+                document.getElementById(`${key_id}_${i}`).classList.add("opacity-0")
+            }
+            for (let i = 0; i < array_lengths[`${key_id}`]; i++) {
+                document.getElementById(`${key_id}_${i}`).style.animation = "0.2s rotateX"
+                document.getElementById(`${key_id}_${i}`).style.animationDelay = `${0.02*(i+1)}s`
+                document.getElementById(`${key_id}_${i}`).style.animationFillMode = 'forwards'
+            }
+
         }
     </script>
 </html>

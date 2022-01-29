@@ -12,20 +12,20 @@
                             <img src={{user_info.profile_picture}} class="pt-1">
                         </div>
                         <div class="px-2 flex flex-col h-full">
-                            <div class="font-bold text-3xl md:text-5xl pb-2">
+                            <div class="font-bold text-2xl md:text-5xl pb-2">
                                 <a target="_blank" rel="noopener noreferrer" href={{user_info.steam_url}} class="hover:underline">{{user_info.display_name}}</a>
                             </div>
                             <div class="text-xl md:text-3xl">
                                 <span class="font-bold">Rank: </span> {{user_info.rank}} / {{user_info.total_players}}
                             </div>
                             <div class="text-xl md:text-3xl">
-                                <span class="font-bold">Score: </span> {{round_tenth user_info.score}} <span class="{{find_color user_info.day_score}}" title="Difference in the last 24 hours">({{positive_plus user_info.day_score}}{{round_tenth user_info.day_score}})</span>
+                                <span class="font-bold">Score: </span> {{round_tenth user_info.score}} <span class="{{find_color user_info.day_score}} text-base md:text-3xl" title="Difference in the last 24 hours">({{positive_plus user_info.day_score}}{{round_tenth user_info.day_score}})</span>
                             </div>
                             <div class="text-lg md:text-2xl">
-                                <span class="font-bold">Correct Picks: </span> {{user_info.correct}} <span class="{{find_color user_info.day_picks}}" title="Difference in the last 24 hours">({{positive_plus user_info.day_picks}}{{user_info.day_picks}})</span>
+                                <span class="font-bold">Correct Picks: </span> {{user_info.correct}} <span class="{{find_color user_info.day_picks}} text-base md:text-2xl" title="Difference in the last 24 hours">({{positive_plus user_info.day_picks}}{{user_info.day_picks}})</span>
                             </div>
                             <div class="text-lg md:text-2xl">
-                                <span class="font-bold">Incorrect Picks: </span> {{user_info.incorrect}} <span class="{{if_incorrect user_info.day_incorrect}}" title="Difference in the last 24 hours">(+{{user_info.day_incorrect}})</span>
+                                <span class="font-bold">Incorrect Picks: </span> {{user_info.incorrect}} <span class="{{if_incorrect user_info.day_incorrect}} text-base md:text-2xl" title="Difference in the last 24 hours">(+{{user_info.day_incorrect}})</span>
                             </div>
                         </div>
                     </div>

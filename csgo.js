@@ -96,10 +96,9 @@ hbs.registerHelper('if_equals', function(arg1, arg2) {
 
 hbs.registerHelper('check_win', function(score, bo3, score2) {
     if (score === "W") return true
-    if (score === Math.floor(bo3 / 2)+1) {
+    if (score > score2) {
         return true
     }
-    if (bo3 === 1) return score > score2 ? 1 : 0
     return false
 })
 
@@ -121,7 +120,7 @@ hbs.registerHelper('display_score', function(score, team1score, team2score, bo3)
     if ((score === 50 && (team1score !== 0 || team2score !== 0)) || team1score === "W" || team2score === "W") {
         return `<span class="font-semibold">0.0</span>`
     }
-    if (team1score === Math.floor(bo3/2)+1 || (bo3 === 1 && team1score > team2score)) {
+    if (team1score > team2score) {
         if (score < 50) {
             return `<span class="text-green-700 font-semibold">+${calc_score(100-score).toFixed(1)}</span>`
         }
@@ -129,7 +128,7 @@ hbs.registerHelper('display_score', function(score, team1score, team2score, bo3)
             return `<span class="text-red-700 font-semibold">${calc_score(100-score).toFixed(1)}</span>`
         }
     }
-    else if (team2score === Math.floor(bo3/2)+1 || (bo3 === 1 && team2score > team1score)) {
+    else if (team2score > team1score) {
         if (score < 50) {
             return `<span class="text-red-700 font-semibold">${calc_score(score).toFixed(1)}</span>`
         }
@@ -151,13 +150,9 @@ hbs.registerHelper('check_team1', function(score) {
 
 hbs.registerHelper('determine_win', function(score, team1score, team2score, is_bo3) {
     if (team1score === "W" || team2score === "W") return false
-    if (score > 50 && team2score === Math.floor(is_bo3 / 2)+1) return true
-    else if (score < 50 && team1score === Math.floor(is_bo3 / 2)+1) return true
 
-    if (is_bo3 === 1) {
-        if (score > 50 && team2score > team1score) return true
-        else if (score < 50 && team1score > team2score) return true
-    }
+    if (score > 50 && team2score > team1score) return true
+    else if (score < 50 && team1score > team2score) return true
 
     return false
 })
@@ -345,8 +340,8 @@ const LEAGUE_IDS = [1]
 // WEU, CN, NA, SEA, EEU, SA
 const leagueid_to_name = {1: "BLAST Premier Spring Groups"}
 const team_to_logo = {}
-const match_table = {}
-const all_match_list = {}
+let match_table = {}
+let all_match_list = {}
 const dota_match_id_to_match = {}
 const team_to_league_id = {}
 const team_to_id = {}
@@ -393,13 +388,8 @@ async function find_teams() {
             }
 
             //hard coded matches
-            match_table[1]["G2 Esports"]["Complexity Gaming"] = [450009]
-            match_table[1]["Complexity Gaming"]["G2 Esports"] = [450009]
-            all_match_list[450009] = {"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":1643387833,"team1score":16,"team2score":12,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":298,"number_guesses":6}
-
-            match_table[1]["BIG"]["Ninjas in Pyjamas"] = [947040]
-            match_table[1]["Ninjas in Pyjamas"]["BIG"] = [947040]
-            all_match_list[947040] = {"team1":"BIG","team2":"Ninjas in Pyjamas","index":0,"start_time":1643383200,"end_time":1643387833,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":356,"number_guesses":6}
+            match_table = {"1":{"Astralis":{"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[467899],"Team Liquid":[],"Team Vitality":[]},"BIG":{"Astralis":[],"Complexity Gaming":[574217],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[947040,810984],"OG":[],"Team Liquid":[],"Team Vitality":[]},"Complexity Gaming":{"Astralis":[],"BIG":[574217],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[450009],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[],"Team Vitality":[]},"Evil Geniuses":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[],"Team Vitality":[620532]},"FaZe Clan":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[175176],"Team Vitality":[]},"G2 Esports":{"Astralis":[],"BIG":[],"Complexity Gaming":[450009],"Evil Geniuses":[],"FaZe Clan":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[838365,437475],"OG":[],"Team Liquid":[],"Team Vitality":[]},"MIBR":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"Natus Vincere":[823460],"Ninjas in Pyjamas":[],"OG":[690531],"Team Liquid":[],"Team Vitality":[]},"Natus Vincere":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[823460],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[],"Team Vitality":[]},"Ninjas in Pyjamas":{"Astralis":[],"BIG":[947040,810984],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[838365,437475],"MIBR":[],"Natus Vincere":[],"OG":[],"Team Liquid":[],"Team Vitality":[]},"OG":{"Astralis":[467899],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[690531],"Natus Vincere":[],"Ninjas in Pyjamas":[],"Team Liquid":[],"Team Vitality":[]},"Team Liquid":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[175176],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Vitality":[]},"Team Vitality":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[620532],"FaZe Clan":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[]}}}
+            all_match_list = {"175176":{"team1":"FaZe Clan","team2":"Team Liquid","index":0,"start_time":1643554800,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":1,"total_guess":373,"number_guesses":6},"437475":{"team1":"G2 Esports","team2":"Ninjas in Pyjamas","index":1,"start_time":1643403600,"end_time":1643409407,"team1score":22,"team2score":19,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":27,"number_guesses":3},"450009":{"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":1643387833,"team1score":16,"team2score":12,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":596,"number_guesses":12},"467899":{"team1":"Astralis","team2":"OG","index":0,"start_time":1643468400,"end_time":1643477799,"team1score":8,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":346,"number_guesses":6},"690531":{"team1":"MIBR","team2":"OG","index":0,"start_time":1643475900,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":1,"total_guess":104,"number_guesses":2},"574217":{"team1":"Complexity Gaming","team2":"BIG","index":0,"start_time":1643393400,"end_time":1643397406,"team1score":10,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":120,"number_guesses":3},"620532":{"team1":"Team Vitality","team2":"Evil Geniuses","index":0,"start_time":1643551200,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":1,"total_guess":366,"number_guesses":6},"810984":{"team1":"Ninjas in Pyjamas","team2":"BIG","index":1,"start_time":1643398800,"end_time":1643402806,"team1score":16,"team2score":9,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":92,"number_guesses":2},"823460":{"team1":"Natus Vincere","team2":"MIBR","index":0,"start_time":1643464800,"end_time":1643477789,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":257,"number_guesses":6},"838365":{"team1":"G2 Esports","team2":"Ninjas in Pyjamas","index":0,"start_time":1643389200,"end_time":1643392606,"team1score":16,"team2score":6,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":50,"number_guesses":2},"947040":{"team1":"BIG","team2":"Ninjas in Pyjamas","index":0,"start_time":1643383200,"end_time":1643387833,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":712,"number_guesses":12}}
         }
         resolve(1)
     })
@@ -530,7 +520,7 @@ async function get_live_matches() {
                 }
 
                 if (match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
-                    console.log("tbd ...")
+                    // console.log("tbd ...")
                     continue
                 }
                 let team2 = match_list.contents[1].contents[1].contents[i].nextElement.contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
@@ -769,7 +759,7 @@ async function check_document_exists(req, res, next) {
                 }
             }
             const result = await collection.updateOne(query, update_doc);
-            console.log("name updated!");
+            // console.log("name updated!");
 
             next()
         }
@@ -814,10 +804,10 @@ function get_complete_matches(req, res, next) {
             //     console.log(`${val.team1} ${val.team1score} - ${val.team2score} ${val.team2} (avg: ${res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]}, user: ${res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})`)
             // }
             if (val.number_guesses === 0) {
-                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": undefined, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3})
+                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": undefined, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
             }
             else {
-                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": Math.round(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3})
+                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": Math.round(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
             }
         }
     }
@@ -843,18 +833,18 @@ function get_upcoming_matches(req, res, next) {
         if (!val.is_completed && !val.is_live) {
             if (val.number_guesses === 0) {
                 if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": 50})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
                 else {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
             }
             else {
                 if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": 50})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
                 else {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
             }
         }

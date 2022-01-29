@@ -370,6 +370,7 @@ async function find_teams() {
                     if (team1.indexOf("(") !== -1) {
                         team1 = team1.substring(0, team1.indexOf("(")-1)
                     }
+                    if (team1 === "Omega Esports") continue
 
                     match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1] = {}
 
@@ -384,6 +385,7 @@ async function find_teams() {
                         if (team2.indexOf("(") !== -1) {
                             team2 = team2.substring(0, team2.indexOf("(")-1)
                         }
+                        if (team2 === "Omega Esports") continue
                         match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2] = []
                     }
                     team_to_league_id[team1] = LEAGUE_IDS[divisions_j*6+region_i]
@@ -578,6 +580,7 @@ async function get_averages() {
                 const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
 
                 // console.log(team1, team2, index)
+                // console.log(match_table[team_to_league_id[team1]][team1][team2][index])
                 const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
 
                 all_match_list[match_id].number_guesses += 1
@@ -659,7 +662,8 @@ async function get_live_matches() {
                     team1 = team1.substring(0, team1.indexOf("(")-1)
                 }
                 if (team1 === "TBD" || team1 === "To Be Determined") {
-                    console.log("TBD spotted")
+                    // console.log(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text)
+                    // console.log(team1)
                     continue
                 }
                 let team2 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
@@ -671,7 +675,7 @@ async function get_live_matches() {
                 if (team2 === "King of Kings") team2 = "APU King of Kings"
 
                 if (team1 === "TBD" || team2 === "TBD") {
-                    console.log("TBD spotted")
+                    // console.log(team1, team2)
                     continue
                 }
 
@@ -945,10 +949,10 @@ function get_complete_matches(req, res, next) {
             //     console.log(`${val.team1} ${val.team1score} - ${val.team2score} ${val.team2} (avg: ${res.locals.average_guess[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]}, user: ${res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})`)
             // }
             if (val.number_guesses === 0) {
-                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": undefined, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3})
+                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": undefined, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
             }
             else {
-                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": Math.round(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3})
+                res.locals.complete_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1score": val.team1score, "team2score": val.team2score, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "end_time": val.end_time, "is_live": val.is_live, "average_guess": Math.round(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "is_bo3": val.is_bo3, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
             }
         }
     }
@@ -1172,7 +1176,7 @@ async function get_user_info(req, res, next) {
                 }
 
                 if ((req.user !== undefined && req.params.userID === req.user._json.steamid) || all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
-                    res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "start_time": all_match_list[match_id].start_time, "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
+                    res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "start_time": all_match_list[match_id].start_time, "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "is_completed": all_match_list[match_id].is_completed, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
                 }
             }
         }
@@ -1268,6 +1272,14 @@ app.post('/insert_guess', [insert_guess], (req, res) => {
 app.get('/logout', function(req, res){
     req.logout();
     res.redirect('/');
+})
+
+app.get('/testing', function(req, res) {
+    res.send(all_match_list)
+})
+
+app.get('/testing2', function(req, res) {
+    res.send(match_table)
 })
 
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }), function(req, res) {
