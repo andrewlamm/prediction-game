@@ -161,7 +161,15 @@
                         document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_days}d ${match_{{team1id}}_{{team2id}}_{{index}}_hours}h ${match_{{team1id}}_{{team2id}}_{{index}}_minutes}m`
                     }
                     else {
-                        document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_hours}h ${match_{{team1id}}_{{team2id}}_{{index}}_minutes}m ${match_{{team1id}}_{{team2id}}_{{index}}_seconds}s`
+						if (match_{{team1id}}_{{team2id}}_{{index}}_hours > 0) {
+                        	document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_hours}h ${match_{{team1id}}_{{team2id}}_{{index}}_minutes}m ${match_{{team1id}}_{{team2id}}_{{index}}_seconds}s`
+						}
+						else if (match_{{team1id}}_{{team2id}}_{{index}}_minutes > 0) {
+                        	document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_minutes}m ${match_{{team1id}}_{{team2id}}_{{index}}_seconds}s`
+						}
+						else {
+                        	document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_seconds}s`
+						}
                     }
 
                     if (match_{{team1id}}_{{team2id}}_{{index}}_diff < 0) {

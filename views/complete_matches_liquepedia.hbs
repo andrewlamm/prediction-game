@@ -30,9 +30,9 @@
                                 </tr>
                                 {{#each this}}
                                 <tr id="{{league_id}}_{{@index}}">
-                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
                                     <td class="px-4 py-1">vs</td>
-                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
                                     <td class="text-center py-1 px-1">
                                         <div class="flex flex-row items-center justify-center {{#if (determine_win average_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                             {{#if (check_exists average_guess)}}

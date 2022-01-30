@@ -280,7 +280,9 @@ hbs.registerHelper('set_timer', function(start) {
         return `${days}d ${hours}h ${minutes}m`
     }
     else {
-        return `${hours}h ${minutes}m ${seconds}s`
+        if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`
+        else if (minutes > 0) return `${minutes}m ${seconds}s`
+        return `${seconds}s`
     }
 })
 
@@ -957,6 +959,19 @@ function get_complete_matches(req, res, next) {
         }
     }
 
+    res.locals.all_complete_matches = []
+    for (const [league, val] of Object.entries(res.locals.complete_matches)) {
+        for (let i = 0; i < res.locals.complete_matches[league].length; i++) {
+            res.locals.all_complete_matches.push(res.locals.complete_matches[league][i])
+        }
+    }
+
+    res.locals.all_complete_matches.sort(function(a, b){
+        if (a.is_live) return -1
+        if (b.is_live) return 1
+        return a.end_time < b.end_time ? 1 : -1
+    })
+
     for (let i = 0; i < LEAGUE_IDS.length; i++) {
         res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].sort(function(a, b){
             if (a.is_live) return -1
@@ -995,6 +1010,16 @@ function get_upcoming_matches(req, res, next) {
         }
     }
 
+    res.locals.all_upcoming_matches = []
+    for (const [league, val] of Object.entries(res.locals.upcoming_matches)) {
+        for (let i = 0; i < res.locals.upcoming_matches[league].length; i++) {
+            res.locals.all_upcoming_matches.push(res.locals.upcoming_matches[league][i])
+        }
+    }
+
+    res.locals.all_upcoming_matches.sort(function(a, b){
+        return a.start_time < b.start_time ? -1 : 1
+    })
     for (let i = 0; i < LEAGUE_IDS.length; i++) {
         res.locals.upcoming_matches[leagueid_to_name[LEAGUE_IDS[i]]].sort(function(a, b){
             return a.start_time < b.start_time ? -1 : 1
@@ -1067,7 +1092,19 @@ async function get_leaderboard(req, res, next) {
     res.locals.total_users = 0
     await collection.find().forEach(async function(doc) {
         res.locals.total_users += 1
-        leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1})
+        let day_points = 0
+        res.locals.prev_day_matches.forEach(function(key) {
+            const doc_id = `match_${team_to_id[all_match_list[key].team1]}_${team_to_id[all_match_list[key].team2]}_${all_match_list[key].index}`
+            if (doc[doc_id] !== undefined) {
+                if (all_match_list[key].team1score > all_match_list[key].team2score) {
+                    day_points += parseFloat(calc_score(100-doc[doc_id]).toFixed(1))
+                }
+                else {
+                    day_points += parseFloat(calc_score(doc[doc_id]).toFixed(1))
+                }
+            }
+        })
+        leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1, "day_points": day_points})
     })
     leaderboard.sort(function(a, b){
         if (a.score === b.score) {
@@ -1245,19 +1282,34 @@ async function get_user_rank(req, res, next) {
     }
 }
 
-app.get('/', [check_document_exists], (req, res) => {
-    res.render('index', {user: req.user})
+app.get('/', [check_document_exists, get_upcoming_matches, get_complete_matches, get_matches_prev_day, get_leaderboard], (req, res) => {
+    const recent_upcoming = []
+    for (let i = 0; i < res.locals.all_upcoming_matches.length; i++) {
+        if (i >= 3) break
+        recent_upcoming.push(res.locals.all_upcoming_matches[i])
+    }
+    const recent_completed = []
+    for (let i = 0; i < res.locals.all_complete_matches.length; i++) {
+        if (i >= 3) break
+        recent_completed.push(res.locals.all_complete_matches[i])
+    }
+    const top_players = []
+    for (let i = 0; i < res.locals.leaderboard.length; i++) {
+        if (i >= 5) break
+        top_players.push(res.locals.leaderboard[i])
+    }
+    res.render('index', {user: req.user, "upcoming_matches": recent_upcoming, "recent_completed": recent_completed, "top_players": top_players})
 })
 
-app.get('/upcoming_matches', [check_document_exists, find_averages, get_upcoming_matches, get_leaderboard], (req, res) => {
+app.get('/upcoming_matches', [check_document_exists, get_matches_prev_day, get_upcoming_matches, get_leaderboard], (req, res) => {
     res.render('upcoming_matches_liquepedia', {user: req.user, upcoming_matches: res.locals.upcoming_matches, total_users: res.locals.total_users})
 })
 
-app.get('/complete_matches', [check_document_exists, find_averages, get_complete_matches, get_leaderboard], (req, res) => {
+app.get('/complete_matches', [check_document_exists, get_matches_prev_day, get_complete_matches, get_leaderboard], (req, res) => {
     res.render('complete_matches_liquepedia', {user: req.user, completed_games: res.locals.complete_matches, total_users: res.locals.total_users})
 })
 
-app.get('/leaderboard', [check_document_exists, get_leaderboard], (req, res) => {
+app.get('/leaderboard', [check_document_exists, get_matches_prev_day, get_leaderboard], (req, res) => {
     res.render('leaderboard', {user: req.user, leaderboard: res.locals.leaderboard, total_users: res.locals.total_users})
 })
 
@@ -1275,11 +1327,21 @@ app.get('/logout', function(req, res){
 })
 
 app.get('/testing', function(req, res) {
-    res.send(all_match_list)
+    if (req.user !== undefined && (req.user._json.steamid === "76561199063897236" || req.user._json.steamid === "76561198251387562")) {
+        res.send(all_match_list)
+    }
+    else {
+        res.send()
+    }
 })
 
 app.get('/testing2', function(req, res) {
-    res.send(match_table)
+    if (req.user !== undefined && (req.user._json.steamid === "76561199063897236" || req.user._json.steamid === "76561198251387562")) {
+        res.send(match_table)
+    }
+    else {
+        res.send()
+    }
 })
 
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }), function(req, res) {

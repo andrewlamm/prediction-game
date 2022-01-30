@@ -79,6 +79,16 @@ a[target="_blank"]::after {
     }
 }
 
+.sidebar_width {
+    @apply w-full
+}
+
+@media (max-width: 767px) {
+    .sidebar_width {
+        width: 400px;
+    }
+}
+
 .plusminus {
     color: #ecf0f1;
     width: 40px;

@@ -5,53 +5,175 @@
         {{> header page_name="Home"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full flex flex-col items-center justify-center">
-                <div class="w-full lg:w-2/3 flex flex-col items-center justify-center pt-2">
-                    <div class="w-full flex flex-col items-center justify-center">
-                        <div class="font-bold text-xl">
-                            Who's better at predicting pro matches: you or your friends? Come play and find out.
+                <div class="w-full lg:w-3/4 flex flex-col-reverse md:flex-row justify-center pt-2">
+                    <div class="w-full md:w-2/3 flex flex-col items-center justify-center md:mr-6">
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-xl">
+                                Who's better at predicting pro matches: you or your friends? Come play and find out.
+                            </div>
+                            <div class="pb-4">
+                                Compete against your friends and the community in this predictor game, inspired by <a target="_blank" rel="noopener noreferrer" href="https://projects.fivethirtyeight.com/2021-nfl-forecasting-game/" class="text-blue-700">FiveThirtyEight’s NFL Forecasting Game</a>.
+                            </div>
                         </div>
-                        <div class="pb-4">
-                            Compete against your friends and the community in this predictor game, inspired by <a target="_blank" rel="noopener noreferrer" href="https://projects.fivethirtyeight.com/2021-nfl-forecasting-game/" class="text-blue-700">FiveThirtyEight’s NFL Forecasting Game</a>.
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-2xl">
+                                Predicting Matches
+                            </div>
+                            <div>
+                                Head over to the <a href="/upcoming_matches" class="text-blue-700">upcoming matches</a> page (after making sure you have <a href="/auth/steam" class="text-blue-700">logged in with Steam</a>) and predict the outcomes of professional DPC matches! However, instead of simply
+                                choosing whether or not a team would win, you need to also choose the probability that a team will win using the slider. But beware—the scoring system punishes overconfidence.
+                            </div>
+                            <div>
+                                The scoring system uses <a target="_blank" rel="noopener noreferrer"  href="https://en.wikipedia.org/wiki/Brier_score" class="text-blue-700">Brier scores</a>, which is the same system that the <a target="_blank" rel="noopener noreferrer" href="https://fivethirtyeight.com/methodology/how-to-play-our-nfl-forecasting-game/" class="text-blue-700">FiveThirtyEight Game</a> uses.
+                                Possible points from each game range from a gain of 25 points to a loss of 75 points, and is calculated using the formula
+                            </div>
+                            <div>
+                                <code>points = 25 - (([probability of team winning] - 100)^2 / 100)</code>
+                            </div>
+                            <div class="pt-2">
+                                For example, let's say for the Team Liquid vs Nigma Galaxy match, you predict that Nigma Galaxy has a 73% chance of winning.
+                                Then, if Nigma Galaxy does indeed win, you will gain 17.7 points! However, if Team Liquid wins, you will lose 28.3 points.
+                                Nigma Galaxy did end up <a target="_blank" rel="noopener noreferrer" href="https://www.dotabuff.com/matches/6371895283" class="text-blue-700">winning</a> the match 2-1, so you would've have gained 17.7 points.
+                            </div>
+                        </div>
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-2xl">
+                                Completed Matches
+                            </div>
+                            <div>
+                                View completed DPC matches at the <a href="/complete_matches" class="text-blue-700">complete matches</a> page. There, you will find each completed and ongoing match, along with the score.
+                                Additionally, you will see the average guess for each match, and if you are logged into steam and have added a guess for the match, you will see that too. Finally, if the match is completed (not live), the average points and your points from that match will be shown.
+                            </div>
+                        </div>
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-2xl">
+                                Leaderboard
+                            </div>
+                            <div>
+                                Finally, look at the <a href="/leaderboard" class="text-blue-700">leaderboard</a> to view the top scores and see how you and your friends are doing.
+                                The number of picks with the correct chosen winner is shown in the Correct column and is used as a tiebreak if there is a tie in scores.
+                                Filters for scores between leagues are coming soon™.
+                            </div>
                         </div>
                     </div>
-                    <div class="w-full flex flex-col items-center justify-center">
-                        <div class="font-bold text-2xl">
-                            Predicting Matches
+                    <div class="w-full md:w-1/3 items-center flex flex-row md:flex-col overflow-x-auto">
+                        <div class="w-full  pb-2 flex flex-col min-w-full md:min-w-0">
+                            <div class="font-bold text-2xl text-center">
+                                Upcoming Matches
+                            </div>
+                            {{#each upcoming_matches}}
+                            <div class="w-full flex flex-row py-1">
+                                <div class="flex flex-col w-3/5">
+                                    <div class="flex flex-row items-center">
+                                        <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}
+                                    </div>
+                                    <div class="flex flex-row items-center">
+                                        <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}
+                                    </div>
+                                </div>
+                                <div class="flex flex-col w-2/5">
+                                    <div class="flex flex-row items-center justify-end" id="match:{{team1id}}:{{team2id}}:{{index}}_timer">
+                                        {{set_timer start_time}}
+                                    </div>
+                                    <div class="flex flex-row items-center justify-end" title="Average Guess">
+                                        {{#if (check_exists average_guess)}}
+                                            {{#if (check_not50 average_guess)}}
+                                            <div style="width: 40px;" class="flex items-center justify-center">
+                                                <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                            </div>
+                                            {{/if}}
+                                            {{display_average average_guess}}%
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{/each}}
                         </div>
-                        <div>
-                            Head over to the <a href="/upcoming_matches" class="text-blue-700">upcoming matches</a> page (after making sure you have <a href="/auth/steam" class="text-blue-700">logged in with Steam</a>) and predict the outcomes of professional DPC matches! However, instead of simply
-                            choosing whether or not a team would win, you need to also choose the probability that a team will win using the slider. But beware—the scoring system punishes overconfidence.
+                        <div class="w-full mx-6 md:mx-0 pb-2 flex flex-col min-w-full md:min-w-0">
+                            <div class="font-bold text-2xl text-center">
+                                Recently Completed
+                            </div>
+                            {{#each recent_completed}}
+                            <div class="flex flex-row py-1 w-full">
+                                <div class="flex flex-col w-3/4">
+                                    <div class="flex flex-row items-center {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}">
+                                        <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}
+                                    </div>
+                                    <div class="flex flex-row items-center {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}">
+                                        <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}
+                                    </div>
+                                </div>
+                                <div class="flex flex-row w-1/4 items-center justify-end h-full">
+                                    <div class="flex items-center justify-center h-full">
+                                        {{#if is_live}}
+                                        <div class="flex flex-col">
+                                            <div class="font-bold text-center">
+                                                LIVE
+                                            </div>
+                                            <div class="flex flex-row items-center justify-center" title="Average Guess">
+                                                {{#if (check_exists average_guess)}}
+                                                    {{#if (check_not50 average_guess)}}
+                                                    <div style="width: 40px;" class="flex items-center justify-center">
+                                                        <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                                    </div>
+                                                    {{/if}}
+                                                    {{display_average average_guess}}%
+                                                {{/if}}
+                                            </div>
+                                        </div>
+                                        {{else}}
+                                        <div class="flex flex-col items-center justify-center h-full">
+                                            <div class="{{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}} h-1/2 flex items-center">
+                                                {{team1score}}
+                                            </div>
+                                            <div class="{{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}} h-1/2 flex items-center">
+                                                {{team2score}}
+                                            </div>
+                                        </div>
+                                        {{/if}}
+                                    </div>
+                                    <div>
+                                        {{#if is_live}}
+                                        {{else}}
+                                        <div class="flex flex-col items-center justify-center pl-1">
+                                            {{#if (check_exists average_guess)}}
+                                                <div class="flex flex-row" title="Average Guess">
+                                                    {{#if (check_not50 average_guess)}}
+                                                    <div style="width: 40px;" class="flex items-center justify-center">
+                                                        <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                                    </div>
+                                                    {{/if}}
+                                                    {{display_average average_guess}}%
+                                                </div>
+                                                <div title="Average Score">
+                                                    {{{display_score average_guess team1score team2score is_bo3}}}
+                                                </div>
+                                            {{/if}}
+                                        </div>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{/each}}
                         </div>
-                        <div>
-                            The scoring system uses <a target="_blank" rel="noopener noreferrer"  href="https://en.wikipedia.org/wiki/Brier_score" class="text-blue-700">Brier scores</a>, which is the same system that the <a target="_blank" rel="noopener noreferrer" href="https://fivethirtyeight.com/methodology/how-to-play-our-nfl-forecasting-game/" class="text-blue-700">FiveThirtyEight Game</a> uses.
-                            Possible points from each game range from a gain of 25 points to a loss of 75 points, and is calculated using the formula
-                        </div>
-                        <div>
-                            <code>points = 25 - (([probability of team winning] - 100)^2 / 100)</code>
-                        </div>
-                        <div class="pt-2">
-                            For example, let's say for the Team Liquid vs Nigma Galaxy match, you predict that Nigma Galaxy has a 73% chance of winning.
-                            Then, if Nigma Galaxy does indeed win, you will gain 17.7 points! However, if Team Liquid wins, you will lose 28.3 points.
-                            Nigma Galaxy did end up <a target="_blank" rel="noopener noreferrer" href="https://www.dotabuff.com/matches/6371895283" class="text-blue-700">winning</a> the match 2-1, so you would've have gained 17.7 points.
-                        </div>
-                    </div>
-                    <div class="w-full flex flex-col items-center justify-center">
-                        <div class="font-bold text-2xl">
-                            Completed Matches
-                        </div>
-                        <div>
-                            View completed DPC matches at the <a href="/complete_matches" class="text-blue-700">complete matches</a> page. There, you will find each completed and ongoing match, along with the score.
-                            Additionally, you will see the average guess for each match, and if you are logged into steam and have added a guess for the match, you will see that too. Finally, if the match is completed (not live), the average points and your points from that match will be shown.
-                        </div>
-                    </div>
-                    <div class="w-full flex flex-col items-center justify-center">
-                        <div class="font-bold text-2xl">
-                            Leaderboard
-                        </div>
-                        <div>
-                            Finally, look at the <a href="/leaderboard" class="text-blue-700">leaderboard</a> to view the top scores and see how you and your friends are doing.
-                            The number of picks with the correct chosen winner is shown in the Correct column and is used as a tiebreak if there is a tie in scores.
-                            Filters for scores between leagues are coming soon™.
+                        <div class="w-full  pb-2 flex flex-col min-w-full md:min-w-0">
+                            <div class="font-bold text-2xl text-center">
+                                Top Scoring Players
+                            </div>
+                            <table class="w-full table-fixed">
+                                <tr>
+                                    <td class="text-center pr-4 font-bold pb-1" style="width: 1px;">#</td>
+                                    <td class="px-1 text-left font-bold pb-1">Name</td>
+                                    <td class="px-1 text-center font-bold pb-1" style="width: 150px;">Score</td>
+                                </tr>
+                                {{#each top_players}}
+                                <tr>
+                                    <td class="text-center pr-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{this.rank}}</td>
+                                    <td class="px-1 py-1 w-full truncate {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}} hover:underline"><a href="/user/{{this.user_id}}">{{this.display_name}}</a></td>
+                                    <td class="text-center px-1 py-1 whitespace-nowrap {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{round_tenth this.score}} <span class="{{find_color this.day_points}} text-xs" title="Difference in the last 24 hours">({{positive_plus this.day_points}}{{round_tenth this.day_points}})</span></td>
+                                </tr>
+                                {{/each}}
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -59,4 +181,30 @@
         </div>
 		{{> footer}}
     </body>
+    <script>
+        setInterval(function() {
+            const now = new Date().getTime()
+            {{#each upcoming_matches}}
+                {{#if start_time}}
+                const match_{{team1id}}_{{team2id}}_{{index}}_diff = ({{start_time}}*1000) - now
+                const match_{{team1id}}_{{team2id}}_{{index}}_days = Math.floor(match_{{team1id}}_{{team2id}}_{{index}}_diff / (86400000));
+                const match_{{team1id}}_{{team2id}}_{{index}}_hours = Math.floor((match_{{team1id}}_{{team2id}}_{{index}}_diff % (86400000)) / (3600000));
+                const match_{{team1id}}_{{team2id}}_{{index}}_minutes = Math.floor((match_{{team1id}}_{{team2id}}_{{index}}_diff % (3600000)) / (60000));
+                const match_{{team1id}}_{{team2id}}_{{index}}_seconds = Math.floor((match_{{team1id}}_{{team2id}}_{{index}}_diff % (60000)) / 1000);
+
+                if (match_{{team1id}}_{{team2id}}_{{index}}_days > 0) {
+                    document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_days}d ${match_{{team1id}}_{{team2id}}_{{index}}_hours}h ${match_{{team1id}}_{{team2id}}_{{index}}_minutes}m`
+                }
+                else {
+                    document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_hours}h ${match_{{team1id}}_{{team2id}}_{{index}}_minutes}m ${match_{{team1id}}_{{team2id}}_{{index}}_seconds}s`
+                }
+
+                if (match_{{team1id}}_{{team2id}}_{{index}}_diff < 0) {
+                    document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = "LIVE"
+                    document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").classList.add("font-bold")
+                }
+                {{/if}}
+            {{/each}}
+        }, 1000)
+    </script>
 </html>

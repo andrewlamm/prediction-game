@@ -282,7 +282,9 @@ hbs.registerHelper('set_timer', function(start) {
         return `${days}d ${hours}h ${minutes}m`
     }
     else {
-        return `${hours}h ${minutes}m ${seconds}s`
+        if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`
+        else if (minutes > 0) return `${minutes}m ${seconds}s`
+        return `${seconds}s`
     }
 })
 
@@ -388,8 +390,9 @@ async function find_teams() {
             }
 
             //hard coded matches
+
             match_table = {"1":{"Astralis":{"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[491702],"Natus Vincere":[379342],"Ninjas in Pyjamas":[],"OG":[467899,506627],"Team Liquid":[],"Team Vitality":[]},"BIG":{"Astralis":[],"Complexity Gaming":[574217],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[947040,810984],"OG":[],"Team Liquid":[],"Team Vitality":[]},"Complexity Gaming":{"Astralis":[],"BIG":[574217],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[450009],"MIBR":[752361],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[],"Team Vitality":[]},"Evil Geniuses":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[],"Team Vitality":[620532]},"FaZe Clan":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[175176],"Team Vitality":[]},"G2 Esports":{"Astralis":[],"BIG":[],"Complexity Gaming":[450009],"Evil Geniuses":[],"FaZe Clan":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[838365,437475],"OG":[],"Team Liquid":[],"Team Vitality":[]},"MIBR":{"Astralis":[491702],"BIG":[],"Complexity Gaming":[752361],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"Natus Vincere":[823460],"Ninjas in Pyjamas":[],"OG":[690531],"Team Liquid":[],"Team Vitality":[]},"Natus Vincere":{"Astralis":[379342],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[823460],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[],"Team Vitality":[]},"Ninjas in Pyjamas":{"Astralis":[],"BIG":[947040,810984],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[838365,437475],"MIBR":[],"Natus Vincere":[],"OG":[],"Team Liquid":[],"Team Vitality":[]},"OG":{"Astralis":[467899,506627],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[],"G2 Esports":[],"MIBR":[690531],"Natus Vincere":[],"Ninjas in Pyjamas":[],"Team Liquid":[],"Team Vitality":[]},"Team Liquid":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[],"FaZe Clan":[175176],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Vitality":[]},"Team Vitality":{"Astralis":[],"BIG":[],"Complexity Gaming":[],"Evil Geniuses":[620532],"FaZe Clan":[],"G2 Esports":[],"MIBR":[],"Natus Vincere":[],"Ninjas in Pyjamas":[],"OG":[],"Team Liquid":[]}}}
-            all_match_list = {"175176":{"team1":"FaZe Clan","team2":"Team Liquid","index":0,"start_time":1643554800,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":1,"total_guess":746,"number_guesses":12},"379342":{"team1":"Natus Vincere","team2":"Astralis","index":0,"start_time":1643480100,"end_time":1643485004,"team1score":17,"team2score":19,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":15,"number_guesses":2},"437475":{"team1":"G2 Esports","team2":"Ninjas in Pyjamas","index":1,"start_time":1643403600,"end_time":1643409407,"team1score":22,"team2score":19,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":54,"number_guesses":6},"450009":{"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":1643387833,"team1score":16,"team2score":12,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":894,"number_guesses":18},"467899":{"team1":"Astralis","team2":"OG","index":0,"start_time":1643468400,"end_time":1643477799,"team1score":8,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":692,"number_guesses":12},"491702":{"team1":"MIBR","team2":"Astralis","index":0,"start_time":1643486700,"end_time":1643490404,"team1score":9,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":185,"number_guesses":2},"506627":{"team1":"OG","team2":"Astralis","index":1,"start_time":1643492100,"end_time":1643495804,"team1score":16,"team2score":8,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":95,"number_guesses":2},"574217":{"team1":"Complexity Gaming","team2":"BIG","index":0,"start_time":1643393400,"end_time":1643397406,"team1score":10,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":240,"number_guesses":6},"620532":{"team1":"Team Vitality","team2":"Evil Geniuses","index":0,"start_time":1643551200,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":1,"total_guess":732,"number_guesses":12},"690531":{"team1":"MIBR","team2":"OG","index":0,"start_time":1643475900,"end_time":1643479604,"team1score":9,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":208,"number_guesses":4},"752361":{"team1":"Complexity Gaming","team2":"MIBR","index":0,"start_time":1643889600,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":3,"total_guess":60,"number_guesses":2},"810984":{"team1":"Ninjas in Pyjamas","team2":"BIG","index":1,"start_time":1643398800,"end_time":1643402806,"team1score":16,"team2score":9,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":184,"number_guesses":4},"823460":{"team1":"Natus Vincere","team2":"MIBR","index":0,"start_time":1643464800,"end_time":1643477789,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":514,"number_guesses":12},"838365":{"team1":"G2 Esports","team2":"Ninjas in Pyjamas","index":0,"start_time":1643389200,"end_time":1643392606,"team1score":16,"team2score":6,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":100,"number_guesses":4},"947040":{"team1":"BIG","team2":"Ninjas in Pyjamas","index":0,"start_time":1643383200,"end_time":1643387833,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":1068,"number_guesses":18}}
+            all_match_list = {"175176":{"team1":"FaZe Clan","team2":"Team Liquid","index":0,"start_time":1643554800,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":1,"total_guess":1119,"number_guesses":18},"379342":{"team1":"Natus Vincere","team2":"Astralis","index":0,"start_time":1643480100,"end_time":1643485004,"team1score":17,"team2score":19,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":30,"number_guesses":4},"437475":{"team1":"G2 Esports","team2":"Ninjas in Pyjamas","index":1,"start_time":1643403600,"end_time":1643409407,"team1score":22,"team2score":19,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":81,"number_guesses":9},"450009":{"team1":"G2 Esports","team2":"Complexity Gaming","index":0,"start_time":1643378400,"end_time":1643387833,"team1score":16,"team2score":12,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":1192,"number_guesses":24},"467899":{"team1":"Astralis","team2":"OG","index":0,"start_time":1643468400,"end_time":1643477799,"team1score":8,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":1038,"number_guesses":18},"491702":{"team1":"MIBR","team2":"Astralis","index":0,"start_time":1643486700,"end_time":1643490404,"team1score":9,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":370,"number_guesses":4},"506627":{"team1":"OG","team2":"Astralis","index":1,"start_time":1643492100,"end_time":1643495804,"team1score":16,"team2score":8,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":190,"number_guesses":4},"574217":{"team1":"Complexity Gaming","team2":"BIG","index":0,"start_time":1643393400,"end_time":1643397406,"team1score":10,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":360,"number_guesses":9},"620532":{"team1":"Team Vitality","team2":"Evil Geniuses","index":0,"start_time":1643551200,"end_time":1643554601,"team1score":16,"team2score":3,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":1098,"number_guesses":18},"690531":{"team1":"MIBR","team2":"OG","index":0,"start_time":1643475900,"end_time":1643479604,"team1score":9,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":312,"number_guesses":6},"752361":{"team1":"Complexity Gaming","team2":"MIBR","index":0,"start_time":1643889600,"end_time":9999999999,"team1score":0,"team2score":0,"is_completed":false,"is_live":false,"is_bo3":3,"total_guess":120,"number_guesses":4},"810984":{"team1":"Ninjas in Pyjamas","team2":"BIG","index":1,"start_time":1643398800,"end_time":1643402806,"team1score":16,"team2score":9,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":276,"number_guesses":6},"823460":{"team1":"Natus Vincere","team2":"MIBR","index":0,"start_time":1643464800,"end_time":1643477789,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":771,"number_guesses":18},"838365":{"team1":"G2 Esports","team2":"Ninjas in Pyjamas","index":0,"start_time":1643389200,"end_time":1643392606,"team1score":16,"team2score":6,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":150,"number_guesses":6},"947040":{"team1":"BIG","team2":"Ninjas in Pyjamas","index":0,"start_time":1643383200,"end_time":1643387833,"team1score":12,"team2score":16,"is_completed":true,"is_live":false,"is_bo3":1,"total_guess":1424,"number_guesses":24}}
         }
         resolve(1)
     })
@@ -644,6 +647,10 @@ async function completed_matches_data() {
                         else {
                             all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text)
                             all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
+                            if (all_match_list[match_id].team2score === null) {
+                                parseInt(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]._text)
+                                team1_win = true
+                            }
                         }
                     }
                     else {
@@ -812,6 +819,19 @@ function get_complete_matches(req, res, next) {
         }
     }
 
+    res.locals.all_complete_matches = []
+    for (const [league, val] of Object.entries(res.locals.complete_matches)) {
+        for (let i = 0; i < res.locals.complete_matches[league].length; i++) {
+            res.locals.all_complete_matches.push(res.locals.complete_matches[league][i])
+        }
+    }
+
+    res.locals.all_complete_matches.sort(function(a, b){
+        if (a.is_live) return -1
+        if (b.is_live) return 1
+        return a.end_time < b.end_time ? 1 : -1
+    })
+
     for (let i = 0; i < LEAGUE_IDS.length; i++) {
         res.locals.complete_matches[leagueid_to_name[LEAGUE_IDS[i]]].sort(function(a, b){
             if (a.is_live) return -1
@@ -850,6 +870,16 @@ function get_upcoming_matches(req, res, next) {
         }
     }
 
+    res.locals.all_upcoming_matches = []
+    for (const [league, val] of Object.entries(res.locals.upcoming_matches)) {
+        for (let i = 0; i < res.locals.upcoming_matches[league].length; i++) {
+            res.locals.all_upcoming_matches.push(res.locals.upcoming_matches[league][i])
+        }
+    }
+
+    res.locals.all_upcoming_matches.sort(function(a, b){
+        return a.start_time < b.start_time ? -1 : 1
+    })
     for (let i = 0; i < LEAGUE_IDS.length; i++) {
         res.locals.upcoming_matches[leagueid_to_name[LEAGUE_IDS[i]]].sort(function(a, b){
             return a.start_time < b.start_time ? -1 : 1
@@ -917,12 +947,37 @@ async function insert_guess(req, res, next) {
     }
 }
 
+function get_matches_prev_day(req, res, next) {
+    const threshold = (Date.now() / 1000) - 84000
+    res.locals.prev_day_matches = new Set()
+
+    for (const [key, val] of Object.entries(all_match_list)) {
+        if (val.end_time > threshold && val.is_completed) {
+            res.locals.prev_day_matches.add(key)
+        }
+    }
+
+    next()
+}
+
 async function get_leaderboard(req, res, next) {
     const leaderboard = []
     res.locals.total_users = 0
     await collection.find().forEach(async function(doc) {
         res.locals.total_users += 1
-        leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1})
+        let day_points = 0
+        res.locals.prev_day_matches.forEach(function(key) {
+            const doc_id = `match_${team_to_id[all_match_list[key].team1]}_${team_to_id[all_match_list[key].team2]}_${all_match_list[key].index}`
+            if (doc[doc_id] !== undefined) {
+                if (all_match_list[key].team1score > all_match_list[key].team2score) {
+                    day_points += parseFloat(calc_score(100-doc[doc_id]).toFixed(1))
+                }
+                else {
+                    day_points += parseFloat(calc_score(doc[doc_id]).toFixed(1))
+                }
+            }
+        })
+        leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1, "day_points": day_points})
     })
     leaderboard.sort(function(a, b){
         if (a.score === b.score) {
@@ -1099,19 +1154,34 @@ async function get_user_rank(req, res, next) {
     }
 }
 
-app.get('/', [check_document_exists], (req, res) => {
-    res.render('index', {user: req.user})
+app.get('/', [check_document_exists, get_upcoming_matches, get_complete_matches, get_matches_prev_day, get_leaderboard], (req, res) => {
+    const recent_upcoming = []
+    for (let i = 0; i < res.locals.all_upcoming_matches.length; i++) {
+        if (i >= 3) break
+        recent_upcoming.push(res.locals.all_upcoming_matches[i])
+    }
+    const recent_completed = []
+    for (let i = 0; i < res.locals.all_complete_matches.length; i++) {
+        if (i >= 3) break
+        recent_completed.push(res.locals.all_complete_matches[i])
+    }
+    const top_players = []
+    for (let i = 0; i < res.locals.leaderboard.length; i++) {
+        if (i >= 5) break
+        top_players.push(res.locals.leaderboard[i])
+    }
+    res.render('index', {user: req.user, "upcoming_matches": recent_upcoming, "recent_completed": recent_completed, "top_players": top_players})
 })
 
-app.get('/upcoming_matches', [check_document_exists, find_averages, get_upcoming_matches, get_leaderboard], (req, res) => {
+app.get('/upcoming_matches', [check_document_exists, get_matches_prev_day, get_upcoming_matches, get_leaderboard], (req, res) => {
     res.render('upcoming_matches_liquepedia', {user: req.user, upcoming_matches: res.locals.upcoming_matches, total_users: res.locals.total_users})
 })
 
-app.get('/complete_matches', [check_document_exists, find_averages, get_complete_matches, get_leaderboard], (req, res) => {
+app.get('/complete_matches', [check_document_exists, get_matches_prev_day, get_complete_matches, get_leaderboard], (req, res) => {
     res.render('complete_matches_liquepedia', {user: req.user, completed_games: res.locals.complete_matches, total_users: res.locals.total_users})
 })
 
-app.get('/leaderboard', [check_document_exists, get_leaderboard], (req, res) => {
+app.get('/leaderboard', [check_document_exists, get_matches_prev_day, get_leaderboard], (req, res) => {
     res.render('leaderboard', {user: req.user, leaderboard: res.locals.leaderboard, total_users: res.locals.total_users})
 })
 
@@ -1129,11 +1199,21 @@ app.get('/logout', function(req, res){
 })
 
 app.get('/testing', function(req, res) {
-    res.send(all_match_list)
+    if (req.user !== undefined && (req.user._json.steamid === "76561199063897236" || req.user._json.steamid === "76561198251387562")) {
+        res.send(all_match_list)
+    }
+    else {
+        res.send()
+    }
 })
 
 app.get('/testing2', function(req, res) {
-    res.send(match_table)
+    if (req.user !== undefined && (req.user._json.steamid === "76561199063897236" || req.user._json.steamid === "76561198251387562")) {
+        res.send(match_table)
+    }
+    else {
+        res.send()
+    }
 })
 
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }), function(req, res) {
