@@ -1,0 +1,362 @@
+<!DOCTYPE >
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Predictions Game</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.css">
+        <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"></script>
+        <link href="output.css" rel="stylesheet">
+    </head>
+    <body class="min-h-full flex flex-col">
+        <div class="relative w-full flex flex-col bg-gray-700">
+            <div class="font-bold text-5xl lg:text-7xl pt-6 text-center text-white">
+                <a href="/">Predictions Game</a>
+            </div>
+            <div class="w-full py-1 pr-2 text-white text-lg lg:text-xl flex justify-end">
+                Hello, superandybean.&nbsp;<a href="/user/76561198251387562" class="text-blue-300 cursor-pointer">Profile</a>&nbsp;|&nbsp;<a class="text-blue-300 cursor-pointer" href="/logout">Logout</a>
+            </div>
+            <div class="w-full grid grid-cols-2 gap-y-2 lg:flex lg:flex-row place-items-center items-center justify-center py-2 bg-gray-600 text-white">
+                <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center font-bold hover:font-bold"><a href="/" class="w-full">Home</a></div>
+                <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center  hover:font-bold"><a href="/upcoming_matches" class="w-full">Upcoming Matches</a></div>
+                <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center  hover:font-bold"><a href="/complete_matches" class="w-full">Complete Matches</a></div>
+                <div class="w-full lg:w-1/4 text-xl md:text-2xl flex items-center justify-center text-center  hover:font-bold"><a href="/leaderboard" class="w-full">Leaderboard</a></div>
+            </div>
+        </div>
+        <div class="px-4 py-2 flex flex-col flex-grow">
+            <div class="w-full flex flex-col items-center justify-center">
+                <div class="w-full lg:w-3/4 flex flex-col-reverse md:flex-row justify-center pt-2">
+                    <div class="w-full md:w-2/3 flex flex-col items-center justify-center md:mr-6">
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-xl">
+                                Who's better at predicting pro matches: you or your friends? Come play and find out.
+                            </div>
+                            <div class="pb-4">
+                                Compete against your friends and the community in this predictor game, inspired by <a target="_blank" rel="noopener noreferrer" href="https://projects.fivethirtyeight.com/2021-nfl-forecasting-game/" class="text-blue-700">FiveThirtyEight’s NFL Forecasting Game</a>.
+                            </div>
+                        </div>
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-2xl">
+                                Predicting Matches
+                            </div>
+                            <div>
+                                Head over to the <a href="/upcoming_matches" class="text-blue-700">upcoming matches</a> page (after making sure you have <a href="/auth/steam" class="text-blue-700">logged in with Steam</a>) and predict the outcomes of professional DPC matches! However, instead of simply
+                                choosing whether or not a team would win, you need to also choose the probability that a team will win using the slider. But beware—the scoring system punishes overconfidence.
+                            </div>
+                            <div>
+                                The scoring system uses <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Brier_score" class="text-blue-700">Brier scores</a>, which is the same system that the <a target="_blank" rel="noopener noreferrer" href="https://fivethirtyeight.com/methodology/how-to-play-our-nfl-forecasting-game/" class="text-blue-700">FiveThirtyEight Game</a> uses.
+                                Possible points from each game range from a gain of 25 points to a loss of 75 points, and is calculated using the formula
+                            </div>
+                            <div>
+                                <code>points = 25 - (([probability of team winning] - 100)^2 / 100)</code>
+                            </div>
+                            <div class="pt-2">
+                                For example, let's say for the Team Liquid vs Nigma Galaxy match, you predict that Nigma Galaxy has a 73% chance of winning.
+                                Then, if Nigma Galaxy does indeed win, you will gain 17.7 points! However, if Team Liquid wins, you will lose 28.3 points.
+                                Nigma Galaxy did end up <a target="_blank" rel="noopener noreferrer" href="https://www.dotabuff.com/matches/6371895283" class="text-blue-700">winning</a> the match 2-1, so you would've have gained 17.7 points.
+                            </div>
+                        </div>
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-2xl">
+                                Completed Matches
+                            </div>
+                            <div>
+                                View completed DPC matches at the <a href="/complete_matches" class="text-blue-700">complete matches</a> page. There, you will find each completed and ongoing match, along with the score.
+                                Additionally, you will see the average guess for each match, and if you are logged into steam and have added a guess for the match, you will see that too. Finally, if the match is completed (not live), the average points and your points from that match will be shown.
+                            </div>
+                        </div>
+                        <div class="w-full flex flex-col items-center justify-center">
+                            <div class="font-bold text-2xl">
+                                Leaderboard
+                            </div>
+                            <div>
+                                Finally, look at the <a href="/leaderboard" class="text-blue-700">leaderboard</a> to view the top scores and see how you and your friends are doing.
+                                The number of picks with the correct chosen winner is shown in the Correct column and is used as a tiebreak if there is a tie in scores.
+                                Filters for scores between leagues are coming soon™.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/3 items-center flex flex-col overflow-x-auto">
+                        <div class="w-full flex flex-row md:flex-col items-center">
+                            <div class="w-full pb-2 flex flex-col min-w-full md:min-w-0 relative" id="panel_0">
+                                <div class="font-bold text-2xl text-center">
+                                    Upcoming Matches
+                                </div>
+                                <div class="w-full flex flex-row py-1">
+                                    <div class="flex flex-col w-3/5">
+                                        <div class="flex flex-row items-center">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/col.png" style="height: 20px;"></div>Complexity Gaming
+                                        </div>
+                                        <div class="flex flex-row items-center">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/mibr.png" style="height: 20px;"></div>MIBR
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col w-2/5">
+                                        <div class="flex flex-row items-center justify-end" id="match:2:6:0_timer">3d 14h 49m</div>
+                                        <div class="flex flex-row items-center justify-end" title="Average Guess">
+                                                <div style="width: 40px;" class="flex items-center justify-center">
+                                                    <img src="imgs/col.png" style="height: 20px;" alt="Complexity Gaming" title="Complexity Gaming">
+                                                </div>
+                                                70%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-full flex flex-row py-1">
+                                    <div class="flex flex-col w-3/5">
+                                        <div class="flex flex-row items-center">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/eg.png" style="height: 20px;"></div>Evil Geniuses
+                                        </div>
+                                        <div class="flex flex-row items-center">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/big.png" style="height: 20px;"></div>BIG
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col w-2/5">
+                                        <div class="flex flex-row items-center justify-end" id="match:3:1:0_timer">3d 20h 19m</div>
+                                        <div class="flex flex-row items-center justify-end" title="Average Guess">
+                                                <div style="width: 40px;" class="flex items-center justify-center">
+                                                    <img src="imgs/eg.png" style="height: 20px;" alt="Evil Geniuses" title="Evil Geniuses">
+                                                </div>
+                                                76%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full md:mx-0 pb-2 flex flex-col min-w-full md:min-w-0 relative" id="panel_1">
+                                <div class="font-bold text-2xl text-center">
+                                    Recently Completed
+                                </div>
+                                <div class="flex flex-row py-1 w-full">
+                                    <div class="flex flex-col w-3/4">
+                                        <div class="flex flex-row items-center ">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/faze.png" style="height: 20px;"></div>FaZe Clan
+                                        </div>
+                                        <div class="flex flex-row items-center ">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/liquid.png" style="height: 20px;"></div>Team Liquid
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row w-1/4 items-center justify-end h-full">
+                                        <div class="flex items-center justify-center h-full">
+                                            <div class="flex flex-col">
+                                                <div class="font-bold text-center">
+                                                    LIVE
+                                                </div>
+                                                <div class="flex flex-row items-center justify-center" title="Average Guess">
+                                                        <div style="width: 40px;" class="flex items-center justify-center">
+                                                            <img src="imgs/liquid.png" style="height: 20px;" alt="Team Liquid" title="Team Liquid">
+                                                        </div>
+                                                        53%
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-row py-1 w-full">
+                                    <div class="flex flex-col w-3/4">
+                                        <div class="flex flex-row items-center ">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/eg.png" style="height: 20px;"></div>Evil Geniuses
+                                        </div>
+                                        <div class="flex flex-row items-center font-bold">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/liquid.png" style="height: 20px;"></div>Team Liquid
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row w-1/4 items-center justify-end h-full">
+                                        <div class="flex items-center justify-center h-full">
+                                            <div class="flex flex-col items-center justify-center h-full">
+                                                <div class=" h-1/2 flex items-center">
+                                                    17
+                                                </div>
+                                                <div class="font-bold h-1/2 flex items-center">
+                                                    19
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-col items-center justify-center pl-1">
+                                                    <div class="flex flex-row" title="Average Guess">
+                                                        <div style="width: 40px;" class="flex items-center justify-center">
+                                                            <img src="imgs/liquid.png" style="height: 20px;" alt="Team Liquid" title="Team Liquid">
+                                                        </div>
+                                                        68%
+                                                    </div>
+                                                    <div title="Average Score">
+                                                        <span class="text-green-700 font-semibold">+14.8</span>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-row py-1 w-full">
+                                    <div class="flex flex-col w-3/4">
+                                        <div class="flex flex-row items-center font-bold">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/vitality.png" style="height: 20px;"></div>Team Vitality
+                                        </div>
+                                        <div class="flex flex-row items-center ">
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src="imgs/faze.png" style="height: 20px;"></div>FaZe Clan
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row w-1/4 items-center justify-end h-full">
+                                        <div class="flex items-center justify-center h-full">
+                                            <div class="flex flex-col items-center justify-center h-full">
+                                                <div class="font-bold h-1/2 flex items-center">
+                                                    19
+                                                </div>
+                                                <div class=" h-1/2 flex items-center">
+                                                    15
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-col items-center justify-center pl-1">
+                                                    <div class="flex flex-row" title="Average Guess">
+                                                        <div style="width: 40px;" class="flex items-center justify-center">
+                                                            <img src="imgs/vitality.png" style="height: 20px;" alt="Team Vitality" title="Team Vitality">
+                                                        </div>
+                                                        79%
+                                                    </div>
+                                                    <div title="Average Score">
+                                                        <span class="text-green-700 font-semibold">+20.6</span>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-full pb-2 flex flex-col min-w-full md:min-w-0 relative" id="panel_2">
+                                <div class="font-bold text-2xl text-center">
+                                    Top Scoring Players
+                                </div>
+                                <table class="w-full table-fixed">
+                                    <tbody><tr>
+                                        <td class="text-center pr-4 font-bold pb-1" style="width: 1px;">#</td>
+                                        <td class="px-1 text-left font-bold pb-1">Name</td>
+                                        <td class="px-1 text-center font-bold pb-1" style="width: 150px;">Score</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center pr-4 py-1 font-bold">1</td>
+                                        <td class="px-1 py-1 w-full truncate font-bold hover:underline"><a href="/user/76561198251387562">superandybean</a></td>
+                                        <td class="text-center px-1 py-1 whitespace-nowrap font-bold">6.7 <span class="text-green-700 text-xs" title="Difference in the last 24 hours">(+24.4)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center pr-4 py-1 ">2</td>
+                                        <td class="px-1 py-1 w-full truncate  hover:underline"><a href="/user/76561199063897236">aaaaaaaaaaaaaaaa</a></td>
+                                        <td class="text-center px-1 py-1 whitespace-nowrap ">-33.2 <span class="text-green-700 text-xs" title="Difference in the last 24 hours">(+53.6)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center pr-4 py-1 ">3</td>
+                                        <td class="px-1 py-1 w-full truncate  hover:underline"><a href="/user/76561198988327392">Mochi</a></td>
+                                        <td class="text-center px-1 py-1 whitespace-nowrap ">-51.3 <span class="text-red-700 text-xs" title="Difference in the last 24 hours">(-74.8)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center pr-4 py-1 ">4</td>
+                                        <td class="px-1 py-1 w-full truncate  hover:underline"><a href="/user/76561199038080200">Super A. Waffle</a></td>
+                                        <td class="text-center px-1 py-1 whitespace-nowrap ">-150.0 <span class="text-green-700 text-xs" title="Difference in the last 24 hours">(+50.0)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center pr-4 py-1 ">4</td>
+                                        <td class="px-1 py-1 w-full truncate  hover:underline"><a href="/user/76561198300027169">dswl</a></td>
+                                        <td class="text-center px-1 py-1 whitespace-nowrap ">-150.0 <span class="text-red-700 text-xs" title="Difference in the last 24 hours">(-150.0)</span></td>
+                                    </tr>
+                                </tbody></table>
+                            </div>
+                        </div>
+                        <div class="md:hidden">
+                            <span class="dot active_dot px-2" onclick="current_panel(0)" id="panel_dot_0"></span>
+                            <span class="dot px-2" onclick="current_panel(1)" id="panel_dot_1"></span>
+                            <span class="dot px-2" onclick="current_panel(2)" id="panel_dot_2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-full flex-shrink-0">
+            <div class="text-center font-normal pt-4 pb-2 flex flex-row items-center justify-center">
+                <div class="pl-4">
+                    API Data from <a target="_blank" rel="noopener noreferrer" href="https://docs.opendota.com/" class="text-blue-700">OpenDota</a> and <a target="_blank" rel="noopener noreferrer" href="https://liquipedia.net/api-terms-of-use" class="text-blue-700">Liquipedia</a>
+                </div>
+                <div class="pl-4">
+                    <a target="_blank" rel="noopener noreferrer" href="https://github.com/superandybean/prediction-game" class="text-blue-700">Open Source</a>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        let curr_panel = 0
+        function current_panel(n) {
+            console.log(n)
+            document.getElementById("panel_dot_0").classList.remove("active_dot")
+            document.getElementById("panel_dot_1").classList.remove("active_dot")
+            document.getElementById("panel_dot_2").classList.remove("active_dot")
+            // document.getElementById("panel_0").classList.remove("flex")
+            // document.getElementById("panel_1").classList.remove("flex")
+            // document.getElementById("panel_2").classList.remove("flex")
+            // document.getElementById("panel_0").classList.add("hidden")
+            // document.getElementById("panel_1").classList.add("hidden")
+            // document.getElementById("panel_2").classList.add("hidden")
+
+            document.getElementById(`panel_dot_${n}`).classList.add("active_dot")
+            // document.getElementById(`panel_${n}`).classList.add("flex")
+            // document.getElementById(`panel_${n}`).classList.remove("hidden")
+
+
+        }
+
+        setInterval(function() {
+            const now = new Date().getTime()
+                const match_2_6_0_diff = (1643889600*1000) - now
+                const match_2_6_0_days = Math.floor(match_2_6_0_diff / (86400000));
+                const match_2_6_0_hours = Math.floor((match_2_6_0_diff % (86400000)) / (3600000));
+                const match_2_6_0_minutes = Math.floor((match_2_6_0_diff % (3600000)) / (60000));
+                const match_2_6_0_seconds = Math.floor((match_2_6_0_diff % (60000)) / 1000);
+
+                if (match_2_6_0_days > 0) {
+                    document.getElementById("match:2:6:0_timer").innerHTML = `${match_2_6_0_days}d ${match_2_6_0_hours}h ${match_2_6_0_minutes}m`
+                }
+                else {
+                    if (match_2_6_0_hours > 0) {
+                        document.getElementById("match:2:6:0_timer").innerHTML = `${match_2_6_0_hours}h ${match_2_6_0_minutes}m ${match_2_6_0_seconds}s`
+                    }
+                    else if (match_2_6_0_minutes > 0) {
+                        document.getElementById("match:2:6:0_timer").innerHTML = `${match_2_6_0_minutes}m ${match_2_6_0_seconds}s`
+                    }
+                    else {
+                        document.getElementById("match:2:6:0_timer").innerHTML = `${match_2_6_0_seconds}s`
+                    }
+                }
+
+                if (match_2_6_0_diff < 0) {
+                    document.getElementById("match:2:6:0_timer").innerHTML = "SOON"
+                    document.getElementById("match:2:6:0_timer").classList.add("font-bold")
+                }
+                const match_3_1_0_diff = (1643909400*1000) - now
+                const match_3_1_0_days = Math.floor(match_3_1_0_diff / (86400000));
+                const match_3_1_0_hours = Math.floor((match_3_1_0_diff % (86400000)) / (3600000));
+                const match_3_1_0_minutes = Math.floor((match_3_1_0_diff % (3600000)) / (60000));
+                const match_3_1_0_seconds = Math.floor((match_3_1_0_diff % (60000)) / 1000);
+
+                if (match_3_1_0_days > 0) {
+                    document.getElementById("match:3:1:0_timer").innerHTML = `${match_3_1_0_days}d ${match_3_1_0_hours}h ${match_3_1_0_minutes}m`
+                }
+                else {
+                    if (match_3_1_0_hours > 0) {
+                        document.getElementById("match:3:1:0_timer").innerHTML = `${match_3_1_0_hours}h ${match_3_1_0_minutes}m ${match_3_1_0_seconds}s`
+                    }
+                    else if (match_3_1_0_minutes > 0) {
+                        document.getElementById("match:3:1:0_timer").innerHTML = `${match_3_1_0_minutes}m ${match_3_1_0_seconds}s`
+                    }
+                    else {
+                        document.getElementById("match:3:1:0_timer").innerHTML = `${match_3_1_0_seconds}s`
+                    }
+                }
+
+                if (match_3_1_0_diff < 0) {
+                    document.getElementById("match:3:1:0_timer").innerHTML = "SOON"
+                    document.getElementById("match:3:1:0_timer").classList.add("font-bold")
+                }
+        }, 1000)
+    </script>
+    </body>
+</html>

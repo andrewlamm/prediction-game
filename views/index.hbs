@@ -191,7 +191,6 @@
                 const match_{{team1id}}_{{team2id}}_{{index}}_hours = Math.floor((match_{{team1id}}_{{team2id}}_{{index}}_diff % (86400000)) / (3600000));
                 const match_{{team1id}}_{{team2id}}_{{index}}_minutes = Math.floor((match_{{team1id}}_{{team2id}}_{{index}}_diff % (3600000)) / (60000));
                 const match_{{team1id}}_{{team2id}}_{{index}}_seconds = Math.floor((match_{{team1id}}_{{team2id}}_{{index}}_diff % (60000)) / 1000);
-
                 if (match_{{team1id}}_{{team2id}}_{{index}}_days > 0) {
                     document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_days}d ${match_{{team1id}}_{{team2id}}_{{index}}_hours}h ${match_{{team1id}}_{{team2id}}_{{index}}_minutes}m`
                 }
@@ -206,7 +205,6 @@
                         document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = `${match_{{team1id}}_{{team2id}}_{{index}}_seconds}s`
                     }
                 }
-
                 if (match_{{team1id}}_{{team2id}}_{{index}}_diff < 0) {
                     document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").innerHTML = "LIVE"
                     document.getElementById("match:{{team1id}}:{{team2id}}:{{index}}_timer").classList.add("font-bold")

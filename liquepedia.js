@@ -274,7 +274,7 @@ hbs.registerHelper('set_timer', function(start) {
     const seconds = Math.floor((diff % 60000) / 1000);
 
     if (diff < 0) {
-        return "LIVE"
+        return "SOON"
     }
     else if (days > 0) {
         return `${days}d ${hours}h ${minutes}m`

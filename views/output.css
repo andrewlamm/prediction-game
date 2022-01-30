@@ -493,11 +493,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-right: 1.5rem;
 }
 
-.mx-4 {
-  margin-left: 1rem;
-  margin-right: 1rem;
-}
-
 .mt-8 {
   margin-top: 2rem;
 }
@@ -538,10 +533,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 100%;
 }
 
-.w-screen {
-  width: 100vw;
-}
-
 .w-3\/5 {
   width: 60%;
 }
@@ -568,12 +559,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-2\/3 {
   width: 66.666667%;
-}
-
-.min-w-max {
-  min-width: -webkit-max-content;
-  min-width: -moz-max-content;
-  min-width: max-content;
 }
 
 .min-w-full {
@@ -1103,6 +1088,23 @@ a[target="_blank"]::after {
   }
 }
 
+.dot {
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  --tw-bg-opacity: 1;
+  background-color: rgb(209 213 219 / var(--tw-bg-opacity));
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active_dot, .dot:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
+}
+
 .hover\:font-bold:hover {
   font-weight: 700;
 }
@@ -1113,11 +1115,6 @@ a[target="_blank"]::after {
 }
 
 @media (min-width: 768px) {
-  .md\:mx-2 {
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-  }
-
   .md\:mx-0 {
     margin-left: 0px;
     margin-right: 0px;
