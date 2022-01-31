@@ -488,33 +488,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   z-index: 10;
 }
 
-.mx-6 {
-  margin-left: 1.5rem;
-  margin-right: 1.5rem;
+.mr-px {
+  margin-right: 1px;
 }
 
 .mt-8 {
   margin-top: 2rem;
-}
-
-.mr-2 {
-  margin-right: 0.5rem;
-}
-
-.mr-1 {
-  margin-right: 0.25rem;
-}
-
-.mr-0\.5 {
-  margin-right: 0.125rem;
-}
-
-.mr-0 {
-  margin-right: 0px;
-}
-
-.mr-px {
-  margin-right: 1px;
 }
 
 .flex {
@@ -561,16 +540,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   width: 40%;
 }
 
-.w-3\/4 {
-  width: 75%;
+.w-1\/2 {
+  width: 50%;
 }
 
 .w-1\/4 {
   width: 25%;
-}
-
-.w-1\/2 {
-  width: 50%;
 }
 
 .w-1\/6 {
@@ -746,14 +721,14 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-bottom: 0.25rem;
 }
 
-.py-8 {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .px-px {
@@ -786,8 +761,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-bottom: 1rem;
 }
 
-.pl-1 {
-  padding-left: 0.25rem;
+.pl-px {
+  padding-left: 1px;
 }
 
 .pr-4 {
@@ -810,6 +785,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-bottom: 2.5rem;
 }
 
+.pl-1 {
+  padding-left: 0.25rem;
+}
+
 .pt-4 {
   padding-top: 1rem;
 }
@@ -824,10 +803,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pt-6 {
   padding-top: 1.5rem;
-}
-
-.pl-px {
-  padding-left: 1px;
 }
 
 .text-left {
@@ -1138,10 +1113,10 @@ a[target="_blank"]::after {
   background-color: rgb(209 213 219 / var(--tw-bg-opacity));
   border-radius: 50%;
   display: inline-block;
-  transition: background-color 0.6s ease;
+  transition: background-color 0.4s ease;
 }
 
-.active_dot, .dot:hover {
+.active_dot {
   --tw-bg-opacity: 1;
   background-color: rgb(75 85 99 / var(--tw-bg-opacity));
 }
@@ -1256,6 +1231,10 @@ a[target="_blank"]::after {
     width: 75%;
   }
 
+  .lg\:w-1\/4 {
+    width: 25%;
+  }
+
   .lg\:w-1\/6 {
     width: 16.666667%;
   }
@@ -1274,10 +1253,6 @@ a[target="_blank"]::after {
 
   .lg\:w-2\/3 {
     width: 66.666667%;
-  }
-
-  .lg\:w-1\/4 {
-    width: 25%;
   }
 
   .lg\:flex-row {
@@ -1332,11 +1307,11 @@ a[target="_blank"]::after {
     width: 80%;
   }
 
-  .xl\:w-2\/3 {
-    width: 66.666667%;
-  }
-
   .xl\:w-3\/4 {
     width: 75%;
+  }
+
+  .xl\:w-2\/3 {
+    width: 66.666667%;
   }
 }

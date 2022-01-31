@@ -473,7 +473,7 @@ async function find_live_matches() {
     live_matches_data = {}
     curr_live_matches.clear()
     await get_matches_data()
-    await get_live_matches()
+    await get_live_matches() // maybe remove these two awaits
     await completed_matches_data()
 }
 
