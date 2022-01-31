@@ -286,6 +286,11 @@ hbs.registerHelper('set_timer', function(start) {
     }
 })
 
+hbs.registerHelper('check_empty', function(s) {
+    if (s.length === 0) return true
+    return false
+})
+
 function turn_to_ordinal(num) {
     let ones = num % 10
     let tens = num % 100

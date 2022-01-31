@@ -5,7 +5,7 @@
         {{> header page_name="Home"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full flex flex-col items-center justify-center">
-                <div class="w-full lg:w-3/4 flex flex-col-reverse md:flex-row justify-center pt-2">
+                <div class="w-full xl:w-3/4 flex flex-col-reverse md:flex-row justify-center pt-2">
                     <div class="w-full md:w-2/3 flex flex-col items-center md:mr-6">
                         <div class="w-full flex flex-col items-center justify-center">
                             <div class="font-bold text-xl">
@@ -62,6 +62,11 @@
                                 <div class="font-bold text-2xl text-center">
                                     Upcoming Matches
                                 </div>
+                                {{#if (check_empty upcoming_matches)}}
+                                <div class="text-center text-2xl font-bold">
+                                    There are no upcoming matches at this time.
+                                </div>
+                                {{else}}
                                 {{#each upcoming_matches}}
                                 <div class="w-full flex flex-row py-1">
                                     <div class="flex flex-col w-3/5">
@@ -76,27 +81,46 @@
                                         <div class="flex flex-row items-center justify-end" id="match:{{team1id}}:{{team2id}}:{{index}}_timer">
                                             {{set_timer start_time}}
                                         </div>
+                                        {{#if ../user}}
+                                        <div class="flex flex-row items-center justify-end" title="Your Guess">
+                                            {{#if (check_exists your_guess)}}
+                                                {{#if (check_not50 your_guess)}}
+                                                <div style="width: 40px;" class="flex items-center justify-center mr-px">
+                                                    <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                                </div>
+                                                {{/if}}
+                                                {{display_average your_guess}}%
+                                            {{/if}}
+                                        </div>
+                                        {{else}}
                                         <div class="flex flex-row items-center justify-end" title="Average Guess">
                                             {{#if (check_exists average_guess)}}
                                                 {{#if (check_not50 average_guess)}}
-                                                <div style="width: 40px;" class="flex items-center justify-center">
+                                                <div style="width: 40px;" class="flex items-center justify-center mr-px">
                                                     <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
                                                 </div>
                                                 {{/if}}
                                                 {{display_average average_guess}}%
                                             {{/if}}
                                         </div>
+                                        {{/if}}
                                     </div>
                                 </div>
                                 {{/each}}
+                                {{/if}}
                             </div>
                             <div class="w-full md:mx-0 pb-2 flex flex-col min-w-full md:min-w-0 snap-start relative px-2" id="panel_1">
                                 <div class="font-bold text-2xl text-center">
                                     Recently Completed
                                 </div>
+                                {{#if (check_empty recent_completed)}}
+                                <div class="text-center text-2xl font-bold">
+                                    No recent matches.
+                                </div>
+                                {{else}}
                                 {{#each recent_completed}}
                                 <div class="flex flex-row py-1 w-full">
-                                    <div class="flex flex-col w-3/4">
+                                    <div class="flex flex-col w-1/2 lg:w-3/4">
                                         <div class="flex flex-row items-center {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}">
                                             <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}
                                         </div>
@@ -104,23 +128,36 @@
                                             <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}
                                         </div>
                                     </div>
-                                    <div class="flex flex-row w-1/4 items-center justify-end h-full">
+                                    <div class="flex flex-row w-1/2 lg:w-1/4 items-center justify-end h-full">
                                         <div class="flex items-center justify-center h-full">
                                             {{#if is_live}}
                                             <div class="flex flex-col">
                                                 <div class="font-bold text-center">
                                                     LIVE
                                                 </div>
+                                                {{#if ../user}}
+                                                <div class="flex flex-row items-center justify-center" title="Your Guess">
+                                                    {{#if (check_exists your_guess)}}
+                                                        {{#if (check_not50 your_guess)}}
+                                                        <div style="width: 40px;" class="flex items-center justify-center mr-px">
+                                                            <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                                        </div>
+                                                        {{/if}}
+                                                        {{display_average your_guess}}%
+                                                    {{/if}}
+                                                </div>
+                                                {{else}}
                                                 <div class="flex flex-row items-center justify-center" title="Average Guess">
                                                     {{#if (check_exists average_guess)}}
                                                         {{#if (check_not50 average_guess)}}
-                                                        <div style="width: 40px;" class="flex items-center justify-center">
+                                                        <div style="width: 40px;" class="flex items-center justify-center mr-px">
                                                             <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
                                                         </div>
                                                         {{/if}}
                                                         {{display_average average_guess}}%
                                                     {{/if}}
                                                 </div>
+                                                {{/if}}
                                             </div>
                                             {{else}}
                                             <div class="flex flex-col items-center justify-center h-full">
@@ -136,19 +173,35 @@
                                         <div>
                                             {{#if is_live}}
                                             {{else}}
-                                            <div class="flex flex-col items-center justify-center pl-1">
-                                                {{#if (check_exists average_guess)}}
-                                                    <div class="flex flex-row" title="Average Guess">
-                                                        {{#if (check_not50 average_guess)}}
-                                                        <div style="width: 40px;" class="flex items-center justify-center">
-                                                            <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                            <div class="flex flex-col items-center justify-center pl-px">
+                                                {{#if ../user}}
+                                                    {{#if (check_exists your_guess)}}
+                                                        <div class="flex flex-row {{#if (determine_win average_guess team1score team2score is_bo3)}}font-bold{{/if}}" title="Your Guess">
+                                                            {{#if (check_not50 your_guess)}}
+                                                            <div style="width: 40px;" class="flex items-center justify-center mr-px">
+                                                                <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                                            </div>
+                                                            {{/if}}
+                                                            {{display_average your_guess}}%
                                                         </div>
-                                                        {{/if}}
-                                                        {{display_average average_guess}}%
-                                                    </div>
-                                                    <div title="Average Score">
-                                                        {{{display_score average_guess team1score team2score is_bo3}}}
-                                                    </div>
+                                                        <div title="Your Score">
+                                                            {{{display_score your_guess team1score team2score is_bo3}}}
+                                                        </div>
+                                                    {{/if}}
+                                                {{else}}
+                                                    {{#if (check_exists average_guess)}}
+                                                        <div class="flex flex-row {{#if (determine_win average_guess team1score team2score is_bo3)}}font-bold{{/if}}" title="Average Guess">
+                                                            {{#if (check_not50 average_guess)}}
+                                                            <div style="width: 40px;" class="flex items-center justify-center mr-px">
+                                                                <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
+                                                            </div>
+                                                            {{/if}}
+                                                            {{display_average average_guess}}%
+                                                        </div>
+                                                        <div title="Average Score">
+                                                            {{{display_score average_guess team1score team2score is_bo3}}}
+                                                        </div>
+                                                    {{/if}}
                                                 {{/if}}
                                             </div>
                                             {{/if}}
@@ -156,6 +209,7 @@
                                     </div>
                                 </div>
                                 {{/each}}
+                                {{/if}}
                             </div>
                             <div class="w-full pb-2 flex flex-col min-w-full md:min-w-0 snap-start relative px-2" id="panel_2">
                                 <div class="font-bold text-2xl text-center">
@@ -192,8 +246,10 @@
         let curr_panel = 0
         let panel_timeout = setInterval(change_panel, 3000)
         function change_panel() {
-            curr_panel += 1
-            current_panel(curr_panel % 3)
+            if (screen.width < 768) {
+                curr_panel += 1
+                current_panel(curr_panel % 3)
+            }
         }
 
         function current_panel(n) {

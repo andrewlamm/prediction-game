@@ -497,6 +497,26 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-top: 2rem;
 }
 
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.mr-1 {
+  margin-right: 0.25rem;
+}
+
+.mr-0\.5 {
+  margin-right: 0.125rem;
+}
+
+.mr-0 {
+  margin-right: 0px;
+}
+
+.mr-px {
+  margin-right: 1px;
+}
+
 .flex {
   display: flex;
 }
@@ -804,6 +824,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pt-6 {
   padding-top: 1.5rem;
+}
+
+.pl-px {
+  padding-left: 1px;
 }
 
 .text-left {
@@ -1310,5 +1334,9 @@ a[target="_blank"]::after {
 
   .xl\:w-2\/3 {
     width: 66.666667%;
+  }
+
+  .xl\:w-3\/4 {
+    width: 75%;
   }
 }
