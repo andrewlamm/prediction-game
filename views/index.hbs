@@ -176,7 +176,7 @@
                                                 {{#if ../user}}
                                                  <div class="flex flex-col items-center justify-center pl-px" style="width: 83px;">
                                                     {{#if (check_exists your_guess)}}
-                                                        <div class="flex flex-row {{#if (determine_win average_guess team1score team2score is_bo3)}}font-bold{{/if}}" title="Your Guess">
+                                                        <div class="flex flex-row {{#if (determine_win your_guess team1score team2score is_bo3)}}font-bold{{/if}}" title="Your Guess">
                                                             {{#if (check_not50 your_guess)}}
                                                             <div style="width: 40px;" class="flex items-center justify-center mr-px">
                                                                 <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
@@ -217,11 +217,11 @@
                                 <div class="font-bold text-2xl text-center">
                                     Top Scoring Players
                                 </div>
-                                <table class="w-full table-fixed">
+                                <table class="w-full" id="top_players_table">
                                     <tr>
                                         <td class="text-center pr-4 font-bold pb-1" style="width: 1px;">#</td>
                                         <td class="px-1 text-left font-bold pb-1">Name</td>
-                                        <td class="px-1 text-center font-bold pb-1" style="width: 150px;">Score</td>
+                                        <td class="px-1 text-center font-bold pb-1" id="player_score_width">Score</td>
                                     </tr>
                                     {{#each top_players}}
                                     <tr>
@@ -245,6 +245,9 @@
 		{{> footer}}
     </body>
     <script>
+        document.getElementById("player_score_width").style.width = `${document.getElementById("player_score_width").offsetWidth}px`
+        document.getElementById("top_players_table").classList.add("table-fixed")
+
         let curr_panel = 0
         let panel_timeout = setInterval(change_panel, 3000)
         function change_panel() {
