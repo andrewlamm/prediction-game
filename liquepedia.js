@@ -1296,6 +1296,7 @@ app.get('/', [check_document_exists, get_upcoming_matches, get_complete_matches,
     const recent_completed = []
     for (let i = 0; i < res.locals.all_complete_matches.length; i++) {
         if (i >= 3) break
+        res.locals.all_complete_matches[i].index_num = i
         recent_completed.push(res.locals.all_complete_matches[i])
     }
     const top_players = []

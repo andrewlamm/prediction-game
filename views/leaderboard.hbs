@@ -5,27 +5,37 @@
         {{> header page_name="Leaderboard"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full overflow-x-auto md:flex md:items-center md:justify-center">
-                <table>
-                    <tr class="border-b-2 border-zinc-600">
-                        <td class="text-center px-4 font-bold pb-1">Rank</td>
-                        <td class="px-4 text-left font-bold pb-1">Name</td>
-                        <td class="px-4 text-center font-bold pb-1">Score</td>
-                        <td class="px-4 border-gray-700 text-center font-bold pb-1">Correct</td>
-                        <td class="px-4 text-center font-bold pb-1"></td>
-                    </tr>
-                    {{#each leaderboard}}
-                    <tr>
-                        <td class="text-center px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{this.rank}}</td>
-                        <td class="px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}} hover:underline" style="width: 400px;"><a href="/user/{{this.user_id}}">{{this.display_name}}</a></td>
-                        <td class="text-center px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{round_tenth this.score}}</td>
-                        <td class="text-center px-4 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{this.correct}}</td>
-                        <td><a target="_blank" rel="noopener noreferrer" href={{this.steam_url}} class="text-blue-700 px-4 py-1 newtab_symbol">Profile</a></td>
-                    </tr>
-                    {{/each}}
-                </table>
+                <div class="w-full lg:w-2/3 overflow-x-auto md:flex md:items-center md:justify-center">
+                    <table id="leaderboard_table">
+                        <tr class="border-b-2 border-zinc-600">
+                            <td class="text-center px-2 font-bold pb-1" id="player_rank_width">Rank</td>
+                            <td class="px-2 text-left font-bold pb-1">Name</td>
+                            <td class="px-2 text-center font-bold pb-1" id="player_score_width">Score</td>
+                            <td class="px-2 border-gray-700 text-center font-bold pb-1" id="player_correct_width">Correct</td>
+                            <td class="px-2 text-center font-bold pb-1" id="player_profile_width"></td>
+                        </tr>
+                        {{#each leaderboard}}
+                        <tr>
+                            <td class="text-center px-2 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{this.rank}}</td>
+                            <td class="px-2 py-1 truncate {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}} hover:underline" style="width: 400px;"><a href="/user/{{this.user_id}}">{{this.display_name}}</a></td>
+                            <td class="text-center px-2 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{round_tenth this.score}}<span class="{{find_color this.day_points}} pl-1" title="Difference in the last 24 hours">({{positive_plus this.day_points}}{{round_tenth this.day_points}})</span></td>
+                            <td class="text-center px-2 py-1 {{#if (if_equals ../user.id this.user_id)}}font-bold{{/if}}">{{this.correct}}</td>
+                            <td><a target="_blank" rel="noopener noreferrer" href={{this.steam_url}} class="text-blue-700 px-2 py-1 newtab_symbol">Profile</a></td>
+                        </tr>
+                        {{/each}}
+                    </table>
+                </div>
             </div>
         </div>
         {{> user_footer}}
 		{{> footer}}
     </body>
+    <script>
+        document.getElementById("player_rank_width").style.width = `${document.getElementById("player_rank_width").offsetWidth+1}px`
+        document.getElementById("player_score_width").style.width = `${document.getElementById("player_score_width").offsetWidth+1}px`
+        document.getElementById("player_correct_width").style.width = `${document.getElementById("player_correct_width").offsetWidth+1}px`
+        document.getElementById("player_profile_width").style.width = `${document.getElementById("player_profile_width").offsetWidth+1}px`
+        document.getElementById("leaderboard_table").style.width = `${document.getElementById("leaderboard_table").offsetWidth+1}px`
+        document.getElementById("leaderboard_table").classList.add("table-fixed")
+    </script>
 </html>

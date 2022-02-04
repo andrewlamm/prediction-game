@@ -119,12 +119,12 @@
                                 </div>
                                 {{else}}
                                 {{#each recent_completed}}
-                                <div class="flex flex-row py-2 w-full">
+                                <div class="flex flex-row py-2 w-full items-center">
                                     <div class="flex flex-col w-1/2 lg:w-3/4">
-                                        <div class="flex flex-row items-center {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}">
+                                        <div class="flex flex-row items-center {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}" id="match_{{this.index_num}}_team1">
                                             <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}
                                         </div>
-                                        <div class="flex flex-row items-center {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}">
+                                        <div class="flex flex-row items-center {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}" id="match_{{this.index_num}}_team2">
                                             <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}
                                         </div>
                                     </div>
@@ -161,10 +161,10 @@
                                             </div>
                                             {{else}}
                                             <div class="flex flex-col items-center justify-center h-full">
-                                                <div class="{{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}} h-1/2 flex items-center">
+                                                <div class="{{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}} h-1/2 flex items-center" id="match_{{this.index_num}}_team1score">
                                                     {{team1score}}
                                                 </div>
-                                                <div class="{{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}} h-1/2 flex items-center">
+                                                <div class="{{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}} h-1/2 flex items-center" id="match_{{this.index_num}}_team2score">
                                                     {{team2score}}
                                                 </div>
                                             </div>
@@ -300,6 +300,11 @@
                 document.getElementById(`panel_dot_0`).classList.add("active_dot")
             }
         }
+
+        {{#each recent_completed}}
+            document.getElementById(`match_{{this.index_num}}_team1score`).style.height = document.getElementById(`match_{{this.index_num}}_team1`).offsetHeight
+            document.getElementById(`match_{{this.index_num}}_team2score`).style.height = document.getElementById(`match_{{this.index_num}}_team2`).offsetHeight
+        {{/each}}
 
         setInterval(function() {
             const now = new Date().getTime()
