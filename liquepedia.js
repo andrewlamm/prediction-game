@@ -31,6 +31,8 @@ const client = new MongoClient(url)
 let database = undefined
 let collection = undefined
 
+let startup_complete = false
+
 async function connect_to_db() {
     return new Promise(async function(resolve, reject) {
         try {
@@ -96,7 +98,7 @@ hbs.registerHelper('if_equals', function(arg1, arg2) {
 
 hbs.registerHelper('check_win', function(score, bo3, score2) {
     if (score === "W") return true
-    if (score === Math.floor(bo3 / 2)+1) {
+    if (score > score2) {
         return true
     }
     return false
@@ -113,14 +115,15 @@ hbs.registerHelper('display_average', function(score) {
 })
 
 function calc_score(score) {
-    return 25 - (Math.pow(score - 100, 2) / 100)
+    // return 25 - (Math.pow(score - 100, 2) / 100)
+    return -30 + 0.65 * score - 0.001 * Math.pow(score, 2)
 }
 
 hbs.registerHelper('display_score', function(score, team1score, team2score, bo3) {
-    if (score === 50 || team1score === "W" || team2score === "W") {
+    if ((score === 50 && (team1score !== 0 || team2score !== 0)) || team1score === "W" || team2score === "W") {
         return `<span class="font-semibold">0.0</span>`
     }
-    if (team1score === Math.floor(bo3/2)+1) {
+    if (team1score > team2score) {
         if (score < 50) {
             return `<span class="text-green-700 font-semibold">+${calc_score(100-score).toFixed(1)}</span>`
         }
@@ -128,7 +131,7 @@ hbs.registerHelper('display_score', function(score, team1score, team2score, bo3)
             return `<span class="text-red-700 font-semibold">${calc_score(100-score).toFixed(1)}</span>`
         }
     }
-    else if (team2score === Math.floor(bo3/2)+1) {
+    else if (team2score > team1score) {
         if (score < 50) {
             return `<span class="text-red-700 font-semibold">${calc_score(score).toFixed(1)}</span>`
         }
@@ -150,8 +153,10 @@ hbs.registerHelper('check_team1', function(score) {
 
 hbs.registerHelper('determine_win', function(score, team1score, team2score, is_bo3) {
     if (team1score === "W" || team2score === "W") return false
-    if (score > 50 && team2score === Math.floor(is_bo3 / 2)+1) return true
-    else if (score < 50 && team1score === Math.floor(is_bo3 / 2)+1) return true
+
+    if (score > 50 && team2score > team1score) return true
+    else if (score < 50 && team1score > team2score) return true
+
     return false
 })
 
@@ -309,7 +314,8 @@ function turn_to_ordinal(num) {
 let parsed_data = {}
 
 const regions = ["Western_Europe", "China", "North_America", "Southeast_Asia", "Eastern_Europe", "South_America"]
-const divisions = ["Division_I", "Division_II"]
+// const divisions = ["Division_I", "Division_II"]
+const divisions = ["Regional_Finals"]
 
 function retrieve_data(region, division) {
     return new Promise(async function(resolve, reject) {
@@ -344,12 +350,14 @@ function retrieve_data(region, division) {
     })
 }
 
-const LEAGUE_IDS = [13738, 13716, 13741, 13747, 13709, 13712, 13740, 13717, 13742, 13748, 13710, 13713]
+// const LEAGUE_IDS = [13738, 13716, 13741, 13747, 13709, 13712, 13740, 13717, 13742, 13748, 13710, 13713]
+const LEAGUE_IDS = [1, 2, 3, 4, 5, 6]
 // WEU, CN, NA, SEA, EEU, SA
-const leagueid_to_name = {13738: "Western Europe Division I", 13716: "China Division I", 13741: "North America Division I", 13747: "Southeast Asia Division I", 13709: "Eastern Europe Division I", 13712: "South America Division I", 13740: "Western Europe Division II", 13717: "China Division II", 13742: "North America Division II", 13748: "Southeast Asia Division II", 13710: "Eastern Europe Division II", 13713: "South America Division II"}
+// const leagueid_to_name = {13738: "Western Europe Division I", 13716: "China Division I", 13741: "North America Division I", 13747: "Southeast Asia Division I", 13709: "Eastern Europe Division I", 13712: "South America Division I", 13740: "Western Europe Division II", 13717: "China Division II", 13742: "North America Division II", 13748: "Southeast Asia Division II", 13710: "Eastern Europe Division II", 13713: "South America Division II"}
+const leagueid_to_name = {1: "Western Europe Regional Finals", 2: "China Regional Finals", 3: "North America Regional Finals", 4: "Southeast Asia Regional Finals", 5: "Eastern Europe Regional Finals", 6: "South America Regional Finals"}
 const team_to_logo = {}
-const match_table = {}
-const all_match_list = {}
+let match_table = {}
+let all_match_list = {}
 const dota_match_id_to_match = {}
 const team_to_league_id = {}
 const team_to_id = {}
@@ -399,93 +407,95 @@ async function find_teams() {
                     // team_to_logo[team1] = `https://liquipedia.net${logo_list[i].contents[0].contents[0].contents[0].attrs.src}`
                 }
 
-                const match_list = soup.findAll("tr", {"class": "match-row"})
+                // const match_list = soup.findAll("tr", {"class": "match-row"})
 
-                for (let i = 0; i < match_list.length; i++) {
-                    if (match_list[i].contents[1].contents[0]._text !== "-") {
-                        // console.log(match_table[LEAGUE_IDS[divisions_j*6+region_i]])
+                // for (let i = 0; i < match_list.length; i++) {
+                //     if (match_list[i].contents[1].contents[0]._text !== "-") {
+                //         // console.log(match_table[LEAGUE_IDS[divisions_j*6+region_i]])
 
-                        let team1 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
-                        let team2 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[1].contents[0].contents[2].contents[0].attrs.title
+                //         let team1 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
+                //         let team2 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[1].contents[0].contents[2].contents[0].attrs.title
 
-                        if (team1.indexOf("(") !== -1) {
-                            team1 = team1.substring(0, team1.indexOf("(")-1)
-                        }
-                        if (team2.indexOf("(") !== -1) {
-                            team2 = team2.substring(0, team2.indexOf("(")-1)
-                        }
+                //         if (team1.indexOf("(") !== -1) {
+                //             team1 = team1.substring(0, team1.indexOf("(")-1)
+                //         }
+                //         if (team2.indexOf("(") !== -1) {
+                //             team2 = team2.substring(0, team2.indexOf("(")-1)
+                //         }
 
-                        if (team1 === "Team Unique") team1 = "Mind Games"
-                        if (team2 === "Team Unique") team2 = "Mind Games"
+                //         if (team1 === "Team Unique") team1 = "Mind Games"
+                //         if (team2 === "Team Unique") team2 = "Mind Games"
 
-                        // console.log(team1, team2)
+                //         // console.log(team1, team2)
 
-                        if (match_list[i].contents[1].contents[0]._text === "FF" || match_list[i].contents[2].contents[0]._text === "FF") {
-                            end_time = -1
+                //         if (match_list[i].contents[1].contents[0]._text === "FF" || match_list[i].contents[2].contents[0]._text === "FF") {
+                //             end_time = -1
 
-                            let new_match_id = parseInt(Math.random()*1000000)
-                            while (new_match_id in all_match_list) {
-                                new_match_id = parseInt(Math.random()*1000000)
-                            }
-                            if (match_list[i].contents[1].contents[0]._text === "FF") {
-                                // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 0, "team2score": 2, "is_completed": true, "is_live": false, "is_bo3": 3}
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "FF", "team2score": "W", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                            }
-                            else {
-                                // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 2, "team2score": 0, "is_completed": true, "is_live": false, "is_bo3": 3}
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "W", "team2score": "FF", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                            }
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                        }
-                        else {
-                            if (match_list[i].contents[1].attrs.style === "font-weight:bold" || match_list[i].contents[2].attrs.style === "font-weight:bold") {
-                                const matches_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents.length
-                                const links_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents.length
-                                const title_string = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents[links_num-2].attrs.title
-                                const last_match_id = title_string.substring(title_string.indexOf(":")+2)
+                //             let new_match_id = parseInt(Math.random()*1000000)
+                //             while (new_match_id in all_match_list) {
+                //                 new_match_id = parseInt(Math.random()*1000000)
+                //             }
+                //             if (match_list[i].contents[1].contents[0]._text === "FF") {
+                //                 // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 0, "team2score": 2, "is_completed": true, "is_live": false, "is_bo3": 3}
+                //                 all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "FF", "team2score": "W", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
+                //             }
+                //             else {
+                //                 // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 2, "team2score": 0, "is_completed": true, "is_live": false, "is_bo3": 3}
+                //                 all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "W", "team2score": "FF", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
+                //             }
+                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
+                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
+                //         }
+                //         else {
+                //             if (match_list[i].contents[1].attrs.style === "font-weight:bold" || match_list[i].contents[2].attrs.style === "font-weight:bold") {
+                //                 const matches_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents.length
+                //                 const links_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents.length
+                //                 const title_string = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents[links_num-2].attrs.title
+                //                 const last_match_id = title_string.substring(title_string.indexOf(":")+2)
 
-                                let new_match_id = parseInt(Math.random()*1000000)
-                                while (new_match_id in all_match_list) {
-                                    new_match_id = parseInt(Math.random()*1000000)
-                                }
-                                dota_match_id_to_match[last_match_id] = new_match_id
+                //                 let new_match_id = parseInt(Math.random()*1000000)
+                //                 while (new_match_id in all_match_list) {
+                //                     new_match_id = parseInt(Math.random()*1000000)
+                //                 }
+                //                 dota_match_id_to_match[last_match_id] = new_match_id
 
-                                if (parseInt(match_list[i].contents[1].contents[0]._text) === 2 || parseInt(match_list[i].contents[2].contents[0]._text) === 2) {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                                }
-                                else {
-                                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 1, "total_guess": 0, "number_guesses": 0}
-                                }
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                            }
-                            else {
-                                let new_match_id = parseInt(Math.random()*1000000)
-                                while (new_match_id in all_match_list) {
-                                    new_match_id = parseInt(Math.random()*1000000)
-                                }
-                                all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": true, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                                match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                            }
-                        }
-                    }
-                }
+                //                 if (parseInt(match_list[i].contents[1].contents[0]._text) === 2 || parseInt(match_list[i].contents[2].contents[0]._text) === 2) {
+                //                     all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
+                //                 }
+                //                 else {
+                //                     all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 1, "total_guess": 0, "number_guesses": 0}
+                //                 }
+                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
+                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
+                //             }
+                //             else {
+                //                 let new_match_id = parseInt(Math.random()*1000000)
+                //                 while (new_match_id in all_match_list) {
+                //                     new_match_id = parseInt(Math.random()*1000000)
+                //                 }
+                //                 all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": true, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
+                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
+                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
+                //             }
+                //         }
+                //     }
+                // }
 
-                for (const [team1, val] of Object.entries(match_table[LEAGUE_IDS[divisions_j*6+region_i]])) {
-                    for (const [team2, val2] of Object.entries(val)) {
-                        if (match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length === 0) {
-                            let new_match_id = parseInt(Math.random()*1000000)
-                            while (new_match_id in all_match_list) {
-                                new_match_id = parseInt(Math.random()*1000000)
-                            }
-                            all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                            match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                        }
-                    }
-                }
+                // for round robins
+
+                // for (const [team1, val] of Object.entries(match_table[LEAGUE_IDS[divisions_j*6+region_i]])) {
+                //     for (const [team2, val2] of Object.entries(val)) {
+                //         if (match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length === 0) {
+                //             let new_match_id = parseInt(Math.random()*1000000)
+                //             while (new_match_id in all_match_list) {
+                //                 new_match_id = parseInt(Math.random()*1000000)
+                //             }
+                //             all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
+                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
+                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
+                //         }
+                //     }
+                // }
             }
         }
         resolve(1)
@@ -497,103 +507,89 @@ async function loop_leagues() {
         for (let i = 0; i < LEAGUE_IDS.length; i++) {
             console.log(LEAGUE_IDS[i])
             await get_team_logos(LEAGUE_IDS[i])
-            await get_match_scores(LEAGUE_IDS[i])
+            // await get_match_scores(LEAGUE_IDS[i])
         }
         resolve(1)
     })
 }
 
 async function get_team_logos(id) {
-    return new Promise(function(resolve, reject) {
-        axios.get(`https://api.opendota.com/api/leagues/${id}/teams`).then(
-            function(response) {
-                var parsed = response.data
-
-                for (let i = 0; i < parsed.length; i++) {
-                    if (parsed[i].team_id === 8261500) { //because xtreme gaming is cringe
-                        parsed[i].name = "Xtreme Gaming"
-                    }
-
-                    if (parsed[i].name === "Tundra Esports ") parsed[i].name = "Tundra Esports"
-                    if (parsed[i].name === "INVICTUS GAMING") parsed[i].name = "Invictus Gaming"
-                    if (parsed[i].name === "phoenix gaming") parsed[i].name = "Phoenix Gaming"
-                    if (parsed[i].name === "Undying") parsed[i].name = "Team Undying"
-                    if (parsed[i].name === "Lava BestPc") parsed[i].name = "Lava"
-                    if (parsed[i].name === "beastcoast") parsed[i].name = "Beastcoast"
-                    if (parsed[i].name === "Noping VPN") parsed[i].name = "NoPing e-sports"
-                    if (parsed[i].name === "Infamous U.esports.") parsed[i].name = "Infamous"
-                    if (parsed[i].name === "Ybb gaming") parsed[i].name = "Ybb Gaming"
-                    if (parsed[i].name === "CDEC ") parsed[i].name = "CDEC Gaming"
-                    if (parsed[i].name === "SHENZHEN") parsed[i].name = "ShenZhen"
-                    if (parsed[i].name === "Team Magma") parsed[i].name = "Team MagMa"
-                    if (parsed[i].name === "felt") parsed[i].name = "Felt"
-                    if (parsed[i].name === "DogChamp") parsed[i].name = "Team DogChamp"
-                    if (parsed[i].name === "Talon") parsed[i].name = "Talon Esports"
-                    if (parsed[i].name === "Spawn.496") parsed[i].name = "SPAWN.496"
-                    if (parsed[i].name === "Balrogs e-Sport") parsed[i].name = "Balrogs"
-                    if (parsed[i].name === "OB.Neon") parsed[i].name = "Neon Esports"
-                    if (parsed[i].name === "Lilgun ") parsed[i].name = "Lilgun"
-                    if (parsed[i].name === "Our Way") parsed[i].name = "Wolf Team"
-
-
-                    // console.log(parsed[i].name)
-                    if (parsed[i].name in team_to_id) {
-                        // console.log("pog")
-                        team_to_logo[parsed[i].name] = parsed[i].logo_url
-                    }
-                    // else {
-                    //     console.log(`"${parsed[i].name}"`)
-                    // }
-                }
-                resolve(1)
-            }, (error) => {
-                reject(error)
-            }
-        )
-    })
-}
-
-async function get_match_scores(id) {
-    return new Promise(function(resolve, reject) {
-        axios.get(`https://api.opendota.com/api/leagues/${id}/matches`).then(
-            function(response) {
-                var parsed = response.data
-
-                for (let i = 0; i < parsed.length; i++) {
-                    if (parsed[i].match_id in dota_match_id_to_match) {
-                        all_match_list[dota_match_id_to_match[parsed[i].match_id]].end_time = parsed[i].start_time + parsed[i].duration
-                    }
-                }
-
-                resolve(1)
-            }, (error) => {
-                reject(error)
-            }
-        )
-    })
+    team_to_logo["Team Liquid"] = "/imgs/dota/liquid.png"
+    team_to_logo["Team Tickles"] = "/imgs/dota/tickles.png"
+    team_to_logo["Tundra Esports"] = "/imgs/dota/tundra.png"
+    team_to_logo["OG"] = "/imgs/dota/og.png"
+    team_to_logo["Team Spirit"] = "/imgs/dota/spirit.png"
+    team_to_logo["PuckChamp"] = "/imgs/dota/puckchamp.png"
+    team_to_logo["Virtus.pro"] = "/imgs/dota/vp.png"
+    team_to_logo["HellRaisers"] = "/imgs/dota/HR.png"
+    team_to_logo["PSG.LGD"] = "/imgs/dota/lgd.png"
+    team_to_logo["Team Aster"] = "/imgs/dota/aster.png"
+    team_to_logo["Royal Never Give Up"] = "/imgs/dota/rng.png"
+    team_to_logo["EHOME"] = "/imgs/dota/ehome.png"
+    team_to_logo["BOOM Esports"] = "/imgs/dota/boom.png"
+    team_to_logo["Fnatic"] = "/imgs/dota/fnatic.png"
+    team_to_logo["T1"] = "/imgs/dota/t1.png"
+    team_to_logo["Team SMG"] = "/imgs/dota/smg.png"
+    team_to_logo["Quincy Crew"] = "/imgs/dota/qc.png"
+    team_to_logo["TSM"] = "/imgs/dota/tsm.png"
+    team_to_logo["Evil Geniuses"] = "/imgs/dota/eg.png"
+    team_to_logo["4 Zoomers"] = "/imgs/dota/4zoomers.png"
+    team_to_logo["Thunder Awaken"] = "/imgs/dota/thunder.png"
+    team_to_logo["Infamous"] = "/imgs/dota/infamous.png"
+    team_to_logo["Beastcoast"] = "/imgs/dota/beastcoast.png"
+    team_to_logo["APU King of Kings"] = "/imgs/dota/apu.png"
 }
 
 async function get_averages() {
     await collection.find().forEach(async function(doc) {
-        for (const [key, val] of Object.entries(doc)) {
-            if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect") {
-                let underscore_count = 0
-                for (let i = 0; i < key.length; i++) {
-                    if (key[i] === "_") underscore_count += 1
+        if (!isNaN(doc._id)) {
+            for (const [key, val] of Object.entries(doc)) {
+                if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect") {
+                    let underscore_count = 0
+                    for (let i = 0; i < key.length; i++) {
+                        if (key[i] === "_") underscore_count += 1
+                    }
+                    if (underscore_count !== 3) continue
+                    const team1 = id_to_team[parseInt(key.substring(6, key.indexOf("_", 6)))]
+                    const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
+                    const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
+
+                    console.log(team1, team2, index)
+                    console.log(match_table[team_to_league_id[team1]][team1][team2][index])
+                    const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
+
+                    all_match_list[match_id].number_guesses += 1
+                    all_match_list[match_id].total_guess += val
                 }
-                if (underscore_count !== 3) continue
-                const team1 = id_to_team[parseInt(key.substring(6, key.indexOf("_", 6)))]
-                const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
-                const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
-
-                // console.log(team1, team2, index)
-                // console.log(match_table[team_to_league_id[team1]][team1][team2][index])
-                const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
-
-                all_match_list[match_id].number_guesses += 1
-                all_match_list[match_id].total_guess += val
             }
         }
+    })
+}
+
+async function set_match_data() {
+    const query = {"_id": "matches_data"}
+
+    const update_doc = { $set : {"all_match_list": all_match_list, "match_table": match_table} }
+
+    const result = await collection.updateOne(query, update_doc);
+    console.log("match data updated!");
+}
+
+async function start_get_match_data() {
+    return new Promise(async function(resolve, reject) {
+        const query = {"_id": "matches_data"}
+
+        const result = await collection.findOne(query)
+
+        match_table = result["match_table"]
+        all_match_list = result["all_match_list"]
+
+        for (const [key, val] of Object.entries(all_match_list)) {
+            all_match_list[key].total_guess = 0
+            all_match_list[key].number_guesses = 0
+        }
+
+        resolve(1)
     })
 }
 
@@ -601,14 +597,18 @@ async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
+    await start_get_match_data()
     // console.log("complete, waiting 30 seconds")
     // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
     // console.log(team_to_id)
+    // console.log(team_to_league_id)
     await start_find_live_matches()
     await get_averages()
+    startup_complete = true
     const repeated_timer = setInterval(repeated_functions, 60000) // 120000
+    const repeat_match_data = setInterval(set_match_data, 1800000) // 1800000
 }
 
 start()
@@ -774,6 +774,12 @@ async function completed_matches_data(game_id) {
 
                     const match_id = match_table[team_to_league_id[team1]][team1][team2][match_index]
 
+                    const timestamp = parseInt(match_list.contents[1].contents[3].contents[i].contents[0].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
+                    if (timestamp !== all_match_list[match_id].start_time) {
+                        console.log("different timestamp spotted, skipping ... ")
+                        continue
+                    }
+
                     if (curr_live_matches.has(match_id)) {
                         console.log("just kidding")
                         continue
@@ -796,6 +802,11 @@ async function completed_matches_data(game_id) {
                         else {
                             all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0]._text) //substr not necesssary?
                             all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
+
+                            if (all_match_list[match_id].team2score === null) {
+                                console.log(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]) //ok this doesnt work
+                                team1_win = true
+                            }
                         }
                     }
                     else {
@@ -816,41 +827,43 @@ async function completed_matches_data(game_id) {
                     }
 
                     await collection.find().forEach(async function(doc) {
-                        const query = {"_id": doc._id}
-                        console.log(doc._id)
-                        const field = `match_${team_to_id[team1]}_${team_to_id[team2]}_${all_match_list[match_id].index}`
+                        if (!isNaN(doc._id)) {
+                            const query = {"_id": doc._id}
+                            console.log(doc._id)
+                            const field = `match_${team_to_id[team1]}_${team_to_id[team2]}_${all_match_list[match_id].index}`
 
-                        const update_doc = { $set : {} }
+                            const update_doc = { $set : {} }
 
-                        if (doc[field] === undefined) {
-                            console.log("prediction missing, skipping...")
-                        }
-                        else {
-                            if (team1_win) {
-                                if (parseInt(doc[field]) > 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
-                                    update_doc.$set.incorrect = doc.incorrect+1
-                                }
-                                else if (parseInt(doc[field]) < 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
-                                    update_doc.$set.correct = doc.correct+1
-                                }
-
-                                const result = await collection.updateOne(query, update_doc)
-                                console.log("victory doc updated!")
+                            if (doc[field] === undefined) {
+                                console.log("prediction missing, skipping...")
                             }
                             else {
-                                if (parseInt(doc[field]) > 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
-                                    update_doc.$set.correct = doc.correct+1
-                                }
-                                else if (parseInt(doc[field]) < 50) {
-                                    update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
-                                    update_doc.$set.incorrect = doc.incorrect+1
-                                }
+                                if (team1_win) {
+                                    if (parseInt(doc[field]) > 50) {
+                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                        update_doc.$set.incorrect = doc.incorrect+1
+                                    }
+                                    else if (parseInt(doc[field]) < 50) {
+                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                        update_doc.$set.correct = doc.correct+1
+                                    }
 
-                                const result = await collection.updateOne(query, update_doc)
-                                console.log("victory doc updated!")
+                                    const result = await collection.updateOne(query, update_doc)
+                                    console.log("victory doc updated!")
+                                }
+                                else {
+                                    if (parseInt(doc[field]) > 50) {
+                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                        update_doc.$set.correct = doc.correct+1
+                                    }
+                                    else if (parseInt(doc[field]) < 50) {
+                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                        update_doc.$set.incorrect = doc.incorrect+1
+                                    }
+
+                                    const result = await collection.updateOne(query, update_doc)
+                                    console.log("victory doc updated!")
+                                }
                             }
                         }
                     })
@@ -911,7 +924,7 @@ async function check_document_exists(req, res, next) {
                 }
             }
             const result = await collection.updateOne(query, update_doc);
-            console.log("name updated!");
+            // console.log("name updated!");
 
             next()
         }
@@ -922,15 +935,17 @@ async function find_averages(req, res, next) {
     const field_totals = {}
     const field_numbers = {}
     await collection.find().forEach(async function(doc) {
-        for (const [key, val] of Object.entries(doc)) {
-            if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect") {
-                if (!(key in field_totals)) {
-                    field_totals[key] = 0
-                    field_numbers[key] = 0
-                }
+        if (!isNaN(doc._id)) {
+            for (const [key, val] of Object.entries(doc)) {
+                if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect") {
+                    if (!(key in field_totals)) {
+                        field_totals[key] = 0
+                        field_numbers[key] = 0
+                    }
 
-                field_totals[key] += val
-                field_numbers[key] += 1
+                    field_totals[key] += val
+                    field_numbers[key] += 1
+                }
             }
         }
     })
@@ -998,18 +1013,18 @@ function get_upcoming_matches(req, res, next) {
         if (!val.is_completed && !val.is_live) {
             if (val.number_guesses === 0) {
                 if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": 50})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
                 else {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
             }
             else {
                 if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": 50})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
                 else {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
                 }
             }
         }
@@ -1092,24 +1107,39 @@ async function insert_guess(req, res, next) {
     }
 }
 
+function get_matches_prev_day(req, res, next) {
+    const threshold = (Date.now() / 1000) - 84000
+    res.locals.prev_day_matches = new Set()
+
+    for (const [key, val] of Object.entries(all_match_list)) {
+        if (val.end_time > threshold && val.is_completed) {
+            res.locals.prev_day_matches.add(key)
+        }
+    }
+
+    next()
+}
+
 async function get_leaderboard(req, res, next) {
     const leaderboard = []
     res.locals.total_users = 0
     await collection.find().forEach(async function(doc) {
-        res.locals.total_users += 1
-        let day_points = 0
-        res.locals.prev_day_matches.forEach(function(key) {
-            const doc_id = `match_${team_to_id[all_match_list[key].team1]}_${team_to_id[all_match_list[key].team2]}_${all_match_list[key].index}`
-            if (doc[doc_id] !== undefined) {
-                if (all_match_list[key].team1score > all_match_list[key].team2score) {
-                    day_points += parseFloat(calc_score(100-doc[doc_id]).toFixed(1))
+        if (!isNaN(doc._id)) {
+            res.locals.total_users += 1
+            let day_points = 0
+            res.locals.prev_day_matches.forEach(function(key) {
+                const doc_id = `match_${team_to_id[all_match_list[key].team1]}_${team_to_id[all_match_list[key].team2]}_${all_match_list[key].index}`
+                if (doc[doc_id] !== undefined) {
+                    if (all_match_list[key].team1score > all_match_list[key].team2score) {
+                        day_points += parseFloat(calc_score(100-doc[doc_id]).toFixed(1))
+                    }
+                    else {
+                        day_points += parseFloat(calc_score(doc[doc_id]).toFixed(1))
+                    }
                 }
-                else {
-                    day_points += parseFloat(calc_score(doc[doc_id]).toFixed(1))
-                }
-            }
-        })
-        leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1, "day_points": day_points})
+            })
+            leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1, "day_points": day_points})
+        }
     })
     leaderboard.sort(function(a, b){
         if (a.score === b.score) {
@@ -1251,8 +1281,10 @@ async function get_user_rank(req, res, next) {
     else {
         res.locals.total_users = 0
         await collection.find().forEach(async function(doc) {
-            res.locals.total_users += 1
-            leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1})
+            if (!isNaN(doc._id)) {
+                res.locals.total_users += 1
+                leaderboard.push({"display_name": doc.display_name, "user_id": doc._id, "steam_url": doc.steam_url, "score": doc.score, "correct": doc.correct, "rank": 1})
+            }
         })
         leaderboard.sort(function(a, b){
             if (a.score === b.score) {
@@ -1288,39 +1320,64 @@ async function get_user_rank(req, res, next) {
 }
 
 app.get('/', [check_document_exists, get_upcoming_matches, get_complete_matches, get_matches_prev_day, get_leaderboard], (req, res) => {
-    const recent_upcoming = []
-    for (let i = 0; i < res.locals.all_upcoming_matches.length; i++) {
-        if (i >= 3) break
-        recent_upcoming.push(res.locals.all_upcoming_matches[i])
+    if (!startup_complete) {
+        res.render('site_restarting')
     }
-    const recent_completed = []
-    for (let i = 0; i < res.locals.all_complete_matches.length; i++) {
-        if (i >= 3) break
-        res.locals.all_complete_matches[i].index_num = i
-        recent_completed.push(res.locals.all_complete_matches[i])
+    else {
+        const recent_upcoming = []
+        for (let i = 0; i < res.locals.all_upcoming_matches.length; i++) {
+            if (i >= 3) break
+            recent_upcoming.push(res.locals.all_upcoming_matches[i])
+        }
+        const recent_completed = []
+        for (let i = 0; i < res.locals.all_complete_matches.length; i++) {
+            if (i >= 3) break
+            res.locals.all_complete_matches[i].index_num = i
+            recent_completed.push(res.locals.all_complete_matches[i])
+        }
+        const top_players = []
+        for (let i = 0; i < res.locals.leaderboard.length; i++) {
+            if (i >= 5) break
+            top_players.push(res.locals.leaderboard[i])
+        }
+        res.render('index', {user: req.user, "upcoming_matches": recent_upcoming, "recent_completed": recent_completed, "top_players": top_players})
     }
-    const top_players = []
-    for (let i = 0; i < res.locals.leaderboard.length; i++) {
-        if (i >= 5) break
-        top_players.push(res.locals.leaderboard[i])
-    }
-    res.render('index', {user: req.user, "upcoming_matches": recent_upcoming, "recent_completed": recent_completed, "top_players": top_players})
 })
 
 app.get('/upcoming_matches', [check_document_exists, get_matches_prev_day, get_upcoming_matches, get_leaderboard], (req, res) => {
-    res.render('upcoming_matches_liquepedia', {user: req.user, upcoming_matches: res.locals.upcoming_matches, total_users: res.locals.total_users})
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        res.render('upcoming_matches_liquepedia', {user: req.user, upcoming_matches: res.locals.upcoming_matches, total_users: res.locals.total_users})
+    }
 })
 
 app.get('/complete_matches', [check_document_exists, get_matches_prev_day, get_complete_matches, get_leaderboard], (req, res) => {
-    res.render('complete_matches_liquepedia', {user: req.user, completed_games: res.locals.complete_matches, total_users: res.locals.total_users})
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        res.render('complete_matches_liquepedia', {user: req.user, completed_games: res.locals.complete_matches, total_users: res.locals.total_users})
+    }
 })
 
 app.get('/leaderboard', [check_document_exists, get_matches_prev_day, get_leaderboard], (req, res) => {
-    res.render('leaderboard', {user: req.user, leaderboard: res.locals.leaderboard, total_users: res.locals.total_users})
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        res.render('leaderboard', {user: req.user, leaderboard: res.locals.leaderboard, total_users: res.locals.total_users})
+    }
 })
 
 app.get('/user/:userID', [get_user_info, get_user_rank], (req, res) => {
-    res.render('user_info_liquepedia', {user: req.user, user_info: res.locals.user_info})
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        res.render('user_info_liquepedia', {user: req.user, user_info: res.locals.user_info})
+    }
 })
 
 app.post('/insert_guess', [insert_guess], (req, res) => {
@@ -1328,8 +1385,13 @@ app.post('/insert_guess', [insert_guess], (req, res) => {
 })
 
 app.get('/logout', function(req, res){
-    req.logout();
-    res.redirect('/');
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        req.logout();
+        res.redirect('/');
+    }
 })
 
 app.get('/testing', function(req, res) {
@@ -1351,11 +1413,21 @@ app.get('/testing2', function(req, res) {
 })
 
 app.get('/auth/steam', passport.authenticate('steam', { failureRedirect: '/' }), function(req, res) {
-    res.redirect('/');
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        res.redirect('/');
+    }
 })
 
 app.get('/auth/steam/return', passport.authenticate('steam', { failureRedirect: '/' }), function(req, res) {
-    res.redirect('/');
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        res.redirect('/');
+    }
 })
 
 app.listen(process.env.PORT || 4000, () => console.log("Server is running..."));

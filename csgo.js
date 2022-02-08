@@ -116,6 +116,7 @@ hbs.registerHelper('display_average', function(score) {
 
 function calc_score(score) {
     return 25 - (Math.pow(score - 100, 2) / 100)
+    // return -30 + 0.65 * score - 0.001 * Math.pow(score, 2)
 }
 
 hbs.registerHelper('display_score', function(score, team1score, team2score, bo3) {
@@ -416,18 +417,18 @@ async function loop_leagues() {
 }
 
 async function get_team_logos(id) {
-    team_to_logo["Astralis"] = "/imgs/astralis.png"
-    team_to_logo["BIG"] = "/imgs/big.png"
-    team_to_logo["Complexity Gaming"] = "/imgs/col.png"
-    team_to_logo["Evil Geniuses"] = "/imgs/eg.png"
-    team_to_logo["FaZe Clan"] = "/imgs/faze.png"
-    team_to_logo["G2 Esports"] = "/imgs/g2.png"
-    team_to_logo["MIBR"] = "/imgs/mibr.png"
-    team_to_logo["Natus Vincere"] = "/imgs/navi.png"
-    team_to_logo["Ninjas in Pyjamas"] = "/imgs/nip.png"
-    team_to_logo["OG"] = "/imgs/og.png"
-    team_to_logo["Team Liquid"] = "/imgs/liquid.png"
-    team_to_logo["Team Vitality"] = "/imgs/vitality.png"
+    team_to_logo["Astralis"] = "/imgs/csgo/astralis.png"
+    team_to_logo["BIG"] = "/imgs/csgo/big.png"
+    team_to_logo["Complexity Gaming"] = "/imgs/csgo/col.png"
+    team_to_logo["Evil Geniuses"] = "/imgs/csgo/eg.png"
+    team_to_logo["FaZe Clan"] = "/imgs/csgo/faze.png"
+    team_to_logo["G2 Esports"] = "/imgs/csgo/g2.png"
+    team_to_logo["MIBR"] = "/imgs/csgo/mibr.png"
+    team_to_logo["Natus Vincere"] = "/imgs/csgo/navi.png"
+    team_to_logo["Ninjas in Pyjamas"] = "/imgs/csgo/nip.png"
+    team_to_logo["OG"] = "/imgs/csgo/og.png"
+    team_to_logo["Team Liquid"] = "/imgs/csgo/liquid.png"
+    team_to_logo["Team Vitality"] = "/imgs/csgo/vitality.png"
 }
 
 async function get_averages() {
@@ -758,6 +759,8 @@ async function completed_matches_data() {
                             }
                         }
                     })
+
+                    await set_match_data()
                 }
             }
         }
