@@ -515,7 +515,7 @@ async function loop_leagues() {
 
 async function get_team_logos(id) {
     team_to_logo["Team Liquid"] = "/imgs/dota/liquid.png"
-    team_to_logo["Team Tickles"] = "/imgs/dota/tickles.png"
+    team_to_logo["Gladiators"] = "/imgs/dota/gladiators.png"
     team_to_logo["Tundra Esports"] = "/imgs/dota/tundra.png"
     team_to_logo["OG"] = "/imgs/dota/og.png"
     team_to_logo["Team Spirit"] = "/imgs/dota/spirit.png"
