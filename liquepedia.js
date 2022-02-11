@@ -554,8 +554,8 @@ async function get_averages() {
                     const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
                     const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
 
-                    console.log(team1, team2, index)
-                    console.log(match_table[team_to_league_id[team1]][team1][team2][index])
+                    // console.log(team1, team2, index)
+                    // console.log(match_table[team_to_league_id[team1]][team1][team2][index])
                     const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
 
                     all_match_list[match_id].number_guesses += 1
@@ -673,6 +673,11 @@ async function get_live_matches() {
                     // console.log(team1)
                     continue
                 }
+
+                if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
+                    console.log(`${team1} vs TBD`)
+                    continue
+                }
                 let team2 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
                 if (team2.indexOf("(") !== -1) {
                     team2 = team2.substring(0, team2.indexOf("(")-1)
@@ -774,7 +779,7 @@ async function completed_matches_data(game_id) {
 
                     const match_id = match_table[team_to_league_id[team1]][team1][team2][match_index]
 
-                    const timestamp = parseInt(match_list.contents[1].contents[3].contents[i].contents[0].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
+                    const timestamp = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
                     if (timestamp !== all_match_list[match_id].start_time) {
                         console.log("different timestamp spotted, skipping ... ")
                         continue
