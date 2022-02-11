@@ -825,7 +825,7 @@ async function completed_matches_data(game_id) {
                             all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text)
 
                             const team2text = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
-                            const team2score = parseInt(team2text) // substr not needed? -> const team2score = parseInt(team2text.substring(1, 2))
+                            const team2score = parseInt(team2text.substring(1)) // substr not needed? -> const team2score = parseInt(team2text.substring(1, 2))
                             all_match_list[match_id].team2score = team2score
                         }
 
@@ -872,6 +872,8 @@ async function completed_matches_data(game_id) {
                             }
                         }
                     })
+
+                    await set_match_data()
                 }
             }
         }
