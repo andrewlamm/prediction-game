@@ -496,8 +496,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-top: 2rem;
 }
 
-.block {
-  display: block;
+.mb-4 {
+  margin-bottom: 1rem;
 }
 
 .flex {
@@ -777,6 +777,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-right: 1rem;
 }
 
+.pl-1 {
+  padding-left: 0.25rem;
+}
+
 .pr-2 {
   padding-right: 0.5rem;
 }
@@ -791,10 +795,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .pb-10 {
   padding-bottom: 2.5rem;
-}
-
-.pl-1 {
-  padding-left: 0.25rem;
 }
 
 .pt-4 {
@@ -951,7 +951,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   background-color: transparent;
 }
 
-.noUi-handle:hover {
+.noUi-handle {
   cursor: ew-resize
 }
 
@@ -1243,6 +1243,10 @@ a[target="_blank"]::after {
     width: 25%;
   }
 
+  .lg\:w-2\/3 {
+    width: 66.666667%;
+  }
+
   .lg\:w-1\/6 {
     width: 16.666667%;
   }
@@ -1257,10 +1261,6 @@ a[target="_blank"]::after {
 
   .lg\:w-full {
     width: 100%;
-  }
-
-  .lg\:w-2\/3 {
-    width: 66.666667%;
   }
 
   .lg\:flex-row {

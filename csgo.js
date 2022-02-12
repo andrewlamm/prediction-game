@@ -174,6 +174,10 @@ hbs.registerHelper('positive_plus', function(n) {
     }
 })
 
+hbs.registerHelper('not', function(b) {
+    return !b
+})
+
 hbs.registerHelper('find_color', function(n) {
     if (n > 0) {
         return 'text-green-700'

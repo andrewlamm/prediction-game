@@ -174,6 +174,10 @@ hbs.registerHelper('positive_plus', function(n) {
     }
 })
 
+hbs.registerHelper('not', function(b) {
+    return !b
+})
+
 hbs.registerHelper('find_color', function(n) {
     if (n > 0) {
         return 'text-green-700'
@@ -675,7 +679,7 @@ async function get_live_matches() {
                 }
 
                 if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
-                    console.log(`${team1} vs TBD`)
+                    // console.log(`${team1} vs TBD`)
                     continue
                 }
                 let team2 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title

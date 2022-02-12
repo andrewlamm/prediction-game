@@ -30,7 +30,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
     background-color: transparent;
 }
 
-.noUi-handle:hover {
+.noUi-handle {
     cursor: ew-resize
 }
 

@@ -5,6 +5,7 @@
 </div>
 {{/if}}
 <script>
+    {{#if user}}
     if (document.body.scrollTop > document.body.offsetHeight-window.innerHeight-48 || document.documentElement.scrollTop > document.body.offsetHeight-window.innerHeight-48) {
         document.getElementById('user_footer').classList.add("hidden")
     }
@@ -19,4 +20,5 @@
             document.getElementById('user_footer').classList.remove("hidden")
         }
     }
+    {{/if}}
 </script>

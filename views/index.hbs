@@ -303,8 +303,10 @@
         }
 
         {{#each recent_completed}}
+            {{#if this.is_completed}}
             document.getElementById(`match_{{this.index_num}}_team1score`).style.height = document.getElementById(`match_{{this.index_num}}_team1`).offsetHeight
             document.getElementById(`match_{{this.index_num}}_team2score`).style.height = document.getElementById(`match_{{this.index_num}}_team2`).offsetHeight
+            {{/if}}
         {{/each}}
 
         setInterval(function() {

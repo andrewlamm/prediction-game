@@ -4,9 +4,13 @@
 	<body class="min-h-full flex flex-col">
 		{{> header page_name="Upcoming Matches"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
-			{{#if user}}
 			<div class="w-full flex items-center justify-center">
 				<div class="w-full lg:w-4/5 flex flex-col">
+					{{#if (not user)}}
+						<div class="font-bold text-center w-full text-3xl mb-4">
+							Please&nbsp;<a href="/auth/steam" class="text-blue-700">login with Steam</a>&nbsp;to predict matches.
+						</div>
+					{{/if}}
 					{{#each upcoming_matches}}
 					<div class="w-full flex flex-col py-2">
 						<div class="flex flex-col text-xl md:text-4xl font-bold">
@@ -88,11 +92,6 @@
 					{{/each}}
 				</div>
 			</div>
-			{{else}}
-			<div class="w-full text-center text-3xl font-bold">
-				Please&nbsp;<a href="/auth/steam" class="text-blue-700">login with Steam</a>&nbsp;to predict matches.
-			</div>
-			{{/if}}
 		</div>
 		{{> user_footer}}
 		{{> footer}}
@@ -142,6 +141,11 @@
 						}
 					},
 				});
+				{{#if (not ../../user)}}
+					match_{{turn_id_to_text team1id}}_{{turn_id_to_text team2id}}_{{turn_id_to_text index}}_slider.setAttribute('disabled', true)
+					match_{{turn_id_to_text team1id}}_{{turn_id_to_text team2id}}_{{turn_id_to_text index}}_slider.getElementsByClassName("noUi-handle")[0].style.cursor = "not-allowed"
+				{{/if}}
+
 				match_{{turn_id_to_text team1id}}_{{turn_id_to_text team2id}}_{{turn_id_to_text index}}_slider.noUiSlider.on('update', function (values, handle) {
 					change_score(match_{{turn_id_to_text team1id}}_{{turn_id_to_text team2id}}_{{turn_id_to_text index}}_slider.id)
 				})
