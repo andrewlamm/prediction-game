@@ -8,10 +8,14 @@ Come find out on the DPC Predicing Game [here](https://dpc-predictions-game.hero
 
 After logging in through Steam, you may predict upcoming matches on the [upcoming matches](https://dpc-predictions-game.herokuapp.com/upcoming_matches) page. Use the sliders to predict the winner of the match. However, this is not just a simple who wins challenge. You must predict the probability of the team winning, and the points lost or gained depends on that probability, determined by [Brier scores](https://en.wikipedia.org/wiki/Brier_score). The points from each match range from a gain of 25 points to a loss of 75 points, and is determined using the formula          
 
-```points = 25 - (([probability of team winning] - 100)^2 / 100)```
+```points = -30 + .65p - 0.001p^2```
 
-For example, let's say for the Team Liquid vs Nigma Galaxy match, you predict that Nigma Galaxy has a 73% chance of winning. Then, if Nigma Galaxy does indeed win, you will gain 17.7 points! However, if Team Liquid wins, you will lose 28.3 points.         
-Nigma Galaxy did end up [winning](https://www.dotabuff.com/matches/6371895283) the match 2-1, so you would've have gained 17.7 points.            
+where ```p``` is the estimated probability of winning you gave the winning team. 
+
+For example, let's say for the PSG.LGD vs Royal Never Give Up match, you predict that PSG.LGD has a 73% chance of winning.
+Then, if PSG.LGD does indeed win, you will gain 12.1 points! However, if Royal Never Give Up wins, you will lose 13.2 points.      
+In the actual match, XinQ and PSG.LGD ended up [punching their way to a 2-0 victory](https://clips.twitch.tv/LittleSucculentBoarPipeHype-i9sA0osMm40k70Eh), so you would've have gained 12.1 points.
+
 
 Find every completed match at the [completed matches](https://dpc-predictions-game.herokuapp.com/complete_matches) page, along with the average guess and points and your guess and points, if applicable.      
 
