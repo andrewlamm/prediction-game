@@ -1196,91 +1196,103 @@ async function get_leaderboard(req, res, next) {
 }
 
 async function get_user_info(req, res, next) {
-    if (isNaN(req.params.userID)) {
-        res.locals.user_info = undefined
-        next()
-    }
-
-    const query = {"_id": req.params.userID}
-    const results = await collection.findOne(query)
-
-    if (results === null) {
-        res.locals.user_info = undefined
-        next()
+    if (!startup_complete) {
+        res.render('site_restarting')
     }
     else {
-        const threshold = (Date.now() / 1000) - 84000
-        let day_score = 0
-        let day_picks = 0
-        let day_incorrect = 0
 
-        res.locals.user_info = results
+        if (isNaN(req.params.userID)) {
+            res.locals.user_info = undefined
+            next()
+        }
 
-        res.locals.user_info.matches = []
+        const query = {"_id": req.params.userID}
+        const results = await collection.findOne(query)
 
-        for (const [key, val] of Object.entries(results)) {
-            if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "matches" && key !== "incorrect") {
-                let underscore_count = 0
-                for (let i = 0; i < key.length; i++) {
-                    if (key[i] === "_") underscore_count += 1
-                }
-                if (underscore_count !== 3) continue
-                const team1 = id_to_team[parseInt(key.substring(6, key.indexOf("_", 6)))]
-                const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
-                const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
+        if (results === null) {
+            res.locals.user_info = undefined
+            next()
+        }
+        else {
+            const threshold = (Date.now() / 1000) - 84000
+            let day_score = 0
+            let day_picks = 0
+            let day_incorrect = 0
 
-                // console.log(team1, team2, index)
-                const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
+            res.locals.user_info = results
 
-                // console.log(all_match_list[match_id].end_time, threshold)
-                if (all_match_list[match_id].end_time > threshold) {
-                    if (all_match_list[match_id].is_completed) {
-                        if (all_match_list[match_id].team1score > all_match_list[match_id].team2score) {
-                            const points = parseFloat(calc_score(100-val).toFixed(1))
-                            day_score += points
-                            if (val < 50) {
-                                day_picks += 1
+            res.locals.user_info.matches = []
+
+            for (const [key, val] of Object.entries(results)) {
+                if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "matches" && key !== "incorrect") {
+                    let underscore_count = 0
+                    for (let i = 0; i < key.length; i++) {
+                        if (key[i] === "_") underscore_count += 1
+                    }
+                    if (underscore_count !== 3) continue
+                    const team1 = id_to_team[parseInt(key.substring(6, key.indexOf("_", 6)))]
+                    const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
+                    const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
+
+                    // console.log(team1, team2, index)
+                    const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
+
+                    // console.log(all_match_list[match_id].end_time, threshold)
+                    if (all_match_list[match_id].end_time > threshold) {
+                        if (all_match_list[match_id].is_completed) {
+                            if (all_match_list[match_id].team1score > all_match_list[match_id].team2score) {
+                                const points = parseFloat(calc_score(100-val).toFixed(1))
+                                day_score += points
+                                if (val < 50) {
+                                    day_picks += 1
+                                }
+                                else if (val > 50) {
+                                    day_incorrect += 1
+                                }
                             }
-                            else if (val > 50) {
-                                day_incorrect += 1
-                            }
-                        }
-                        else {
-                            const points = parseFloat(calc_score(val).toFixed(1))
-                            day_score += points
-                            if (val > 50) {
-                                day_picks += 1
-                            }
-                            else if (val < 50) {
-                                day_incorrect += 1
+                            else {
+                                const points = parseFloat(calc_score(val).toFixed(1))
+                                day_score += points
+                                if (val > 50) {
+                                    day_picks += 1
+                                }
+                                else if (val < 50) {
+                                    day_incorrect += 1
+                                }
                             }
                         }
                     }
-                }
 
-                if ((req.user !== undefined && req.params.userID === req.user._json.steamid) || all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
-                    res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "start_time": all_match_list[match_id].start_time, "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "is_completed": all_match_list[match_id].is_completed, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
+                    if ((req.user !== undefined && req.params.userID === req.user._json.steamid) || all_match_list[match_id].is_completed || all_match_list[match_id].is_live) {
+                        res.locals.user_info.matches.push({"team1": all_match_list[match_id].team1, "team2": all_match_list[match_id].team2, "team1score": all_match_list[match_id].team1score, "team2score": all_match_list[match_id].team2score, "team1image": team_to_logo[all_match_list[match_id].team1], "team2image": team_to_logo[all_match_list[match_id].team2], "start_time": all_match_list[match_id].start_time, "end_time": all_match_list[match_id].end_time, "is_live": all_match_list[match_id].is_live, "is_completed": all_match_list[match_id].is_completed, "user_guess": val, "is_bo3": all_match_list[match_id].is_bo3})
+                    }
                 }
             }
+
+
+            res.locals.user_info.matches.sort(function(a, b) {
+                if (a.is_live) return -1
+                if (b.is_live) return 1
+
+                if (a.is_completed && b.is_completed) {
+                    return a.end_time < b.end_time ? 1 : -1
+                }
+
+                if (a.is_completed) return -1
+                if (b.is_completed) return 1
+
+                if (!a.is_completed && !b.is_completed && a.end_time === b.end_time) {
+                    return a.start_time < b.start_time ? -1 : 1
+                }
+                return a.end_time < b.end_time ? 1 : -1
+            })
+
+            res.locals.user_info.day_score = day_score
+            res.locals.user_info.day_picks = day_picks
+            res.locals.user_info.day_incorrect = day_incorrect
+
+            next()
         }
-
-
-        res.locals.user_info.matches.sort(function(a, b) {
-            if (a.is_live) return -1
-            if (b.is_live) return 1
-            if (a.end_time === b.end_time) {
-                return a.start_time < b.start_time ? -1 : 1
-            }
-            if (!a.is_completed) return -1
-            if (!a.is_completed) return 1
-            return a.end_time < b.end_time ? 1 : -1
-        })
-
-        res.locals.user_info.day_score = day_score
-        res.locals.user_info.day_picks = day_picks
-        res.locals.user_info.day_incorrect = day_incorrect
-
-        next()
     }
 }
 
