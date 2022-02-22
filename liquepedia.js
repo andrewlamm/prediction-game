@@ -542,7 +542,7 @@ async function get_team_logos(id) {
     team_to_logo["Thunder Awaken"] = "/imgs/dota/thunder.png"
     team_to_logo["Infamous"] = "/imgs/dota/infamous.png"
     team_to_logo["Beastcoast"] = "/imgs/dota/beastcoast.png"
-    team_to_logo["King of Kings"] = "/imgs/dota/apu.png"
+    team_to_logo["APU King of Kings"] = "/imgs/dota/apu.png"
 }
 
 async function get_averages() {
