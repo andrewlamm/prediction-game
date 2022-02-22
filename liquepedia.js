@@ -390,6 +390,7 @@ async function find_teams() {
                         team1 = team1.substring(0, team1.indexOf("(")-1)
                     }
                     if (team1 === "Omega Esports") continue
+                    if (team1 === "King of Kings") team1 = "APU King of Kings"
 
                     match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1] = {}
 
@@ -541,7 +542,7 @@ async function get_team_logos(id) {
     team_to_logo["Thunder Awaken"] = "/imgs/dota/thunder.png"
     team_to_logo["Infamous"] = "/imgs/dota/infamous.png"
     team_to_logo["Beastcoast"] = "/imgs/dota/beastcoast.png"
-    team_to_logo["APU King of Kings"] = "/imgs/dota/apu.png"
+    team_to_logo["King of Kings"] = "/imgs/dota/apu.png"
 }
 
 async function get_averages() {
