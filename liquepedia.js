@@ -756,7 +756,7 @@ async function completed_matches_data(game_id) {
 
         for (let i = 0; i < match_list.contents[1].contents[2].contents.length; i++) {
             if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) {
-                if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("OQ") !== -1) {
+                if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("OQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("CQ") !== -1) {
                     continue
                 }
                 let team1 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
