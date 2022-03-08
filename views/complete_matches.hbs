@@ -1,21 +1,27 @@
 <!DOCTYPE >
 <html>
 	{{> head_tag title="Complete Matches"}}
-	<body class="min-h-full flex flex-col bg-gray-400">
+	<body class="min-h-full flex flex-col">
         {{> header page_name="Complete Matches"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full flex items-center justify-center z-0">
-                <div class="w-full lg:w-4/5 flex flex-col">
+                <div class="w-full xl:w-4/5 flex flex-col">
                     {{#each completed_games}}
                     <div class="w-full flex flex-col py-2">
-                        <div class="flex flex-col text-4xl font-bold">
-                            <div class="pb-2">{{@key}}</div>
+                        <div class="flex flex-col text-xl md:text-4xl font-bold">
+                            <div class="pb-2 flex flex-row">
+                                <span class="flex-grow cursor-pointer" id="{{@key}}_text" onclick="toggle_division_list(this.id)">{{@key}}</span>
+                                <button class="plusminus z-10 toggle_button_animation" id="{{@key}}_toggle_button" onclick="toggle_division_list(this.id)">
+                                    <span class="plusminusspan plusminusspanfirst"></span>
+                                    <span class="plusminusspan plusminusspansecond"></span>
+                                </button>
+                            </div>
                             <hr class="bg-black h-px border-0">
                         </div>
-                        <div class="w-full pt-2 overflow-x-auto">
+                        <div class="w-full pt-2 overflow-x-auto" id="{{@key}}_match_list">
                             <table class="w-full">
                                 <tr class="border-b-2 border-zinc-600">
-                                    <td colspan=3 class="text-left px-1 font-bold pb-1">Match</td>
+                                    <td colspan=3 class="text-left px-1 font-bold pb-1" style="width:450px">Match</td>
                                     <td class="px-1 text-center font-bold pb-1">Average<br> Guess</td>
                                     <td class="px-1 text-center font-bold pb-1">Your<br> Guess</td>
                                     <td class="px-1 border-gray-700 text-center font-bold pb-1">Final Score</td>
@@ -23,16 +29,16 @@
                                     <td class="px-1 text-center font-bold pb-1">Your<br> Points</td>
                                 </tr>
                                 {{#each this}}
-                                <tr>
-                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score true)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
+                                <tr id="{{league_id}}_{{@index}}">
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
                                     <td class="px-4 py-1">vs</td>
-                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score true)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
                                     <td class="text-center py-1 px-1">
-                                        <div class="flex flex-row items-center justify-center {{#if (determine_win average_guess team1score team2score)}}font-bold{{/if}}">
+                                        <div class="flex flex-row items-center justify-center {{#if (determine_win average_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                             {{#if (check_exists average_guess)}}
                                                 {{#if (check_not50 average_guess)}}
                                                 <div style="width: 40px;" class="flex items-center justify-center">
-                                                    <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;">
+                                                    <img src={{#if (check_team1 average_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 average_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
                                                 </div>
                                                 {{/if}}
                                                 {{display_average average_guess}}%
@@ -40,20 +46,20 @@
                                         </div>
                                     </td>
                                     <td class="text-center py-1 px-1">
-                                        <div class="flex flex-row items-center justify-center {{#if (determine_win your_guess team1score team2score)}}font-bold{{/if}}">
+                                        <div class="flex flex-row items-center justify-center {{#if (determine_win your_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                             {{#if (check_exists your_guess)}}
                                                 {{#if (check_not50 your_guess)}}
                                                 <div style="width: 40px;" class="flex items-center justify-center">
-                                                    <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;">
+                                                    <img src={{#if (check_team1 your_guess)}}{{team1image}}{{else}}{{team2image}}{{/if}} style="height: 20px;" alt="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}" title="{{#if (check_team1 your_guess)}}{{team1}}{{else}}{{team2}}{{/if}}">
                                                 </div>
                                                 {{/if}}
                                                 {{display_average your_guess}}%
                                             {{/if}}
                                         </div>
                                     </td>
-                                    <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else}}<span class="{{#if (check_win team1score true)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score true)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
-                                    <td class="text-center py-1 px-1">{{#if (check_exists average_guess)}}{{{display_score average_guess team1score team2score}}}{{/if}}</td>
-                                    <td class="text-center py-1 px-1">{{#if (check_exists your_guess)}}{{{display_score your_guess team1score team2score}}}{{/if}}</td>
+                                    <td class="text-center py-1 px-1">{{#if is_live}}<span class="font-bold">LIVE</span>{{else}}<span class="{{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}">{{team1score}}</span>&nbsp;-&nbsp;<span class="{{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}">{{team2score}}</span>{{/if}}</td>
+                                    <td class="text-center py-1 px-1">{{#if (check_exists average_guess)}}{{{display_score average_guess team1score team2score is_bo3}}}{{/if}}</td>
+                                    <td class="text-center py-1 px-1">{{#if (check_exists your_guess)}}{{{display_score your_guess team1score team2score is_bo3}}}{{/if}}</td>
                                 </tr>
                                 {{/each}}
                             </table>
@@ -66,4 +72,25 @@
         {{> user_footer}}
 		{{> footer}}
     </body>
+    <script>
+        const array_lengths = {}
+        {{#each completed_games}}
+            array_lengths["{{@key}}"] = {{this.length}}
+        {{/each}}
+        function toggle_division_list(id) {
+            const key_id = id.substring(0, id.indexOf('_'))
+            document.getElementById(`${key_id}_toggle_button`).classList.toggle("toggle_button_animation")
+            document.getElementById(`${key_id}_match_list`).classList.toggle("hidden")
+
+            for (let i = 0; i < array_lengths[`${key_id}`]; i++) {
+                document.getElementById(`${key_id}_${i}`).classList.add("opacity-0")
+            }
+            for (let i = 0; i < array_lengths[`${key_id}`]; i++) {
+                document.getElementById(`${key_id}_${i}`).style.animation = "0.2s rotateX"
+                document.getElementById(`${key_id}_${i}`).style.animationDelay = `${0.02*(i+1)}s`
+                document.getElementById(`${key_id}_${i}`).style.animationFillMode = 'forwards'
+            }
+
+        }
+    </script>
 </html>
