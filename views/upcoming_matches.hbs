@@ -1,5 +1,5 @@
-<!DOCTYPE >
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	{{> head_tag title="Upcoming Matches"}}
 	<body class="min-h-full flex flex-col">
 		{{> header page_name="Upcoming Matches"}}
@@ -16,7 +16,7 @@
 						<div class="flex flex-col text-xl md:text-4xl font-bold">
 							<div class="pb-2 flex flex-row">
                                 <span class="flex-grow cursor-pointer" id="{{@key}}_text" onclick="toggle_division_list(this.id)">{{@key}}</span>
-                                <button class="plusminus z-10 toggle_button_animation" id="{{@key}}_toggle_button" onclick="toggle_division_list(this.id)">
+                                <button class="plusminus z-10 toggle_button_animation" id="{{@key}}_toggle_button" onclick="toggle_division_list(this.id)" aria-label="Toggle {{@key}}">
                                     <span class="plusminusspan plusminusspanfirst"></span>
                                     <span class="plusminusspan plusminusspansecond"></span>
                                 </button>
@@ -27,7 +27,7 @@
 							{{#each this}}
 							<div class="w-full items-center justify-center flex flex-col" id="{{league_id}}_{{@index}}">
 								<div class="flex flex-row text-center font-bold text-2xl md:text-4xl justify-center items-center">
-									<img src={{team1image}} class="pr-2 lg:pr-6 logo_image_height">{{team1}} vs {{team2}}<img src={{team2image}} class="pl-2 lg:pl-6 logo_image_height">
+									<img src={{team1image}} alt="{{team1}}" class="pr-2 lg:pr-6 logo_image_height">{{team1}} vs {{team2}}<img src={{team2image}} alt="{{team2}}" class="pl-2 lg:pl-6 logo_image_height">
 								</div>
 								<div class="flex flex-col lg:flex-row pt-2 lg:pt-8 pb-2 lg:pb-8 items-center justify-center w-full">
                                     <div class="flex flex-col items-center pb-10 lg:pb-0 justify-center w-full lg:w-1/6">
@@ -52,7 +52,7 @@
 											{{team1}}
 										</div>
 										<div class="flex pr-1 md:px-2 w-1/6 md:w-1/6 text-right items-center justify-end relative">
-											<img src={{team1image}} style="width: 40px;" id="match:{{team1id}}:{{team2id}}:{{index}}_team1image">
+											<img src={{team1image}} alt="{{team1}}" style="width: 40px;" id="match:{{team1id}}:{{team2id}}:{{index}}_team1image">
 										</div>
 										<div class="px-2 w-2/3 md:w-3/5">
 											<div id="match:{{team1id}}:{{team2id}}:{{index}}_slider" style="height: 1px; top:48px;" class="flex items-center justify-center w-full"></div>
@@ -70,7 +70,7 @@
 											</div>
 										</div>
 										<div class="flex pl-1 md:px-2 w-1/6 md:w-1/6 text-right items-center relative">
-											<img src={{team2image}} style="width: 40px;" id="match:{{team1id}}:{{team2id}}:{{index}}_team2image">
+											<img src={{team2image}} alt="{{team2}}" style="width: 40px;" id="match:{{team1id}}:{{team2id}}:{{index}}_team2image">
 										</div>
 										<div class="hidden md:px-2 w-1/6 md:w-1/6 text-left items-center relative" id="match:{{team1id}}:{{team2id}}:{{index}}_team2">
 											{{team2}}

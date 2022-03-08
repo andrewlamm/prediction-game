@@ -1,5 +1,5 @@
-<!DOCTYPE >
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	{{> head_tag title="Predictions Game"}}
 	<body class="min-h-full flex flex-col">
         {{> header page_name="Home"}}
@@ -72,10 +72,10 @@
                                 <div class="w-full flex flex-row py-2 h-full justify-center items-center">
                                     <div class="flex flex-col w-3/5">
                                         <div class="flex flex-row items-center">
-                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} alt="{{team1}}" style="height: 20px;"></div>{{team1}}
                                         </div>
                                         <div class="flex flex-row items-center">
-                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} alt="{{team2}}" style="height: 20px;"></div>{{team2}}
                                         </div>
                                     </div>
                                     <div class="flex flex-col w-2/5 justify-center">
@@ -123,10 +123,10 @@
                                 <div class="flex flex-row py-2 w-full items-center justify-center h-full">
                                     <div class="flex flex-col w-1/2 lg:w-3/4">
                                         <div class="flex flex-row items-center {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}" id="match_{{this.index_num}}_team1">
-                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} alt="{{team1}}" style="height: 20px;"></div>{{team1}}
                                         </div>
                                         <div class="flex flex-row items-center {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}" id="match_{{this.index_num}}_team2">
-                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}
+                                            <div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} alt="{{team2}}" style="height: 20px;"></div>{{team2}}
                                         </div>
                                     </div>
                                     <div class="flex flex-row w-1/2 lg:w-1/4 items-center justify-end h-full">

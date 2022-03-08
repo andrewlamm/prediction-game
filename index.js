@@ -595,7 +595,7 @@ async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
-    // await start_get_match_data()
+    await start_get_match_data()
     // console.log("complete, waiting 30 seconds")
     // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
@@ -1059,7 +1059,7 @@ function get_upcoming_matches(req, res, next) {
 }
 
 async function insert_guess(req, res, next) {
-    console.log(req.body)
+    // console.log(req.body)
     const team1 = id_to_team[req.body.team1id]
     const team2 = id_to_team[req.body.team2id]
     const index = req.body.index
@@ -1108,7 +1108,7 @@ async function insert_guess(req, res, next) {
                 update_doc.$set[`match_${req.body.team1id}_${req.body.team2id}_${index}`] = parseInt(req.body.guess)
 
                 const result = await collection.updateOne(query, update_doc);
-                console.log("document updated!");
+                // console.log("document updated!");
 
                 next()
             }

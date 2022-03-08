@@ -1,5 +1,5 @@
-<!DOCTYPE >
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	{{> head_tag title="User Information"}}
 	<body class="min-h-full flex flex-col">
         {{> header page_name=""}}
@@ -9,7 +9,7 @@
                 <div class="w-full xl:w-2/3 flex flex-col items-center justify-center pt-2">
                     <div class="w-full flex flex-row items-center justify-center">
                         <div class="px-2 ">
-                            <img src={{user_info.profile_picture}} class="pt-1">
+                            <img src={{user_info.profile_picture}} alt="Profile Picture" class="pt-1">
                         </div>
                         <div class="px-2 flex flex-col h-full">
                             <div class="font-bold text-2xl md:text-5xl pb-2">
@@ -39,9 +39,9 @@
                             </tr>
                             {{#each user_info.matches}}
                             <tr>
-                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
+                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} alt="{{team1}}" style="height: 20px;"></div>{{team1}}</td>
                                 <td class="px-4 py-1">vs</td>
-                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
+                                <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} alt="{{team2}}" style="height: 20px;"></div>{{team2}}</td>
                                 <td class="text-center py-1 px-1">
                                     <div class="flex flex-row items-center justify-center {{#if (determine_win user_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                         {{#if (check_not50 user_guess)}}

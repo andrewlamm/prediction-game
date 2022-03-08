@@ -1,5 +1,5 @@
-<!DOCTYPE >
-<html>
+<!DOCTYPE html>
+<html lang="en">
 	{{> head_tag title="Complete Matches"}}
 	<body class="min-h-full flex flex-col">
         {{> header page_name="Complete Matches"}}
@@ -11,7 +11,7 @@
                         <div class="flex flex-col text-xl md:text-4xl font-bold">
                             <div class="pb-2 flex flex-row">
                                 <span class="flex-grow cursor-pointer" id="{{@key}}_text" onclick="toggle_division_list(this.id)">{{@key}}</span>
-                                <button class="plusminus z-10 toggle_button_animation" id="{{@key}}_toggle_button" onclick="toggle_division_list(this.id)">
+                                <button class="plusminus z-10 toggle_button_animation" id="{{@key}}_toggle_button" onclick="toggle_division_list(this.id)" aria-label="Toggle {{@key}}">
                                     <span class="plusminusspan plusminusspanfirst"></span>
                                     <span class="plusminusspan plusminusspansecond"></span>
                                 </button>
@@ -30,9 +30,9 @@
                                 </tr>
                                 {{#each this}}
                                 <tr id="{{league_id}}_{{@index}}">
-                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} style="height: 20px;"></div>{{team1}}</td>
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team1score is_bo3 team2score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team1image}} alt="{{team1}}" style="height: 20px;"></div>{{team1}}</td>
                                     <td class="px-4 py-1">vs</td>
-                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} style="height: 20px;"></div>{{team2}}</td>
+                                    <td style="width:230px" class="flex items-center px-1 py-1 {{#if (check_win team2score is_bo3 team1score)}}font-bold{{/if}}"><div style="width: 40px;" class="flex items-center justify-center pr-1"><img src={{team2image}} alt="{{team2}}" style="height: 20px;"></div>{{team2}}</td>
                                     <td class="text-center py-1 px-1">
                                         <div class="flex flex-row items-center justify-center {{#if (determine_win average_guess team1score team2score is_bo3)}}font-bold{{/if}}">
                                             {{#if (check_exists average_guess)}}
