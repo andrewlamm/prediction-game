@@ -318,15 +318,14 @@ function turn_to_ordinal(num) {
 let parsed_data = {}
 
 const regions = ["Western_Europe", "China", "North_America", "Southeast_Asia", "Eastern_Europe", "South_America"]
-// const divisions = ["Division_I", "Division_II"]
-const divisions = ["Regional_Finals"]
+const divisions = ["Division_I", "Division_II"]
 
 function retrieve_data(region, division) {
     return new Promise(async function(resolve, reject) {
         const options = {
             hostname: 'liquipedia.net',
             port: 443,
-            path: `/dota2/api.php?action=parse&format=json&page=Dota_Pro_Circuit/2021-22/1/${region}/${division}`,
+            path: `/dota2/api.php?action=parse&format=json&page=Dota_Pro_Circuit/2021-22/2/${region}/${division}`,
             method: 'GET',
             headers: {
                 'User-Agent': 'DPCScenarios',
@@ -355,10 +354,9 @@ function retrieve_data(region, division) {
 }
 
 // const LEAGUE_IDS = [13738, 13716, 13741, 13747, 13709, 13712, 13740, 13717, 13742, 13748, 13710, 13713]
-const LEAGUE_IDS = [1, 2, 3, 4, 5, 6]
+const LEAGUE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 // WEU, CN, NA, SEA, EEU, SA
-// const leagueid_to_name = {13738: "Western Europe Division I", 13716: "China Division I", 13741: "North America Division I", 13747: "Southeast Asia Division I", 13709: "Eastern Europe Division I", 13712: "South America Division I", 13740: "Western Europe Division II", 13717: "China Division II", 13742: "North America Division II", 13748: "Southeast Asia Division II", 13710: "Eastern Europe Division II", 13713: "South America Division II"}
-const leagueid_to_name = {1: "Western Europe Regional Finals", 2: "China Regional Finals", 3: "North America Regional Finals", 4: "Southeast Asia Regional Finals", 5: "Eastern Europe Regional Finals", 6: "South America Regional Finals"}
+const leagueid_to_name = {1: "Western Europe Division I", 2: "China Division I", 3: "North America Division I", 4: "Southeast Asia Division I", 5: "Eastern Europe Division I", 6: "South America Division I", 7: "Western Europe Division II", 8: "China Division II", 9: "North America Division II", 10: "Southeast Asia Division II", 11: "Eastern Europe Division II", 12: "South America Division II"}
 const team_to_logo = {}
 let match_table = {}
 let all_match_list = {}
@@ -385,6 +383,7 @@ async function find_teams() {
                 match_table[LEAGUE_IDS[divisions_j*6+region_i]] = {}
 
                 for (let i = 0; i < team_list.length; i++) {
+                    if (team_list[i].contents[0].contents[0]._text === "TBD") continue
                     let team1 = `${team_list[i].contents[0].contents[0].attrs.title}`
                     if (team1.indexOf("(") !== -1) {
                         team1 = team1.substring(0, team1.indexOf("(")-1)
@@ -401,6 +400,7 @@ async function find_teams() {
 
                     for (let j = 0; j < team_list.length; j++) {
                         if (i === j) continue
+                        if (team_list[j].contents[0].contents[0]._text === "TBD") continue
                         let team2 = `${team_list[j].contents[0].contents[0].attrs.title}`
                         if (team2.indexOf("(") !== -1) {
                             team2 = team2.substring(0, team2.indexOf("(")-1)
@@ -411,96 +411,6 @@ async function find_teams() {
                     team_to_league_id[team1] = LEAGUE_IDS[divisions_j*6+region_i]
                     // team_to_logo[team1] = `https://liquipedia.net${logo_list[i].contents[0].contents[0].contents[0].attrs.src}`
                 }
-
-                // const match_list = soup.findAll("tr", {"class": "match-row"})
-
-                // for (let i = 0; i < match_list.length; i++) {
-                //     if (match_list[i].contents[1].contents[0]._text !== "-") {
-                //         // console.log(match_table[LEAGUE_IDS[divisions_j*6+region_i]])
-
-                //         let team1 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
-                //         let team2 = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[0].contents[1].contents[0].contents[2].contents[0].attrs.title
-
-                //         if (team1.indexOf("(") !== -1) {
-                //             team1 = team1.substring(0, team1.indexOf("(")-1)
-                //         }
-                //         if (team2.indexOf("(") !== -1) {
-                //             team2 = team2.substring(0, team2.indexOf("(")-1)
-                //         }
-
-                //         if (team1 === "Team Unique") team1 = "Mind Games"
-                //         if (team2 === "Team Unique") team2 = "Mind Games"
-
-                //         // console.log(team1, team2)
-
-                //         if (match_list[i].contents[1].contents[0]._text === "FF" || match_list[i].contents[2].contents[0]._text === "FF") {
-                //             end_time = -1
-
-                //             let new_match_id = parseInt(Math.random()*1000000)
-                //             while (new_match_id in all_match_list) {
-                //                 new_match_id = parseInt(Math.random()*1000000)
-                //             }
-                //             if (match_list[i].contents[1].contents[0]._text === "FF") {
-                //                 // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 0, "team2score": 2, "is_completed": true, "is_live": false, "is_bo3": 3}
-                //                 all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "FF", "team2score": "W", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                //             }
-                //             else {
-                //                 // all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": 2, "team2score": 0, "is_completed": true, "is_live": false, "is_bo3": 3}
-                //                 all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": end_time, "team1score": "W", "team2score": "FF", "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                //             }
-                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                //         }
-                //         else {
-                //             if (match_list[i].contents[1].attrs.style === "font-weight:bold" || match_list[i].contents[2].attrs.style === "font-weight:bold") {
-                //                 const matches_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents.length
-                //                 const links_num = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents.length
-                //                 const title_string = match_list[i].contents[1].contents[0].nextElement.contents[0].contents[matches_num-1].contents[links_num-2].attrs.title
-                //                 const last_match_id = title_string.substring(title_string.indexOf(":")+2)
-
-                //                 let new_match_id = parseInt(Math.random()*1000000)
-                //                 while (new_match_id in all_match_list) {
-                //                     new_match_id = parseInt(Math.random()*1000000)
-                //                 }
-                //                 dota_match_id_to_match[last_match_id] = new_match_id
-
-                //                 if (parseInt(match_list[i].contents[1].contents[0]._text) === 2 || parseInt(match_list[i].contents[2].contents[0]._text) === 2) {
-                //                     all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                //                 }
-                //                 else {
-                //                     all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": parseInt(match_list[i].contents[1].contents[0]._text), "team2score": parseInt(match_list[i].contents[2].contents[0]._text), "is_completed": true, "is_live": false, "is_bo3": 1, "total_guess": 0, "number_guesses": 0}
-                //                 }
-                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                //             }
-                //             else {
-                //                 let new_match_id = parseInt(Math.random()*1000000)
-                //                 while (new_match_id in all_match_list) {
-                //                     new_match_id = parseInt(Math.random()*1000000)
-                //                 }
-                //                 all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": true, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
-                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                //                 match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                //             }
-                //         }
-                //     }
-                // }
-
-                // for round robins
-
-                // for (const [team1, val] of Object.entries(match_table[LEAGUE_IDS[divisions_j*6+region_i]])) {
-                //     for (const [team2, val2] of Object.entries(val)) {
-                //         if (match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length === 0) {
-                //             let new_match_id = parseInt(Math.random()*1000000)
-                //             while (new_match_id in all_match_list) {
-                //                 new_match_id = parseInt(Math.random()*1000000)
-                //             }
-                //             all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].length, "start_time": undefined, "end_time": -1, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": 3, "total_guess": 0, "number_guesses": 0}
-                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2].push(new_match_id)
-                //             match_table[LEAGUE_IDS[divisions_j*6+region_i]][team2][team1].push(new_match_id)
-                //         }
-                //     }
-                // }
             }
         }
         resolve(1)
@@ -602,11 +512,12 @@ async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
-    await start_get_match_data()
+    // await start_get_match_data()
     // console.log("complete, waiting 30 seconds")
     // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
+    // console.log(match_table)
     // console.log(team_to_id)
     // console.log(team_to_league_id)
     await start_find_live_matches()
@@ -696,7 +607,7 @@ async function get_live_matches() {
                     continue
                 }
 
-                // console.log(team1, team2)
+                console.log(team1, team2)
 
                 const match_id = match_table[team_to_league_id[team1]][team1][team2][match_table[team_to_league_id[team1]][team1][team2].length-1]
                 if (all_match_list[match_id] === undefined || all_match_list[match_id].is_completed) {
@@ -756,7 +667,7 @@ async function completed_matches_data(game_id) {
 
         for (let i = 0; i < match_list.contents[1].contents[2].contents.length; i++) {
             if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) {
-                if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("OQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("CQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DT") !== -1) {
+                if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("OQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("CQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DT") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("Regional Finals") !== -1) {
                     continue
                 }
                 let team1 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
