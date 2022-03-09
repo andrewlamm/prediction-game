@@ -383,8 +383,14 @@ async function find_teams() {
                 match_table[LEAGUE_IDS[divisions_j*6+region_i]] = {}
 
                 for (let i = 0; i < team_list.length; i++) {
-                    if (team_list[i].contents[0].contents[0]._text === "TBD") continue
-                    let team1 = `${team_list[i].contents[0].contents[0].attrs.title}`
+                    let team1 = ""
+                    if (team_list[i].contents[0].contents[0]._text === "TBD") {
+                        team1 = `TBD_${LEAGUE_IDS[divisions_j*6+region_i]}_${i}`
+                    }
+                    else {
+                        team1 = `${team_list[i].contents[0].contents[0].attrs.title}`
+                    }
+
                     if (team1.indexOf("(") !== -1) {
                         team1 = team1.substring(0, team1.indexOf("(")-1)
                     }
@@ -400,8 +406,15 @@ async function find_teams() {
 
                     for (let j = 0; j < team_list.length; j++) {
                         if (i === j) continue
-                        if (team_list[j].contents[0].contents[0]._text === "TBD") continue
-                        let team2 = `${team_list[j].contents[0].contents[0].attrs.title}`
+
+                        let team2 = ""
+                        if (team_list[j].contents[0].contents[0]._text === "TBD") {
+                            team2 = `TBD_${LEAGUE_IDS[divisions_j*6+region_i]}_${j}`
+                        }
+                        else {
+                            team2 = `${team_list[j].contents[0].contents[0].attrs.title}`
+                        }
+
                         if (team2.indexOf("(") !== -1) {
                             team2 = team2.substring(0, team2.indexOf("(")-1)
                         }
@@ -638,19 +651,24 @@ async function get_matches_data() {
         }
 
         const request = https.get(options, response => {
-            var chunks = []
-            response.on('data', function(chunk) {
-                chunks.push(chunk);
-            });
-
-            response.on('end', async function() {
-                var buffer = Buffer.concat(chunks);
-
-                zlib.gunzip(buffer, function(err, decoded) {
-                    live_matches_data = JSON.parse(decoded.toString()).parse.text
-                    resolve(1)
+            try {
+                var chunks = []
+                response.on('data', function(chunk) {
+                    chunks.push(chunk);
                 });
-            })
+
+                response.on('end', async function() {
+                    var buffer = Buffer.concat(chunks);
+
+                    zlib.gunzip(buffer, function(err, decoded) {
+                        live_matches_data = JSON.parse(decoded.toString()).parse.text
+                        resolve(1)
+                    });
+                })
+            }
+            catch (e) {
+                console.log("getting match data failed, skiping...")
+            }
         })
     })
 }
@@ -662,80 +680,83 @@ async function get_live_matches() {
         const match_list = soup.findAll("div", {"class": "matches-list"})[0]
 
         for (let i = 0; i < match_list.contents[1].contents[1].contents.length; i++) {
-            if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0] !== undefined && match_list.contents[1].contents[1].contents[i].contents[0].contents[0].attrs.style === "background-color:#ffffcc;" && match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) { // remember to add check for (page does not exist)
-                let team1 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
-                if (team1.indexOf("(") !== -1) {
-                    team1 = team1.substring(0, team1.indexOf("(")-1)
-                }
-                if (team1 === "TBD" || team1 === "To Be Determined") {
-                    // console.log(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text)
-                    // console.log(team1)
-                    continue
-                }
+            try {
+                if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0] !== undefined && match_list.contents[1].contents[1].contents[i].contents[0].contents[0].attrs.style === "background-color:#ffffcc;" && match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) { // remember to add check for (page does not exist)
+                    let team1 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
+                    if (team1.indexOf("(") !== -1) {
+                        team1 = team1.substring(0, team1.indexOf("(")-1)
+                    }
+                    if (team1 === "TBD" || team1 === "To Be Determined") {
+                        continue
+                    }
 
-                if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
-                    // console.log(`${team1} vs TBD`)
-                    continue
-                }
-                let team2 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
-                if (team2.indexOf("(") !== -1) {
-                    team2 = team2.substring(0, team2.indexOf("(")-1)
-                }
+                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
+                        continue
+                    }
+                    let team2 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
+                    if (team2.indexOf("(") !== -1) {
+                        team2 = team2.substring(0, team2.indexOf("(")-1)
+                    }
 
-                if (team1 === "King of Kings") team1 = "APU King of Kings"
-                if (team2 === "King of Kings") team2 = "APU King of Kings"
+                    if (team1 === "King of Kings") team1 = "APU King of Kings"
+                    if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                if (team1 === "TBD" || team2 === "TBD") {
+                    if (team1 === "TBD" || team2 === "TBD") {
+                        // console.log(team1, team2)
+                        continue
+                    }
+
                     // console.log(team1, team2)
-                    continue
-                }
 
-                // console.log(team1, team2)
+                    const match_id = match_table[team_to_league_id[team1]][team1][team2][match_table[team_to_league_id[team1]][team1][team2].length-1]
+                    if (all_match_list[match_id] === undefined || all_match_list[match_id].is_completed) {
+                        console.log(`new match - ${team1} vs ${team2}`)
+                        let new_match_id = parseInt(Math.random()*1000000)
+                        while (new_match_id in all_match_list) {
+                            new_match_id = parseInt(Math.random()*1000000)
+                        }
+                        all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": parseInt(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]), "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
+                        match_table[team_to_league_id[team1]][team1][team2].push(new_match_id)
+                        match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
 
-                const match_id = match_table[team_to_league_id[team1]][team1][team2][match_table[team_to_league_id[team1]][team1][team2].length-1]
-                if (all_match_list[match_id] === undefined || all_match_list[match_id].is_completed) {
-                    console.log(`new match - ${team1} vs ${team2}`)
-                    let new_match_id = parseInt(Math.random()*1000000)
-                    while (new_match_id in all_match_list) {
-                        new_match_id = parseInt(Math.random()*1000000)
-                    }
-                    all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": parseInt(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]), "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
-                    match_table[team_to_league_id[team1]][team1][team2].push(new_match_id)
-                    match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
+                        curr_live_matches.add(new_match_id)
 
-                    curr_live_matches.add(new_match_id)
-
-                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
-                        all_match_list[new_match_id].is_bo3 = 3
-                    }
-                    else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
-                        all_match_list[new_match_id].is_bo3 = 5
+                        if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
+                            all_match_list[new_match_id].is_bo3 = 3
+                        }
+                        else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
+                            all_match_list[new_match_id].is_bo3 = 5
+                        }
+                        else {
+                            all_match_list[new_match_id].is_bo3 = 1
+                        }
                     }
                     else {
-                        all_match_list[new_match_id].is_bo3 = 1
-                    }
-                }
-                else {
-                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[0].contents[0]._text === "vs") {
-                        all_match_list[match_id].is_live = false
-                    }
-                    else {
-                        console.log(`Live: ${team1} vs ${team2}`)
-                        all_match_list[match_id].is_live = true
-                        curr_live_matches.add(match_id)
-                    }
+                        if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[0].contents[0]._text === "vs") {
+                            all_match_list[match_id].is_live = false
+                        }
+                        else {
+                            console.log(`Live: ${team1} vs ${team2}`)
+                            all_match_list[match_id].is_live = true
+                            curr_live_matches.add(match_id)
+                        }
 
-                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
-                        all_match_list[match_id].is_bo3 = 3
+                        if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
+                            all_match_list[match_id].is_bo3 = 3
+                        }
+                        else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
+                            all_match_list[match_id].is_bo3 = 5
+                        }
+                        else {
+                            all_match_list[match_id].is_bo3 = 1
+                        }
+                        all_match_list[match_id].start_time = parseInt(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
                     }
-                    else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
-                        all_match_list[match_id].is_bo3 = 5
-                    }
-                    else {
-                        all_match_list[match_id].is_bo3 = 1
-                    }
-                    all_match_list[match_id].start_time = parseInt(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
                 }
+            }
+            catch (e) {
+                console.log(`ERROR LIVE MATCHES INDEX ${i}`)
+                console.log(e)
             }
         }
         resolve(1)
@@ -749,134 +770,140 @@ async function completed_matches_data(game_id) {
         const match_list = soup.findAll("div", {"class": "matches-list"})[0]
 
         for (let i = 0; i < match_list.contents[1].contents[2].contents.length; i++) {
-            if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) {
-                if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("OQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("CQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DT") !== -1) {
-                    continue
-                }
-                let team1 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
-                let team2 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
-
-                if (team1.indexOf("(") !== -1) {
-                    team1 = team1.substring(0, team1.indexOf("(")-1)
-                }
-                if (team2.indexOf("(") !== -1) {
-                    team2 = team2.substring(0, team2.indexOf("(")-1)
-                }
-
-                if (team1 === "King of Kings") team1 = "APU King of Kings"
-                if (team2 === "King of Kings") team2 = "APU King of Kings"
-
-                // console.log(team1, team2)
-
-                let match_index = -1
-                for (let i = 0; i < match_table[team_to_league_id[team1]][team1][team2].length; i++) {
-                    if (all_match_list[match_table[team_to_league_id[team1]][team1][team2][i]].is_live) {
-                        match_index = i
-                        break
-                    }
-                }
-
-                if (match_index !== -1) {
-                    console.log(`${team1} vs ${team2} match complete`)
-
-                    const match_id = match_table[team_to_league_id[team1]][team1][team2][match_index]
-
-                    const timestamp = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
-                    if (timestamp !== all_match_list[match_id].start_time) {
-                        console.log("different timestamp spotted, skipping ... ")
+            try {
+                if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) {
+                    if (match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("OQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("CQ") !== -1 || match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DT") !== -1) {
                         continue
                     }
+                    let team1 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
+                    let team2 = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
 
-                    if (curr_live_matches.has(match_id)) {
-                        console.log("just kidding")
-                        continue
+                    if (team1.indexOf("(") !== -1) {
+                        team1 = team1.substring(0, team1.indexOf("(")-1)
+                    }
+                    if (team2.indexOf("(") !== -1) {
+                        team2 = team2.substring(0, team2.indexOf("(")-1)
                     }
 
-                    let team1_win = true
+                    if (team1 === "King of Kings") team1 = "APU King of Kings"
+                    if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                    all_match_list[match_id].is_live = false
-                    all_match_list[match_id].is_completed = true
-                    all_match_list[match_id].end_time = Math.floor(Date.now() / 1000)
+                    // console.log(team1, team2)
 
-                    if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === undefined) {
-                        team1_win = false
-                        if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text === "W") {
-                            all_match_list[match_id].team1score = "FF" // 0
-                            all_match_list[match_id].team2score = "W" // 2
-                            console.log("forfeited match, skip")
+                    let match_index = -1
+                    for (let i = 0; i < match_table[team_to_league_id[team1]][team1][team2].length; i++) {
+                        if (all_match_list[match_table[team_to_league_id[team1]][team1][team2][i]].is_live) {
+                            match_index = i
+                            break
+                        }
+                    }
+
+                    if (match_index !== -1) {
+                        console.log(`${team1} vs ${team2} match complete`)
+
+                        const match_id = match_table[team_to_league_id[team1]][team1][team2][match_index]
+
+                        const timestamp = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
+                        if (timestamp !== all_match_list[match_id].start_time) {
+                            console.log("different timestamp spotted, skipping ... ")
                             continue
                         }
-                        else {
-                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0]._text) //substr not necesssary?
-                            all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
 
-                            if (all_match_list[match_id].team2score === null) {
-                                console.log(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]) //ok this doesnt work
-                                team1_win = true
-                            }
-                        }
-                    }
-                    else {
-                        if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === "W") {
-                            all_match_list[match_id].team1score = "W" // 2
-                            all_match_list[match_id].team2score = "FF" // 0
-                            console.log("forfeited match, skip")
+                        if (curr_live_matches.has(match_id)) {
+                            console.log("just kidding")
                             continue
                         }
-                        else {
-                            all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text)
 
-                            const team2text = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
-                            const team2score = parseInt(team2text.substring(1)) // substr not needed? -> const team2score = parseInt(team2text.substring(1, 2))
-                            all_match_list[match_id].team2score = team2score
-                        }
+                        let team1_win = true
 
-                    }
+                        all_match_list[match_id].is_live = false
+                        all_match_list[match_id].is_completed = true
+                        all_match_list[match_id].end_time = Math.floor(Date.now() / 1000)
 
-                    await collection.find().forEach(async function(doc) {
-                        if (!isNaN(doc._id)) {
-                            const query = {"_id": doc._id}
-                            console.log(doc._id)
-                            const field = `match_${team_to_id[team1]}_${team_to_id[team2]}_${all_match_list[match_id].index}`
-
-                            const update_doc = { $set : {} }
-
-                            if (doc[field] === undefined) {
-                                console.log("prediction missing, skipping...")
+                        if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === undefined) {
+                            team1_win = false
+                            if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text === "W") {
+                                all_match_list[match_id].team1score = "FF" // 0
+                                all_match_list[match_id].team2score = "W" // 2
+                                console.log("forfeited match, skip")
+                                continue
                             }
                             else {
-                                if (team1_win) {
-                                    if (parseInt(doc[field]) > 50) {
-                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
-                                        update_doc.$set.incorrect = doc.incorrect+1
-                                    }
-                                    else if (parseInt(doc[field]) < 50) {
-                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
-                                        update_doc.$set.correct = doc.correct+1
-                                    }
+                                all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0]._text) //substr not necesssary?
+                                all_match_list[match_id].team2score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text)
 
-                                    const result = await collection.updateOne(query, update_doc)
-                                    console.log("victory doc updated!")
-                                }
-                                else {
-                                    if (parseInt(doc[field]) > 50) {
-                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
-                                        update_doc.$set.correct = doc.correct+1
-                                    }
-                                    else if (parseInt(doc[field]) < 50) {
-                                        update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
-                                        update_doc.$set.incorrect = doc.incorrect+1
-                                    }
-
-                                    const result = await collection.updateOne(query, update_doc)
-                                    console.log("victory doc updated!")
+                                if (all_match_list[match_id].team2score === null) {
+                                    console.log(match_list.contents[1].contents[3].contents[i].nextElement.contents[0].contents[0].contents[1].contents[0]) //ok this doesnt work
+                                    team1_win = true
                                 }
                             }
                         }
-                    })
+                        else {
+                            if (match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text === "W") {
+                                all_match_list[match_id].team1score = "W" // 2
+                                all_match_list[match_id].team2score = "FF" // 0
+                                console.log("forfeited match, skip")
+                                continue
+                            }
+                            else {
+                                all_match_list[match_id].team1score = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement._text)
 
-                    await set_match_data()
+                                const team2text = match_list.contents[1].contents[2].contents[i].contents[0].contents[0].contents[1].contents[0].nextElement.nextElement._text
+                                const team2score = parseInt(team2text.substring(1)) // substr not needed? -> const team2score = parseInt(team2text.substring(1, 2))
+                                all_match_list[match_id].team2score = team2score
+                            }
+
+                        }
+
+                        await collection.find().forEach(async function(doc) {
+                            if (!isNaN(doc._id)) {
+                                const query = {"_id": doc._id}
+                                console.log(doc._id)
+                                const field = `match_${team_to_id[team1]}_${team_to_id[team2]}_${all_match_list[match_id].index}`
+
+                                const update_doc = { $set : {} }
+
+                                if (doc[field] === undefined) {
+                                    console.log("prediction missing, skipping...")
+                                }
+                                else {
+                                    if (team1_win) {
+                                        if (parseInt(doc[field]) > 50) {
+                                            update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                            update_doc.$set.incorrect = doc.incorrect+1
+                                        }
+                                        else if (parseInt(doc[field]) < 50) {
+                                            update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(100-doc[field]).toFixed(1))).toFixed(1))
+                                            update_doc.$set.correct = doc.correct+1
+                                        }
+
+                                        const result = await collection.updateOne(query, update_doc)
+                                        console.log("victory doc updated!")
+                                    }
+                                    else {
+                                        if (parseInt(doc[field]) > 50) {
+                                            update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                            update_doc.$set.correct = doc.correct+1
+                                        }
+                                        else if (parseInt(doc[field]) < 50) {
+                                            update_doc.$set.score = parseFloat((doc.score + parseFloat(calc_score(doc[field]).toFixed(1))).toFixed(1))
+                                            update_doc.$set.incorrect = doc.incorrect+1
+                                        }
+
+                                        const result = await collection.updateOne(query, update_doc)
+                                        console.log("victory doc updated!")
+                                    }
+                                }
+                            }
+                        })
+
+                        await set_match_data()
+                    }
                 }
+            }
+            catch (e) {
+                console.log(`ERROR COMPLETED MATCHES INDEX ${i}`)
+                console.log(e)
             }
         }
         resolve(1)
