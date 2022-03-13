@@ -419,6 +419,7 @@ async function find_teams() {
                             team2 = team2.substring(0, team2.indexOf("(")-1)
                         }
                         if (team2 === "Omega Esports") continue
+                        if (team2 === "King of Kings") team2 = "APU King of Kings"
                         match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2] = []
                     }
                     team_to_league_id[team1] = LEAGUE_IDS[divisions_j*6+region_i]
@@ -530,7 +531,7 @@ async function get_team_logos(id) {
     team_to_logo["Army Geniuses"] = "/imgs/dota/armygeniuses.png"
     team_to_logo["ChubbyBoiz"] = "/imgs/dota/chubbyboiz.png"
     team_to_logo["UD Vessuwan"] = "/imgs/dota/vessuwan.png"
-    // TBD
+    team_to_logo["The Apes E-Sport"] = "/imgs/dota/apes.png"
 
     team_to_logo["AS Monaco Gambit"] = "/imgs/dota/monacogambit.png"
     team_to_logo["Team Empire"] = "/imgs/dota/empire.png"
@@ -608,7 +609,7 @@ async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
-    // await start_get_match_data() uncomment later
+    await start_get_match_data()
     // console.log("complete, waiting 30 seconds")
     // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
@@ -617,7 +618,6 @@ async function start() {
     // console.log(team_to_id)
     // console.log(team_to_league_id)
     await start_find_live_matches()
-    await set_match_data() // delete later
     await get_averages()
     startup_complete = true
     const repeated_timer = setInterval(repeated_functions, 60000) // 120000
