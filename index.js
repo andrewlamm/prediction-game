@@ -474,7 +474,7 @@ async function get_team_logos(id) {
     team_to_logo["Fnatic"] = "/imgs/dota/fnatic.png"
     team_to_logo["T1"] = "/imgs/dota/t1.png"
     team_to_logo["Team SMG"] = "/imgs/dota/smg.png"
-    team_to_logo["Neon Esports"] = "/imgs/dota/boom.png"
+    team_to_logo["Neon Esports"] = "/imgs/dota/neon.png"
     team_to_logo["Execration"] = "/imgs/dota/execration.png"
     team_to_logo["Polaris Esports"] = "/imgs/dota/polaris.png"
     team_to_logo["Nigma Galaxy SEA"] = "/imgs/dota/nigmasea.png"
@@ -549,7 +549,7 @@ async function get_team_logos(id) {
     team_to_logo["Wolf Team"] = "/imgs/dota/wolf.png"
     team_to_logo["Interitus"] = "/imgs/dota/interitus.png"
     team_to_logo["Ravens"] = "/imgs/dota/ravens.png"
-    team_to_logo["Vendetta eSports"] = "/imgs/dota/vendetta.png"
+    team_to_logo["Dreamers"] = "/imgs/dota/dreamers.png"
 }
 
 async function get_averages() {
