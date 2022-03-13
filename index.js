@@ -525,11 +525,11 @@ async function get_team_logos(id) {
 
     team_to_logo["Motivate.Trust Gaming"] = "/imgs/dota/motivatetrust.png"
     team_to_logo["TNC Predator"] = "/imgs/dota/tnc.png"
-    team_to_logo["Team Orca"] = "/imgs/dota/orca.png"
     team_to_logo["Lilgun"] = "/imgs/dota/lilgun.png"
     team_to_logo["Talon Esports"] = "/imgs/dota/talon.png"
     team_to_logo["Army Geniuses"] = "/imgs/dota/armygeniuses.png"
-    // TBD
+    team_to_logo["ChubbyBoiz"] = "/imgs/dota/chubbyboiz.png"
+    team_to_logo["UD Vessuwan"] = "/imgs/dota/vessuwan.png"
     // TBD
 
     team_to_logo["AS Monaco Gambit"] = "/imgs/dota/monacogambit.png"
@@ -608,7 +608,7 @@ async function start() {
     await connect_to_db()
     await find_teams()
     await loop_leagues()
-    await start_get_match_data()
+    // await start_get_match_data() uncomment later
     // console.log("complete, waiting 30 seconds")
     // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
@@ -617,6 +617,7 @@ async function start() {
     // console.log(team_to_id)
     // console.log(team_to_league_id)
     await start_find_live_matches()
+    await set_match_data() // delete later
     await get_averages()
     startup_complete = true
     const repeated_timer = setInterval(repeated_functions, 60000) // 120000
