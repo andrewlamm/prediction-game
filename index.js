@@ -556,7 +556,7 @@ async function get_averages() {
     await collection.find().forEach(async function(doc) {
         if (!isNaN(doc._id)) {
             for (const [key, val] of Object.entries(doc)) {
-                if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect") {
+                if (key !== "_id" && key !== "display_name" && key !== "steam_url" && key !== "score" && key !== "correct" && key !== "profile_picture" && key !== "incorrect" && key.substring(0, 6) !== "score_") {
                     let underscore_count = 0
                     for (let i = 0; i < key.length; i++) {
                         if (key[i] === "_") underscore_count += 1
