@@ -30,4 +30,4 @@ This site uses [ExpressJS](https://expressjs.com/) and is hosted on [Heroku](htt
 
 - [x] Sort upcoming matches by start time
 - [x] Add predictions for tiebreaker matches
-- [ ] Add league filtering on the leaderboard
+- [x] Add league filtering on the leaderboard

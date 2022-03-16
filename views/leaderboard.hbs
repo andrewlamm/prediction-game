@@ -5,8 +5,20 @@
         {{> header page_name="Leaderboard"}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full overflow-x-auto md:flex md:items-center md:justify-center">
-                <div class="w-full lg:w-2/3 overflow-x-auto md:flex md:items-center md:justify-center">
-                    <table id="main_leaderboard_table">
+                <div class="w-full lg:w-2/3 overflow-x-auto md:flex md:flex-col md:items-center md:justify-center">
+                    <div class="w-full mb-4" id="leaderboard_heading_text">
+                         <select name="league_table" style="float: right" id="league_table_select">
+                            <option value="Full Season" id="main_option">Full Season</option>
+                            {{#each leaderboard_leagues}}
+                            <option value="{{league_name}}" id="league_{{league_id}}_option">{{league_name}}</option>
+                            {{/each}}
+                        </select>
+                        <div class="font-bold text-3xl">
+                            <span id="leaderboard_name_text">Full Season</span>
+                        </div>
+                        <hr class="bg-black h-px border-0">
+                    </div>
+                    <table id="main_leaderboard_table" class="leaderboard_table">
                         <tr class="border-b-2 border-zinc-600">
                             <td class="text-center px-2 font-bold pb-1" id="main_player_rank_width">Rank</td>
                             <td class="px-2 text-left font-bold pb-1">Name</td>
@@ -24,6 +36,26 @@
                         </tr>
                         {{/each}}
                     </table>
+                    {{#each leaderboard_leagues}}
+                    <table id="league_{{league_id}}_leaderboard_table" class="leaderboard_table">
+                        <tr class="border-b-2 border-zinc-600">
+                            <td class="text-center px-2 font-bold pb-1" id="league_{{league_id}}_player_rank_width">Rank</td>
+                            <td class="px-2 text-left font-bold pb-1">Name</td>
+                            <td class="px-2 text-center font-bold pb-1" id="league_{{league_id}}_player_score_width">Score</td>
+                            <td class="px-2 border-gray-700 text-center font-bold pb-1" id="league_{{league_id}}_player_correct_width">Correct</td>
+                            <td class="px-2 text-center font-bold pb-1" id="league_{{league_id}}_player_profile_width"></td>
+                        </tr>
+                        {{#each users}}
+                        <tr>
+                            <td class="text-center px-2 py-1 {{#if (if_equals ../../user.id this.user_id)}}font-bold{{/if}}">{{this.rank}}</td>
+                            <td class="px-2 py-1 truncate {{#if (if_equals ../../user.id this.user_id)}}font-bold{{/if}} hover:underline" style="width: 400px;"><a href="/user/{{this.user_id}}">{{this.display_name}}</a></td>
+                            <td class="text-center px-2 py-1 {{#if (if_equals ../../user.id this.user_id)}}font-bold{{/if}}">{{round_tenth this.score}}<span class="{{find_color this.day_points}} pl-1" title="Difference in the last 24 hours">({{positive_plus this.day_points}}{{round_tenth this.day_points}})</span></td>
+                            <td class="text-center px-2 py-1 {{#if (if_equals ../../user.id this.user_id)}}font-bold{{/if}}">{{this.correct}}</td>
+                            <td><a target="_blank" rel="noopener noreferrer" href={{this.steam_url}} class="text-blue-700 px-2 py-1 newtab_symbol">Profile</a></td>
+                        </tr>
+                        {{/each}}
+                    </table>
+                    {{/each}}
                 </div>
             </div>
         </div>
@@ -31,11 +63,48 @@
 		{{> footer}}
     </body>
     <script>
+        let max_width = 0
+
         document.getElementById("main_player_rank_width").style.width = `${document.getElementById("main_player_rank_width").offsetWidth+1}px`
         document.getElementById("main_player_score_width").style.width = `${document.getElementById("main_player_score_width").offsetWidth+1}px`
         document.getElementById("main_player_correct_width").style.width = `${document.getElementById("main_player_correct_width").offsetWidth+1}px`
         document.getElementById("main_player_profile_width").style.width = `${document.getElementById("main_player_profile_width").offsetWidth+1}px`
         document.getElementById("main_leaderboard_table").style.width = `${document.getElementById("main_leaderboard_table").offsetWidth+1}px`
+        if (document.getElementById("main_leaderboard_table").offsetWidth > max_width) {
+            max_width = `${document.getElementById("main_leaderboard_table").offsetWidth}`
+        }
         document.getElementById("main_leaderboard_table").classList.add("table-fixed")
+
+        {{#each leaderboard_leagues}}
+        document.getElementById("league_{{league_id}}_player_rank_width").style.width = `${document.getElementById("league_{{league_id}}_player_rank_width").offsetWidth+1}px`
+        document.getElementById("league_{{league_id}}_player_score_width").style.width = `${document.getElementById("league_{{league_id}}_player_score_width").offsetWidth+1}px`
+        document.getElementById("league_{{league_id}}_player_correct_width").style.width = `${document.getElementById("league_{{league_id}}_player_correct_width").offsetWidth+1}px`
+        document.getElementById("league_{{league_id}}_player_profile_width").style.width = `${document.getElementById("league_{{league_id}}_player_profile_width").offsetWidth+1}px`
+        document.getElementById("league_{{league_id}}_leaderboard_table").style.width = `${document.getElementById("league_{{league_id}}_leaderboard_table").offsetWidth+1}px`
+        if (document.getElementById("league_{{league_id}}_leaderboard_table").offsetWidth > max_width) {
+            max_width = `${document.getElementById("league_{{league_id}}_leaderboard_table").offsetWidth}`
+        }
+        document.getElementById("league_{{league_id}}_leaderboard_table").classList.add("table-fixed")
+        document.getElementById("league_{{league_id}}_leaderboard_table").classList.add("hidden")
+        {{/each}}
+
+        document.getElementById('leaderboard_heading_text').style.width = `${max_width}px`
+
+        const leaderboards = document.querySelectorAll('.leaderboard_table')
+
+        document.getElementById('league_table_select').addEventListener('change', (event) => {
+            document.getElementById('leaderboard_name_text').innerHTML = `${event.target.value}`
+
+            for (let i = 0; i < leaderboards.length; i++) {
+                leaderboards[i].classList.add('hidden')
+            }
+
+            const selected_id = event.target.options[event.target.selectedIndex].getAttribute('id')
+            const selected_table = `${selected_id.substring(0, selected_id.length-7)}`
+            // console.log(selected_table)
+
+            document.getElementById(`${selected_table}_leaderboard_table`).classList.remove('hidden')
+        });
+
     </script>
 </html>
