@@ -529,7 +529,7 @@ async function get_team_logos(id) {
     team_to_logo["Lilgun"] = "/imgs/dota/lilgun.png"
     team_to_logo["Talon Esports"] = "/imgs/dota/talon.png"
     team_to_logo["Army Geniuses"] = "/imgs/dota/armygeniuses.png"
-    team_to_logo["ChubbyBoiz"] = "/imgs/dota/chubbyboiz.png"
+    team_to_logo["RSG"] = "/imgs/dota/RSG.png"
     team_to_logo["UD Vessuwan"] = "/imgs/dota/vessuwan.png"
     team_to_logo["The Apes E-Sport"] = "/imgs/dota/apes.png"
 
