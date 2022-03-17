@@ -789,6 +789,9 @@ async function completed_matches_data(game_id) {
                     if (team1 === "King of Kings") team1 = "APU King of Kings"
                     if (team2 === "King of Kings") team2 = "APU King of Kings"
 
+                    if (team1 === "ChubbyBoiz") continue
+                    if (team2 === "ChubbyBoiz") continue
+
                     // console.log(team1, team2)
 
                     let match_index = -1

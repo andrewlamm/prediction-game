@@ -31,23 +31,57 @@ async function run() {
         const database = client.db("picks_db")
         const collection = database.collection("users")
 
-        await collection.find().forEach(async function(doc) {
-            if (doc._id !== "matches_data") {
-                const query = {"_id": doc._id}
-                console.log(doc._id)
+        const query = {"_id": "matches_data"}
+        const result = await collection.findOne(query)
 
-                const update_doc = { $set : {} }
+        // console.log(result)
 
-                for (let i = 0; i < LEAGUE_IDS.length; i++) {
-                    update_doc["$set"][`score_${LEAGUE_IDS[i]}`] = 0
-                    update_doc["$set"][`correct_${LEAGUE_IDS[i]}`] = 0
-                    update_doc["$set"][`incorrect_${LEAGUE_IDS[i]}`] = 0
-                }
+        // Object.defineProperty(result["match_table"]['10'], "RSG", Object.getOwnPropertyDescriptor(result["match_table"]['10'], "ChubbyBoiz"))
+        // delete result["match_table"]['10']["ChubbyBoiz"]
 
-                const result = await collection.updateOne(query, update_doc)
-                console.log("updated!")
-            }
-        })
+        // for (const [key, val] of Object.entries(result["match_table"]['10'])) {
+        //     // console.log(key)
+        //     if (key === "RSG") continue
+        //     Object.defineProperty(result["match_table"][10][key], "RSG", Object.getOwnPropertyDescriptor(result["match_table"][10][key], "ChubbyBoiz"))
+        //     delete result["match_table"][10][key]["ChubbyBoiz"]
+        // }
+
+        // console.log(result["match_table"]['10'])
+
+        // const update_doc = { $set : {} }
+
+        // update_doc["$set"]["match_table"] = result["match_table"]
+        // const update_result = await collection.updateOne(query, update_doc)
+        // console.log("updated!")
+
+        result["all_match_list"]["334927"]["team2"] = "RSG"
+        result["all_match_list"]["21796"]["team2"] = "RSG"
+        result["all_match_list"]["170407"]["team2"] = "RSG"
+
+        const update_doc = { $set : {} }
+
+        update_doc["$set"]["all_match_list"] = result["all_match_list"]
+        const update_result = await collection.updateOne(query, update_doc)
+        console.log("updated!")
+
+
+        // await collection.find().forEach(async function(doc) {
+        //     if (doc._id !== "matches_data") {
+        //         const query = {"_id": doc._id}
+        //         console.log(doc._id)
+
+        //         const update_doc = { $set : {} }
+
+        //         for (let i = 0; i < LEAGUE_IDS.length; i++) {
+        //             update_doc["$set"][`score_${LEAGUE_IDS[i]}`] = 0
+        //             update_doc["$set"][`correct_${LEAGUE_IDS[i]}`] = 0
+        //             update_doc["$set"][`incorrect_${LEAGUE_IDS[i]}`] = 0
+        //         }
+
+        //         const result = await collection.updateOne(query, update_doc)
+        //         console.log("updated!")
+        //     }
+        // })
     } catch (err) {
         console.log(err.stack);
     }
