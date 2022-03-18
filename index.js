@@ -662,8 +662,13 @@ async function get_matches_data() {
                     var buffer = Buffer.concat(chunks);
 
                     zlib.gunzip(buffer, function(err, decoded) {
-                        live_matches_data = JSON.parse(decoded.toString()).parse.text
-                        resolve(1)
+                        if (decoded === undefined) {
+                            console.log("getting match data failed, skiping...")
+                        }
+                        else {
+                            live_matches_data = JSON.parse(decoded.toString()).parse.text
+                            resolve(1)
+                        }
                     });
                 })
             }
@@ -862,13 +867,14 @@ async function completed_matches_data(game_id) {
                         await collection.find().forEach(async function(doc) {
                             if (!isNaN(doc._id)) {
                                 const query = {"_id": doc._id}
-                                console.log(doc._id)
+                                // console.log(doc._id)
                                 const field = `match_${team_to_id[team1]}_${team_to_id[team2]}_${all_match_list[match_id].index}`
 
                                 const update_doc = { $set : {} }
 
                                 if (doc[field] === undefined) {
-                                    console.log("prediction missing, skipping...")
+                                    // console.log("prediction missing, skipping...")
+                                    temp = 0
                                 }
                                 else {
                                     if (team1_win) {
@@ -886,7 +892,7 @@ async function completed_matches_data(game_id) {
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                        // console.log("victory doc updated!")
                                     }
                                     else {
                                         if (parseInt(doc[field]) > 50) {
@@ -903,7 +909,7 @@ async function completed_matches_data(game_id) {
                                         }
 
                                         const result = await collection.updateOne(query, update_doc)
-                                        console.log("victory doc updated!")
+                                        // console.log("victory doc updated!")
                                     }
                                 }
                             }
