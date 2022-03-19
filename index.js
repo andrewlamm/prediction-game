@@ -685,10 +685,10 @@ async function get_live_matches() {
         const soup = new JSSoup(live_matches_data["*"])
         const match_list = soup.findAll("div", {"class": "matches-list"})[0]
 
-        for (let i = 0; i < match_list.contents[1].contents[1].contents.length; i++) {
+        for (let i = 0; i < match_list.contents[1].contents[0].contents.length; i++) {
             try {
-                if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0] !== undefined && match_list.contents[1].contents[1].contents[i].contents[0].contents[0].attrs.style === "background-color:#ffffcc;" && match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) { // remember to add check for (page does not exist)
-                    let team1 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
+                if (match_list.contents[1].contents[0].contents[i].contents[0].contents[0] !== undefined && match_list.contents[1].contents[0].contents[i].contents[0].contents[0].attrs.style === "background-color:#ffffcc;" && match_list.contents[1].contents[0].contents[i].contents[0].contents[1].contents[0].contents[1].contents[1].contents[0].contents[0]._text.indexOf("DPC") !== -1) { // remember to add check for (page does not exist)
+                    let team1 = match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[0].contents[0].contents[0].contents[0].attrs.title
                     if (team1.indexOf("(") !== -1) {
                         team1 = team1.substring(0, team1.indexOf("(")-1)
                     }
@@ -696,10 +696,10 @@ async function get_live_matches() {
                         continue
                     }
 
-                    if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
+                    if (match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2] === undefined) {
                         continue
                     }
-                    let team2 = match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
+                    let team2 = match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[2].contents[0].contents[2].contents[0].attrs.title
                     if (team2.indexOf("(") !== -1) {
                         team2 = team2.substring(0, team2.indexOf("(")-1)
                     }
@@ -721,16 +721,16 @@ async function get_live_matches() {
                         while (new_match_id in all_match_list) {
                             new_match_id = parseInt(Math.random()*1000000)
                         }
-                        all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": parseInt(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]), "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
+                        all_match_list[new_match_id] = {"team1": team1, "team2": team2, "index": match_table[team_to_league_id[team1]][team1][team2].length, "start_time": parseInt(match_list.contents[1].contents[0].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"]), "end_time": 9999999999, "team1score": 0, "team2score": 0, "is_completed": false, "is_live": false, "is_bo3": undefined, "total_guess": 0, "number_guesses": 0}
                         match_table[team_to_league_id[team1]][team1][team2].push(new_match_id)
                         match_table[team_to_league_id[team1]][team2][team1].push(new_match_id)
 
                         curr_live_matches.add(new_match_id)
 
-                        if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
+                        if (match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
                             all_match_list[new_match_id].is_bo3 = 3
                         }
-                        else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
+                        else if (match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
                             all_match_list[new_match_id].is_bo3 = 5
                         }
                         else {
@@ -738,7 +738,7 @@ async function get_live_matches() {
                         }
                     }
                     else {
-                        if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[0].contents[0]._text === "vs") {
+                        if (match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[1].contents[0].contents[0]._text === "vs") {
                             all_match_list[match_id].is_live = false
                         }
                         else {
@@ -747,16 +747,16 @@ async function get_live_matches() {
                             curr_live_matches.add(match_id)
                         }
 
-                        if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
+                        if (match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo3") {
                             all_match_list[match_id].is_bo3 = 3
                         }
-                        else if (match_list.contents[1].contents[1].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
+                        else if (match_list.contents[1].contents[0].contents[i].contents[0].contents[0].contents[1].contents[1].contents[1].contents[0]._text === "Bo5") {
                             all_match_list[match_id].is_bo3 = 5
                         }
                         else {
                             all_match_list[match_id].is_bo3 = 1
                         }
-                        all_match_list[match_id].start_time = parseInt(match_list.contents[1].contents[1].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
+                        all_match_list[match_id].start_time = parseInt(match_list.contents[1].contents[0].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
                     }
                 }
             }
@@ -1149,7 +1149,7 @@ async function insert_guess(req, res, next) {
                 else {
                     all_match_list[match_id].number_guesses += 1
                 }
-                all_match_list[match_id].total_guess += parseInt(req.body.guess) // need to test these lines and up
+                all_match_list[match_id].total_guess += parseInt(req.body.guess)
 
                 const update_doc = { $set : {} }
 
