@@ -1,4 +1,5 @@
-'Team Liquid': 0,
+{
+  'Team Liquid': 0,
   Gladiators: 1,
   'Tundra Esports': 2,
   OG: 3,
@@ -72,12 +73,12 @@
   'The Mystery Machine': 71,
   'Motivate.Trust Gaming': 72,
   'TNC Predator': 73,
-  'Team Orca': 74,
-  Lilgun: 75,
-  'Talon Esports': 76,
-  'Army Geniuses': 77,
-  TBD_10_6: 78,
-  TBD_10_7: 79,
+  Lilgun: 74,
+  'Talon Esports': 75,
+  'Army Geniuses': 76,
+  RSG: 77,
+  'UD Vessuwan': 78,
+  'The Apes E-Sport': 79,
   'AS Monaco Gambit': 80,
   'Team Empire': 81,
   HYDRA: 82,
@@ -93,4 +94,5 @@
   'Wolf Team': 92,
   Interitus: 93,
   Ravens: 94,
-  'Vendetta eSports': 95
+  Dreamers: 95
+}

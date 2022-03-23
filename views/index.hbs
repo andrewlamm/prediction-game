@@ -261,7 +261,7 @@
         function current_panel(n) {
             curr_panel = n
 
-            const curr_scroll = document.body.scrollTop
+            const curr_scroll = document.documentElement.scrollTop
 
             for (let i = 0; i < 3; i++) {
                 if (n === i) {
@@ -273,7 +273,7 @@
             }
 
             document.getElementById(`panel_${n}`).scrollIntoView();
-            document.body.scrollTop = curr_scroll
+            document.documentElement.scrollTop = curr_scroll
         }
 
         function scrolling_sidebar() {

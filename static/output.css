@@ -492,12 +492,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-right: 1px;
 }
 
-.mt-8 {
-  margin-top: 2rem;
-}
-
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
 }
 
 .flex {
@@ -546,10 +546,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .w-1\/2 {
   width: 50%;
-}
-
-.w-1\/4 {
-  width: 25%;
 }
 
 .w-1\/6 {
@@ -684,11 +680,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-color: rgb(55 65 81 / var(--tw-border-opacity));
 }
 
-.bg-gray-400 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(156 163 175 / var(--tw-bg-opacity));
-}
-
 .bg-black {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity));
@@ -738,19 +729,9 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-right: 0.5rem;
 }
 
-.py-8 {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-
 .px-px {
   padding-left: 1px;
   padding-right: 1px;
-}
-
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
 }
 
 .pb-2 {
@@ -793,10 +774,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   padding-left: 0.5rem;
 }
 
-.pl-6 {
-  padding-left: 1.5rem;
-}
-
 .pb-10 {
   padding-bottom: 2.5rem;
 }
@@ -829,11 +806,6 @@ Ensure the default browser behavior of the `hidden` attribute.
   text-align: right;
 }
 
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-}
-
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
@@ -849,14 +821,19 @@ Ensure the default browser behavior of the `hidden` attribute.
   line-height: 1rem;
 }
 
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .text-base {
@@ -1152,6 +1129,10 @@ a[target="_blank"]::after {
     margin-right: 1.5rem;
   }
 
+  .md\:block {
+    display: block;
+  }
+
   .md\:flex {
     display: flex;
   }
@@ -1166,10 +1147,6 @@ a[target="_blank"]::after {
 
   .md\:w-1\/3 {
     width: 33.333333%;
-  }
-
-  .md\:w-full {
-    width: 100%;
   }
 
   .md\:w-1\/6 {
@@ -1235,10 +1212,6 @@ a[target="_blank"]::after {
     display: flex;
   }
 
-  .lg\:w-4\/5 {
-    width: 80%;
-  }
-
   .lg\:w-3\/4 {
     width: 75%;
   }
@@ -1249,6 +1222,10 @@ a[target="_blank"]::after {
 
   .lg\:w-2\/3 {
     width: 66.666667%;
+  }
+
+  .lg\:w-4\/5 {
+    width: 80%;
   }
 
   .lg\:w-1\/6 {
@@ -1275,10 +1252,6 @@ a[target="_blank"]::after {
     justify-content: flex-end;
   }
 
-  .lg\:pt-0 {
-    padding-top: 0px;
-  }
-
   .lg\:pr-6 {
     padding-right: 1.5rem;
   }
@@ -1299,8 +1272,8 @@ a[target="_blank"]::after {
     padding-bottom: 0px;
   }
 
-  .lg\:text-left {
-    text-align: left;
+  .lg\:pt-0 {
+    padding-top: 0px;
   }
 
   .lg\:text-7xl {

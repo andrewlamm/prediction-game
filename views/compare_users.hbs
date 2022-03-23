@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+	{{> head_tag title="Compare Users"}}
+	<body class="min-h-full flex flex-col">
+        {{> header page_name=""}}
+		<div class="px-4 py-2 flex flex-col flex-grow">
+            <div class="w-full flex flex-col items-center justify-center">
+                <div class="w-full xl:w-2/3 flex flex-col items-center justify-center pt-2">
+                    <div class="hidden md:block w-full mt-4 text-center">
+                        <select class="text-black py-1 px-2 leading-normal font-base border border-black w-full mb-2 compared_users_list" required onchange="add_user()" id="user_select">
+                            <option value="none" disabled selected value class="hidden">Select a User</option>
+                            {{#each user_list}}
+                            <option value="{{this.user_id}}" id="option_{{this.user_id}}">{{this.display_name}}</option>
+                            {{/each}}
+                        </select>
+                        {{!-- <input type="search" list="user_list" class="pl-1 w-full border border-black" id="user_0" autocomplete="off">
+                        <datalist name="user_list" id="user_list">
+                            <option data-value="none" disabled selected value class="hidden">Select an Option</option>
+                            {{#each user_list}}
+                            <option data-value="{{this.user_id}}">{{this.display_name}}</option>
+                            {{/each}}
+                        </datalist> --}}
+                    </div>
+                    <div class="hidden md:block w-full mt-4">
+                        <table class="w-full" id="curr_user_table">
+                        </table>
+                    </div>
+                    <div class="hidden md:block w-full text-2xl mt-4 font-bold text-center">
+                        Score Over Time
+                        <canvas id="score_chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+		{{> footer}}
+    </body>
+    <script>
+        const ALL_COLORS = ["#357DED", "#FFBF00", "#F7567C", "#B7C0EE", "#861388"]
+        const COLORS = new Set()
+        const graphed_users = []
+        const graphed_colors = []
+
+        let curr_users = 0
+        function add_user() {
+            if (curr_users >= 5) return
+            let request = new XMLHttpRequest();
+            request.open('POST', '/get_compare_stats');
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            const new_user_row = document.createElement("tr")
+            new_user_row.id = `userrow_${document.getElementById(`user_select`).value}`
+            const user_element = document.createElement("td")
+            user_element.innerHTML = document.getElementById(`user_select`).options[document.getElementById(`user_select`).selectedIndex].innerHTML
+            new_user_row.appendChild(user_element)
+
+            const x_arrow_element = document.createElement("td")
+            x_arrow_element.classList.add("cursor-pointer")
+            x_arrow_element.setAttribute("onclick", `remove_user("${document.getElementById(`user_select`).value}")`)
+            const x_arrow_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+            x_arrow_svg.setAttribute("viewBox", "0 0 320 512")
+
+            const x_arrow_path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+            x_arrow_path.setAttribute("d", "M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z")
+            x_arrow_svg.appendChild(x_arrow_path)
+            x_arrow_element.appendChild(x_arrow_svg)
+            new_user_row.appendChild(x_arrow_element)
+
+            graphed_users.push(document.getElementById(`user_select`).value)
+
+            document.getElementById("curr_user_table").appendChild(new_user_row)
+
+            document.getElementById(`option_${document.getElementById(`user_select`).value}`).classList.add("hidden")
+
+            request.responseType = 'json';
+            request.send(`userID=${document.getElementById(`user_select`).value}`);
+
+            request.onload = function() {
+                const data = request.response;
+
+                for (let i = 0; i < data.length; i++) {
+                    data[i].x *= 1000
+                }
+
+                // console.log(data)
+
+                let chosen_color = "#84DCC6"
+                for (let i = 0; i < ALL_COLORS.length; i++) {
+                    if (!COLORS.has(ALL_COLORS[i])) {
+                        chosen_color = ALL_COLORS[i]
+                        COLORS.add(chosen_color)
+                        graphed_colors.push(chosen_color)
+                        break
+                    }
+                }
+
+                score_chart.data.datasets.push({
+                    label: document.getElementById(`user_select`).options[document.getElementById(`user_select`).selectedIndex].innerHTML,
+                    data: data,
+                    borderColor: chosen_color,
+                    backgroundColor: `${chosen_color}FF`,
+                    lineTension: 0.1,
+                })
+
+                score_chart.update()
+            }
+
+            curr_users += 1
+        }
+
+        function remove_user(id) {
+            // console.log(id)
+            if (curr_users <= 0) {
+                return
+            }
+
+            let user_index = 0
+            for (let i = 0; i < graphed_users.length; i++) {
+                if (graphed_users[i] === id) {
+                    user_index = i
+                    break
+                }
+            }
+
+            document.getElementById("curr_user_table").removeChild(document.getElementById(`userrow_${id}`))
+            document.getElementById(`option_${id}`).classList.remove("hidden")
+
+            graphed_users.splice(user_index, 1)
+            score_chart.data.datasets.splice(user_index, 1)
+
+            const deleted_color = graphed_colors[user_index]
+            graphed_colors.splice(user_index, 1)
+            COLORS.delete(deleted_color)
+
+            score_chart.update()
+
+            document.getElementById("user_select").value = "none"
+
+            curr_users -= 1
+        }
+
+        const config = {
+            type: 'line',
+            data: {
+                labels: null,
+                datasets: [],
+            },
+            options: {
+                interaction: {
+                    intersect: true,
+                },
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Score over Time',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: context => {
+                                const date = new Date(context[0].raw.x).toLocaleString([], {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    hour12: false,
+                                    minute: '2-digit',
+                                })
+                                return date
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        },
+                        min: 1647235392000,
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Score'
+                        },
+                        grid: {
+                            color: (context) => {
+                                if (context.tick.value === 0) return 'rgba(0, 0, 0, 0.5)'
+                                else return 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                },
+            }
+        }
+
+        const score_chart = new Chart(
+            document.getElementById('score_chart'),
+            config
+        )
+
+
+    </script>
+</html>

@@ -58,6 +58,10 @@
                             {{/each}}
                         </table>
                     </div>
+                    <div class="hidden md:block w-full text-2xl mt-4 font-bold text-center">
+                        Score Over Time
+                        <canvas id="score_chart"></canvas>
+                    </div>
                 </div>
             </div>
             {{else}}
@@ -68,4 +72,79 @@
         </div>
 		{{> footer}}
     </body>
+    <script>
+        const config = {
+            type: 'line',
+            data: {
+                labels: null,
+                datasets: [{
+                    label: 'Points',
+                    data: [
+                        {{#each user_info.score_over_time}}
+                            { x: {{this.x}}*1000, y: {{this.y}} },
+                        {{/each}}
+                    ],
+                    borderColor: '#F7567C',
+                    backgroundColor: '#F7567CFF',
+                    lineTension: 0.1,
+                }],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Score over Time',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: context => {
+                                const date = new Date(context[0].raw.x).toLocaleString([], {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    hour12: false,
+                                    minute: '2-digit',
+                                })
+                                return date
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        },
+                        min: 1647235392000,
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Score'
+                        },
+                        grid: {
+                            color: (context) => {
+                                if (context.tick.value === 0) return 'rgba(0, 0, 0, 0.5)'
+                                else return 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                },
+            }
+        }
+
+        const score_chart = new Chart(
+            document.getElementById('score_chart'),
+            config
+        )
+    </script>
 </html>

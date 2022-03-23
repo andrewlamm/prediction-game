@@ -25,5 +25,15 @@
     <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js"></script>
     {{/if}}
 
+    {{#if (if_equals title "User Information")}}
+    <script type="text/javascript" charset="utf8" src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    {{/if}}
+
+    {{#if (if_equals title "Compare Users")}}
+    <script type="text/javascript" charset="utf8" src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    {{/if}}
+
     <link href="/output.css" rel="stylesheet">
 </head>

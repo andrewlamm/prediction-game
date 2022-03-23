@@ -366,6 +366,8 @@ const team_to_id = {}
 const id_to_team = {}
 let curr_id = 0
 
+let match_order_list = []
+
 async function find_teams() {
     return new Promise(async function(resolve, reject) {
         for (let divisions_j = 0; divisions_j < divisions.length; divisions_j++) {
@@ -599,7 +601,15 @@ async function start_get_match_data() {
         for (const [key, val] of Object.entries(all_match_list)) {
             all_match_list[key].total_guess = 0
             all_match_list[key].number_guesses = 0
+
+            if (all_match_list[key].is_completed) {
+                match_order_list.push({end_time: all_match_list[key].end_time, match_id: key})
+            }
         }
+
+        match_order_list.sort(function(a, b){
+            return a.end_time < b.end_time ? -1 : 1
+        })
 
         resolve(1)
     })
@@ -617,6 +627,7 @@ async function start() {
     // console.log(match_table)
     // console.log(team_to_id)
     // console.log(team_to_league_id)
+    // console.log(match_order_list)
     await start_find_live_matches()
     await get_averages()
     startup_complete = true
@@ -822,6 +833,8 @@ async function completed_matches_data(game_id) {
                             console.log("just kidding")
                             continue
                         }
+
+                        match_order_list.push({end_time: Math.floor(Date.now() / 1000), match_id: match_id})
 
                         let team1_win = true
 
@@ -1411,6 +1424,35 @@ async function get_user_info(req, res, next) {
                 }
             }
 
+            res.locals.user_info.score_over_time = []
+            let curr_score = 0
+
+            res.locals.user_info.score_over_time.push({x: 1647235392, y: curr_score})
+
+            for (let i = 0; i < match_order_list.length; i++) {
+                const end_time = match_order_list[i].end_time
+                const match_id = match_order_list[i].match_id
+                const field = `match_${team_to_id[all_match_list[match_id].team1]}_${team_to_id[all_match_list[match_id].team2]}_${all_match_list[match_id].index}`
+
+                if (results[field] === undefined) {
+                    res.locals.user_info.score_over_time.push({x: end_time, y: curr_score})
+                }
+                else {
+                    if (all_match_list[match_id].team1score === "W" || all_match_list[match_id].team1score === "FF" || all_match_list[match_id].team2score === "W" || all_match_list[match_id].team2score === "FF") {
+                        res.locals.user_info.score_over_time.push({x: end_time, y: curr_score})
+                    }
+                    else if (all_match_list[match_id].team1score > all_match_list[match_id].team2score) {
+                        curr_score += parseFloat(calc_score(100-results[field]).toFixed(1))
+                        res.locals.user_info.score_over_time.push({x: end_time, y: curr_score})
+                    }
+                    else {
+                        curr_score += parseFloat(calc_score(results[field]).toFixed(1))
+                        res.locals.user_info.score_over_time.push({x: end_time, y: curr_score})
+                    }
+                }
+            }
+
+            // console.log(res.locals.user_info.score_over_time)
 
             res.locals.user_info.matches.sort(function(a, b) {
                 if (a.is_live) return -1
@@ -1481,6 +1523,67 @@ async function get_user_rank(req, res, next) {
         }
 
         next()
+    }
+}
+
+async function get_list_of_users(req, res, next) {
+    res.locals.user_list = []
+    await collection.find().forEach(async function(doc) {
+        if (!isNaN(doc._id)) {
+            res.locals.user_list.push({display_name: doc.display_name, user_id: doc._id, score: doc.score, profile_picture: doc.profile_picture})
+        }
+    })
+    next()
+}
+
+async function get_compare_stats(req, res, next) {
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        if (isNaN(req.body.userID)) {
+            res.locals.compare_stats = undefined
+            next()
+        }
+
+        const query = {"_id": req.body.userID}
+        const results = await collection.findOne(query)
+
+        if (results === null) {
+            res.locals.compare_stats = undefined
+            next()
+        }
+        else {
+            res.locals.compare_stats = []
+
+            let curr_score = 0
+            res.locals.compare_stats.push({x: 1647235392, y: curr_score})
+
+            for (let i = 0; i < match_order_list.length; i++) {
+                const end_time = match_order_list[i].end_time
+                const match_id = match_order_list[i].match_id
+                const field = `match_${team_to_id[all_match_list[match_id].team1]}_${team_to_id[all_match_list[match_id].team2]}_${all_match_list[match_id].index}`
+
+                if (results[field] === undefined) {
+                    res.locals.compare_stats.push({x: end_time, y: curr_score})
+                }
+                else {
+                    if (all_match_list[match_id].team1score === "W" || all_match_list[match_id].team1score === "FF" || all_match_list[match_id].team2score === "W" || all_match_list[match_id].team2score === "FF") {
+                        res.locals.compare_stats.push({x: end_time, y: curr_score})
+                    }
+                    else if (all_match_list[match_id].team1score > all_match_list[match_id].team2score) {
+                        curr_score += parseFloat(calc_score(100-results[field]).toFixed(1))
+                        res.locals.compare_stats.push({x: end_time, y: curr_score})
+                    }
+                    else {
+                        curr_score += parseFloat(calc_score(results[field]).toFixed(1))
+                        res.locals.compare_stats.push({x: end_time, y: curr_score})
+                    }
+                }
+            }
+
+            next()
+        }
     }
 }
 
@@ -1557,6 +1660,19 @@ app.get('/logout', function(req, res){
         req.logout();
         res.redirect('/');
     }
+})
+
+app.get('/compare', [get_list_of_users], function(req, res) {
+    if (!startup_complete) {
+        res.render('site_restarting')
+    }
+    else {
+        res.render('compare_users', {user_list: res.locals.user_list})
+    }
+})
+
+app.post('/get_compare_stats', [get_compare_stats], function(req, res) {
+    res.send(res.locals.compare_stats)
 })
 
 app.get('/testing', function(req, res) {

@@ -34,6 +34,22 @@ async function run() {
         const query = {"_id": "matches_data"}
         const result = await collection.findOne(query)
 
+        // result["all_match_list"]["928205"]["is_live"] = false
+        // result["all_match_list"]["928205"]["start_time"] = 1647795600
+
+        // result["all_match_list"]["36186"]["start_time"] = 1647806100
+        // result["all_match_list"]["928205"]["start_time"] = 1648054800
+
+        result["all_match_list"]["813169"]["start_time"] = 1648314000
+
+        const update_doc = { $set : {} }
+
+        update_doc["$set"]["all_match_list"] = result["all_match_list"]
+        const update_result = await collection.updateOne(query, update_doc)
+        console.log("updated!")
+
+        // UPDATING SPECIFIC TEAMS
+
         // console.log(result)
 
         // Object.defineProperty(result["match_table"]['10'], "RSG", Object.getOwnPropertyDescriptor(result["match_table"]['10'], "ChubbyBoiz"))
@@ -54,15 +70,31 @@ async function run() {
         // const update_result = await collection.updateOne(query, update_doc)
         // console.log("updated!")
 
-        result["all_match_list"]["334927"]["team2"] = "RSG"
-        result["all_match_list"]["21796"]["team2"] = "RSG"
-        result["all_match_list"]["170407"]["team2"] = "RSG"
+        // result["all_match_list"]["334927"]["team2"] = "RSG"
+        // result["all_match_list"]["21796"]["team2"] = "RSG"
+        // result["all_match_list"]["170407"]["team2"] = "RSG"
 
-        const update_doc = { $set : {} }
+        // const update_doc = { $set : {} }
 
-        update_doc["$set"]["all_match_list"] = result["all_match_list"]
-        const update_result = await collection.updateOne(query, update_doc)
-        console.log("updated!")
+        // update_doc["$set"]["all_match_list"] = result["all_match_list"]
+        // const update_result = await collection.updateOne(query, update_doc)
+        // console.log("updated!")
+
+        /// UPDATE CERTAIN USER
+
+        // const query = {"_id": "76561198300027169"}
+
+        // const update_doc = { $set : {} }
+
+        // for (let i = 0; i < LEAGUE_IDS.length; i++) {
+        //     update_doc["$set"][`correct_${LEAGUE_IDS[i]}`] = 0
+        //     update_doc["$set"][`incorrect_${LEAGUE_IDS[i]}`] = 0
+        // }
+
+        // const result = await collection.updateOne(query, update_doc)
+        // console.log("updated!")
+
+        /// UPDATE ALL USERS
 
 
         // await collection.find().forEach(async function(doc) {
