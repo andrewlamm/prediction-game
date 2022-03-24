@@ -546,6 +546,16 @@
             }
         }
 
+        function clickOnPoint(event) {
+            if (score_chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true) !== undefined && score_chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true).length !== 0) {
+                if (score_chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true)[0].index === 0) {
+                    return
+                }
+                match_number = score_chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true)[0].index-1
+                update_match()
+            }
+        }
+
         function customRadius (context) {
             let index = context.dataIndex;
             return index === match_number+1 ? 5 : 3
@@ -557,6 +567,6 @@
             config
         )
 
-
+        score_chart.options.onClick = clickOnPoint
     </script>
 </html>
