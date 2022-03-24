@@ -40,7 +40,8 @@ async function run() {
         // result["all_match_list"]["36186"]["start_time"] = 1647806100
         // result["all_match_list"]["928205"]["start_time"] = 1648054800
 
-        result["all_match_list"]["813169"]["start_time"] = 1648314000
+        // result["all_match_list"]["813169"]["start_time"] = 1648314000
+        result["all_match_list"]["160542"]["end_time"] = 1648073549
 
         const update_doc = { $set : {} }
 

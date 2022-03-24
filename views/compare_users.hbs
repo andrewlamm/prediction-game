@@ -10,7 +10,7 @@
                         <select class="text-black py-1 px-2 leading-normal font-base border border-black w-full mb-2 compared_users_list" required onchange="add_user()" id="user_select">
                             <option value="none" disabled selected value class="hidden">Select a User</option>
                             {{#each user_list}}
-                            <option value="{{this.user_id}}" id="option_{{this.user_id}}">{{this.display_name}}</option>
+                            <option value="{{this.user_id}}" id="option_{{this.user_id}}" data-picture="{{this.profile_picture}}" data-score="{{this.score}}">{{this.display_name}}</option>
                             {{/each}}
                         </select>
                         {{!-- <input type="search" list="user_list" class="pl-1 w-full border border-black" id="user_0" autocomplete="off">
@@ -23,7 +23,69 @@
                     </div>
                     <div class="hidden md:block w-full mt-4">
                         <table class="w-full" id="curr_user_table">
+                            <thead>
+                                <tr class="font-bold">
+                                    <td>User</td>
+                                    <td class="text-center" style="width: 80px;">Guess</td>
+                                    <td class="text-center" style="width: 80px;">Change</td>
+                                    <td class="text-center" style="width: 90px;">Score</td>
+                                    <td style="width: 12px;"></td>
+                                </tr>
+                            </thead>
+                            <tbody id="curr_user_tbody">
+
+                            </tbody>
                         </table>
+                    </div>
+                    <div class="flex flex-col items-center justify-center w-full mt-4">
+                        <div class="flex flex-row items-center justify-center w-full text-3xl font-bold">
+                            <div class="pr-2">
+                                <img src="" id="team1logo" style="height: 30px">
+                            </div>
+                            <div class="pr-2" id="team1name">
+                                Team 1
+                            </div>
+                            <div class="px-2" id="team1score">
+                                XX
+                            </div>
+                            <div class="px-1">
+                                -
+                            </div>
+                            <div class="px-2" id="team2score">
+                                YY
+                            </div>
+                            <div class="pl-2" id="team2name">
+                                Team 2
+                            </div>
+                            <div class="pl-2">
+                                <img src="" id="team2logo" style="height: 30px">
+                            </div>
+                        </div>
+                        <div class="flex flex-row items-center justify-center w-full pt-2">
+                            <div class="mr-2 cursor-pointer" style="width: 20px" onclick="fast_skip(0)">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px" id="back_skip">
+                                    <path d="M0 415.1V96.03c0-17.67 14.33-31.1 31.1-31.1C49.67 64.03 64 78.36 64 96.03v131.8l171.5-156.5C256.1 54.28 288 68.66 288 96.03v131.9l171.5-156.5C480.1 54.28 512 68.66 512 96.03v319.9c0 27.37-31.88 41.74-52.5 24.62L288 285.2v130.7c0 27.37-31.88 41.74-52.5 24.62L64 285.2v130.7c0 17.67-14.33 31.1-31.1 31.1C14.33 447.1 0 433.6 0 415.1z"/>
+                                </svg>
+                            </div>
+                            <div class="mr-2 cursor-pointer" style="width: 16px" onclick="change_match(-1)">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="height: 20px" id="back_one">
+                                    <path d="M31.1 64.03c-17.67 0-31.1 14.33-31.1 32v319.9c0 17.67 14.33 32 32 32C49.67 447.1 64 433.6 64 415.1V96.03C64 78.36 49.67 64.03 31.1 64.03zM267.5 71.41l-192 159.1C67.82 237.8 64 246.9 64 256c0 9.094 3.82 18.18 11.44 24.62l192 159.1c20.63 17.12 52.51 2.75 52.51-24.62v-319.9C319.1 68.66 288.1 54.28 267.5 71.41z"/>
+                                </svg>
+                            </div>
+                            <div class="font-bold text-center" style="font-size: 1.25rem; width: 225px;" id="match_date">
+                                DATE
+                            </div>
+                            <div class="ml-2 cursor-pointer" style="width: 16px" onclick="change_match(1)">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" style="height: 20px" class="hidden" id="forward_one">
+                                    <path d="M287.1 447.1c17.67 0 31.1-14.33 31.1-32V96.03c0-17.67-14.33-32-32-32c-17.67 0-31.1 14.33-31.1 31.1v319.9C255.1 433.6 270.3 447.1 287.1 447.1zM52.51 440.6l192-159.1c7.625-6.436 11.43-15.53 11.43-24.62c0-9.094-3.809-18.18-11.43-24.62l-192-159.1C31.88 54.28 0 68.66 0 96.03v319.9C0 443.3 31.88 457.7 52.51 440.6z"/>
+                                </svg>
+                            </div>
+                            <div class="ml-2 cursor-pointer" style="width: 20px" onclick="fast_skip(1)">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px" class="hidden" id="forward_skip">
+                                    <path d="M512 96.03v319.9c0 17.67-14.33 31.1-31.1 31.1C462.3 447.1 448 433.6 448 415.1V284.1l-171.5 156.5C255.9 457.7 224 443.3 224 415.1V284.1l-171.5 156.5C31.88 457.7 0 443.3 0 415.1V96.03c0-27.37 31.88-41.74 52.5-24.62L224 226.8V96.03c0-27.37 31.88-41.74 52.5-24.62L448 226.8V96.03c0-17.67 14.33-31.1 31.1-31.1C497.7 64.03 512 78.36 512 96.03z"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                     <div class="hidden md:block w-full text-2xl mt-4 font-bold text-center">
                         Score Over Time
@@ -35,39 +97,211 @@
 		{{> footer}}
     </body>
     <script>
-        const ALL_COLORS = ["#357DED", "#FFBF00", "#F7567C", "#B7C0EE", "#861388"]
+        const ALL_COLORS = ["#357DED", "#FFBF00", "#F7567C", "#861388", "#A3CC1B"]
         const COLORS = new Set()
         const graphed_users = []
+        const historical_users = []
         const graphed_colors = []
 
+        const MAX_USERS = 5
+
+        const all_match_list = {}
+        const match_order = []
+        {{#each compare_order_list}}
+        all_match_list[{{@key}}] = {end_time: "{{end_time}}",  team1: "{{team1}}", team1logo: "{{team1logo}}", team1score: "{{team1score}}", team2: "{{team2}}", team2logo: "{{team2logo}}", team2score: "{{team2score}}"}
+        match_order.push({end_time: "{{end_time}}", match_id: "{{@key}}"})
+        {{/each}}
+
+        match_order.sort(function(a, b){
+            return a.end_time < b.end_time ? -1 : 1
+        })
+
+        const MAX_MATCHES = match_order.length
+        let match_number = match_order.length-1
+
+        document.getElementById("team1logo").setAttribute("src", all_match_list[match_order[match_number].match_id].team1logo)
+        document.getElementById("team1name").innerHTML = all_match_list[match_order[match_number].match_id].team1
+        document.getElementById("team1score").innerHTML = all_match_list[match_order[match_number].match_id].team1score
+        document.getElementById("team2score").innerHTML = all_match_list[match_order[match_number].match_id].team2score
+        document.getElementById("team2name").innerHTML = all_match_list[match_order[match_number].match_id].team2
+        document.getElementById("team2logo").setAttribute("src", all_match_list[match_order[match_number].match_id].team2logo)
+        document.getElementById("match_date").innerHTML = new Date(all_match_list[match_order[match_number].match_id].end_time*1000).toLocaleString([], {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: 'numeric',
+            hour12: true,
+            minute: '2-digit',
+        })
+
         let curr_users = 0
+
+        function calc_score(prob) {
+			// return 25 - (Math.pow(prob - 100, 2) / 100)
+			return -30 + 0.65 * prob - 0.001 * Math.pow(prob, 2)
+		}
+
+        function update_match() {
+            if (match_number === 0) {
+                document.getElementById("back_one").classList.add("hidden")
+                document.getElementById("back_one").classList.remove("cursor-pointer")
+
+                document.getElementById("back_skip").classList.add("hidden")
+                document.getElementById("back_skip").classList.remove("cursor-pointer")
+            }
+            else {
+                document.getElementById("back_one").classList.remove("hidden")
+                document.getElementById("back_one").classList.add("cursor-pointer")
+
+                document.getElementById("back_skip").classList.remove("hidden")
+                document.getElementById("back_skip").classList.add("cursor-pointer")
+            }
+
+            if (match_number === MAX_MATCHES-1) {
+                document.getElementById("forward_one").classList.add("hidden")
+                document.getElementById("forward_one").classList.remove("cursor-pointer")
+
+                document.getElementById("forward_skip").classList.add("hidden")
+                document.getElementById("forward_skip").classList.remove("cursor-pointer")
+            }
+            else {
+                document.getElementById("forward_one").classList.remove("hidden")
+                document.getElementById("forward_one").classList.add("cursor-pointer")
+
+                document.getElementById("forward_skip").classList.remove("hidden")
+                document.getElementById("forward_skip").classList.add("cursor-pointer")
+            }
+
+            document.getElementById("team1logo").setAttribute("src", all_match_list[match_order[match_number].match_id].team1logo)
+            document.getElementById("team1name").innerHTML = all_match_list[match_order[match_number].match_id].team1
+            document.getElementById("team1score").innerHTML = all_match_list[match_order[match_number].match_id].team1score
+            document.getElementById("team2score").innerHTML = all_match_list[match_order[match_number].match_id].team2score
+            document.getElementById("team2name").innerHTML = all_match_list[match_order[match_number].match_id].team2
+            document.getElementById("team2logo").setAttribute("src", all_match_list[match_order[match_number].match_id].team2logo)
+            document.getElementById("match_date").innerHTML = new Date(all_match_list[match_order[match_number].match_id].end_time*1000).toLocaleString([], {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                hour12: true,
+                minute: '2-digit',
+            })
+
+            for (let i = 0; i < graphed_users.length; i++) {
+                document.getElementById(`score_${graphed_users[i]}`).innerHTML = historical_users[i][match_order[match_number].match_id].curr_score.toFixed(1)
+                document.getElementById(`guessimg_${graphed_users[i]}`).setAttribute("src", "")
+                document.getElementById(`guesstext_${graphed_users[i]}`).innerHTML = ""
+                document.getElementById(`gain_${graphed_users[i]}`).innerHTML = ""
+
+                if (historical_users[i][match_order[match_number].match_id].pick !== undefined) {
+                    if (historical_users[i][match_order[match_number].match_id].pick < 50) {
+                        document.getElementById(`guessimg_${graphed_users[i]}`).setAttribute("src", all_match_list[match_order[match_number].match_id].team1logo)
+                        document.getElementById(`guesstext_${graphed_users[i]}`).innerHTML += `${100-historical_users[i][match_order[match_number].match_id].pick}%`
+                    }
+                    else if (historical_users[i][match_order[match_number].match_id].pick > 50) {
+                        document.getElementById(`guessimg_${graphed_users[i]}`).setAttribute("src", all_match_list[match_order[match_number].match_id].team2logo)
+                        document.getElementById(`guesstext_${graphed_users[i]}`).innerHTML += `${historical_users[i][match_order[match_number].match_id].pick}%`
+                    }
+
+
+                    if (all_match_list[match_order[match_number].match_id].team1score === "W" || all_match_list[match_order[match_number].match_id].team1score === "FF" || all_match_list[match_order[match_number].match_id].team2score === "W" || all_match_list[match_order[match_number].match_id].team2score === "FF") {
+                        document.getElementById(`gain_${graphed_users[i]}`).classList.remove("text-green-700")
+                        document.getElementById(`gain_${graphed_users[i]}`).classList.remove("text-red-700")
+                        document.getElementById(`gain_${graphed_users[i]}`).innerHTML = 0
+                    }
+                    else if (all_match_list[match_order[match_number].match_id].team1score > all_match_list[match_order[match_number].match_id].team2score) {
+                        const game_score = parseFloat(calc_score(100-historical_users[i][match_order[match_number].match_id].pick).toFixed(1))
+                        if (game_score > 0) {
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.add("text-green-700")
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.remove("text-red-700")
+                            document.getElementById(`guesstext_${graphed_users[i]}`).classList.add("font-bold")
+                            document.getElementById(`gain_${graphed_users[i]}`).innerHTML = `+${game_score.toFixed(1)}`
+                        }
+                        else if (game_score < 0) {
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.remove("text-green-700")
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.add("text-red-700")
+                            document.getElementById(`guesstext_${graphed_users[i]}`).classList.remove("font-bold")
+                            document.getElementById(`gain_${graphed_users[i]}`).innerHTML = `${game_score.toFixed(1)}`
+                        }
+                    }
+                    else if (all_match_list[match_order[match_number].match_id].team1score < all_match_list[match_order[match_number].match_id].team2score) {
+                        const game_score = parseFloat(calc_score(historical_users[i][match_order[match_number].match_id].pick).toFixed(1))
+                        if (game_score > 0) {
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.add("text-green-700")
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.remove("text-red-700")
+                            document.getElementById(`guesstext_${graphed_users[i]}`).classList.add("font-bold")
+                            document.getElementById(`gain_${graphed_users[i]}`).innerHTML = `+${game_score.toFixed(1)}`
+                        }
+                        else if (game_score < 0) {
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.remove("text-green-700")
+                            document.getElementById(`gain_${graphed_users[i]}`).classList.add("text-red-700")
+                            document.getElementById(`guesstext_${graphed_users[i]}`).classList.remove("font-bold")
+                            document.getElementById(`gain_${graphed_users[i]}`).innerHTML = `${game_score.toFixed(1)}`
+                        }
+                    }
+                }
+            }
+
+            sort_users()
+            score_chart.update()
+        }
+
+        function fast_skip(num) {
+            if (num === 0) {
+                match_number = 0
+                update_match()
+            }
+            else {
+                match_number = MAX_MATCHES-1
+                update_match()
+            }
+        }
+
+        function change_match(inc) {
+            match_number += inc
+            if (match_number >= MAX_MATCHES) {
+                match_number = MAX_MATCHES-1
+            }
+            if (match_number < 0) {
+                match_number = 0
+            }
+
+            update_match()
+        }
+
+        function sort_users() {
+            const all_children = document.getElementById("curr_user_tbody").children
+            const row_list = []
+
+            for (let i = 0; i < all_children.length; i++) {
+                row_list.push({score: parseFloat(all_children[i].children[all_children[i].children.length-2].innerHTML), row: all_children[i]})
+            }
+
+            row_list.sort(function(a, b){
+                return a.score < b.score ? 1 : -1
+            })
+
+            while (document.getElementById("curr_user_tbody").firstChild) {
+                document.getElementById("curr_user_tbody").removeChild(document.getElementById("curr_user_tbody").lastChild)
+            }
+
+            for (let i = 0; i < row_list.length; i++) {
+                document.getElementById("curr_user_tbody").appendChild(row_list[i].row)
+            }
+
+        }
+
         function add_user() {
-            if (curr_users >= 5) return
+            if (curr_users >= MAX_USERS) return
             let request = new XMLHttpRequest();
             request.open('POST', '/get_compare_stats');
             request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
             const new_user_row = document.createElement("tr")
             new_user_row.id = `userrow_${document.getElementById(`user_select`).value}`
-            const user_element = document.createElement("td")
-            user_element.innerHTML = document.getElementById(`user_select`).options[document.getElementById(`user_select`).selectedIndex].innerHTML
-            new_user_row.appendChild(user_element)
-
-            const x_arrow_element = document.createElement("td")
-            x_arrow_element.classList.add("cursor-pointer")
-            x_arrow_element.setAttribute("onclick", `remove_user("${document.getElementById(`user_select`).value}")`)
-            const x_arrow_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-            x_arrow_svg.setAttribute("viewBox", "0 0 320 512")
-
-            const x_arrow_path = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            x_arrow_path.setAttribute("d", "M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z")
-            x_arrow_svg.appendChild(x_arrow_path)
-            x_arrow_element.appendChild(x_arrow_svg)
-            new_user_row.appendChild(x_arrow_element)
+            new_user_row.classList.add("border-y-3", "border-transparent")
 
             graphed_users.push(document.getElementById(`user_select`).value)
-
-            document.getElementById("curr_user_table").appendChild(new_user_row)
 
             document.getElementById(`option_${document.getElementById(`user_select`).value}`).classList.add("hidden")
 
@@ -75,7 +309,10 @@
             request.send(`userID=${document.getElementById(`user_select`).value}`);
 
             request.onload = function() {
-                const data = request.response;
+                const data = request.response.compare_stats;
+                const historical = request.response.historical
+
+                historical_users.push(historical)
 
                 for (let i = 0; i < data.length; i++) {
                     data[i].x *= 1000
@@ -102,6 +339,108 @@
                 })
 
                 score_chart.update()
+
+                // const user_picture_element = document.createElement("td")
+                // user_picture_element.style.height = '20px'
+                // user_picture_element.style.width = '20px'
+                // const user_picture = document.createElement("img")
+                // user_picture.setAttribute("src", document.getElementById(`user_select`).options[document.getElementById(`user_select`).selectedIndex].dataset.picture)
+                // user_picture_element.appendChild(user_picture)
+                // new_user_row.appendChild(user_picture_element)
+
+                const user_element = document.createElement("td")
+                user_element.innerHTML = document.getElementById(`user_select`).options[document.getElementById(`user_select`).selectedIndex].innerHTML
+                new_user_row.appendChild(user_element)
+
+                const guess_element = document.createElement("td")
+                guess_element.id = `guess_${document.getElementById(`user_select`).value}`
+                guess_element.classList.add("flex", "flex-row", "items-center", "justify-center")
+
+                const guess_team_div = document.createElement("div")
+                guess_team_div.classList.add("flex", "items-center", "justify-center")
+
+                const guess_team_img = document.createElement("img")
+                guess_team_img.setAttribute("src", "")
+                guess_team_img.style.height ='25px'
+                guess_team_img.classList.add("pr-2")
+                guess_team_img.id = `guessimg_${document.getElementById(`user_select`).value}`
+                guess_team_div.append(guess_team_img)
+
+                const guess_team_text = document.createElement("span")
+                guess_team_text.id = `guesstext_${document.getElementById(`user_select`).value}`
+
+                if (historical[match_order[match_number].match_id].pick !== undefined) {
+                    if (historical[match_order[match_number].match_id].pick < 50) {
+                        guess_team_img.setAttribute("src", all_match_list[match_order[match_number].match_id].team1logo)
+                        guess_team_text.innerHTML += `${100-historical[match_order[match_number].match_id].pick}%`
+                    }
+                    else if (historical[match_order[match_number].match_id].pick > 50) {
+                        guess_team_img.setAttribute("src", all_match_list[match_order[match_number].match_id].team2logo)
+                        guess_team_text.innerHTML += `${historical[match_order[match_number].match_id].pick}%`
+                    }
+                }
+
+                guess_team_div.append(guess_team_text)
+
+                guess_element.appendChild(guess_team_div)
+                new_user_row.appendChild(guess_element)
+
+                const gain_element = document.createElement("td")
+                gain_element.classList.add("text-center", "font-semibold")
+                gain_element.id = `gain_${document.getElementById(`user_select`).value}`
+                if (all_match_list[match_order[match_number].match_id].team1score === "W" || all_match_list[match_order[match_number].match_id].team1score === "FF" || all_match_list[match_order[match_number].match_id].team2score === "W" || all_match_list[match_order[match_number].match_id].team2score === "FF") {
+                    gain_element.innerHTML = 0
+                }
+                else if (all_match_list[match_order[match_number].match_id].team1score > all_match_list[match_order[match_number].match_id].team2score) {
+                    const game_score = parseFloat(calc_score(100-historical[match_order[match_number].match_id].pick).toFixed(1))
+                    if (game_score > 0) {
+                        gain_element.classList.add("text-green-700")
+                        guess_team_text.classList.add("font-bold")
+                        gain_element.innerHTML = `+${game_score.toFixed(1)}`
+                    }
+                    else if (game_score < 0) {
+                        gain_element.classList.add("text-red-700")
+                        gain_element.innerHTML = `${game_score.toFixed(1)}`
+                    }
+                }
+                else if (all_match_list[match_order[match_number].match_id].team1score < all_match_list[match_order[match_number].match_id].team2score) {
+                    const game_score = parseFloat(calc_score(historical[match_order[match_number].match_id].pick).toFixed(1))
+                    if (game_score > 0) {
+                        gain_element.classList.add("text-green-700")
+                        guess_team_text.classList.add("font-bold")
+                        gain_element.innerHTML = `+${game_score.toFixed(1)}`
+                    }
+                    else if (game_score < 0) {
+                        gain_element.classList.add("text-red-700")
+                        gain_element.innerHTML = `${game_score.toFixed(1)}`
+                    }
+                }
+
+                new_user_row.appendChild(gain_element)
+
+                const score_element = document.createElement("td")
+                score_element.id = `score_${document.getElementById(`user_select`).value}`
+                score_element.classList.add("text-center")
+                score_element.innerHTML = historical[match_order[match_number].match_id].curr_score.toFixed(1)
+                new_user_row.appendChild(score_element)
+
+                const x_arrow_element = document.createElement("td")
+                x_arrow_element.classList.add("cursor-pointer")
+                x_arrow_element.style.height = '12px'
+                x_arrow_element.style.width = '12px'
+                x_arrow_element.setAttribute("onclick", `remove_user("${document.getElementById(`user_select`).value}")`)
+                const x_arrow_svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+                x_arrow_svg.setAttribute("viewBox", "0 0 320 512")
+
+                const x_arrow_path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+                x_arrow_path.setAttribute("d", "M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z")
+                x_arrow_svg.appendChild(x_arrow_path)
+                x_arrow_element.appendChild(x_arrow_svg)
+                new_user_row.appendChild(x_arrow_element)
+
+                document.getElementById("curr_user_tbody").appendChild(new_user_row)
+
+                sort_users()
             }
 
             curr_users += 1
@@ -121,10 +460,11 @@
                 }
             }
 
-            document.getElementById("curr_user_table").removeChild(document.getElementById(`userrow_${id}`))
+            document.getElementById("curr_user_tbody").removeChild(document.getElementById(`userrow_${id}`))
             document.getElementById(`option_${id}`).classList.remove("hidden")
 
             graphed_users.splice(user_index, 1)
+            historical_users.splice(user_index, 1)
             score_chart.data.datasets.splice(user_index, 1)
 
             const deleted_color = graphed_colors[user_index]
@@ -147,6 +487,12 @@
             options: {
                 interaction: {
                     intersect: true,
+                },
+                elements: {
+                    point: {
+                        radius : customRadius,
+                        display: true
+                    }
                 },
                 responsive: true,
                 plugins: {
@@ -199,6 +545,12 @@
                 },
             }
         }
+
+        function customRadius (context) {
+            let index = context.dataIndex;
+            return index === match_number+1 ? 5 : 3
+        }
+
 
         const score_chart = new Chart(
             document.getElementById('score_chart'),

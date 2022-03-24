@@ -1555,6 +1555,7 @@ async function get_compare_stats(req, res, next) {
         }
         else {
             res.locals.compare_stats = []
+            res.locals.compare_historical = {}
 
             let curr_score = 0
             res.locals.compare_stats.push({x: 1647235392, y: curr_score})
@@ -1580,6 +1581,8 @@ async function get_compare_stats(req, res, next) {
                         res.locals.compare_stats.push({x: end_time, y: curr_score})
                     }
                 }
+
+                res.locals.compare_historical[match_id] = {curr_score: curr_score, pick: results[field]}
             }
 
             next()
@@ -1667,12 +1670,16 @@ app.get('/compare', [get_list_of_users], function(req, res) {
         res.render('site_restarting')
     }
     else {
-        res.render('compare_users', {user_list: res.locals.user_list})
+        const compare_order_list = {}
+        for (let i = 0; i < match_order_list.length; i++) {
+            compare_order_list[match_order_list[i].match_id] = {end_time: match_order_list[i].end_time,  team1: all_match_list[match_order_list[i].match_id].team1, team1logo: team_to_logo[all_match_list[match_order_list[i].match_id].team1], team1score: all_match_list[match_order_list[i].match_id].team1score, team2: all_match_list[match_order_list[i].match_id].team2, team2logo: team_to_logo[all_match_list[match_order_list[i].match_id].team2], team2score: all_match_list[match_order_list[i].match_id].team2score}
+        }
+        res.render('compare_users', {user: req.user, user_list: res.locals.user_list, compare_order_list: compare_order_list})
     }
 })
 
 app.post('/get_compare_stats', [get_compare_stats], function(req, res) {
-    res.send(res.locals.compare_stats)
+    res.send({compare_stats: res.locals.compare_stats, historical: res.locals.compare_historical})
 })
 
 app.get('/testing', function(req, res) {
