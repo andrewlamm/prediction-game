@@ -825,8 +825,11 @@ async function completed_matches_data(game_id) {
 
                         const timestamp = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
                         if (timestamp !== all_match_list[match_id].start_time) {
-                            console.log("different timestamp spotted, skipping ... ")
-                            continue
+                            // console.log("different timestamp spotted, skipping ... ")
+                            // continue
+
+                            console.log("different timestamp spotted, but not skipping now ")
+                            all_match_list[match_id].start_time = timestamp
                         }
 
                         if (curr_live_matches.has(match_id)) {
