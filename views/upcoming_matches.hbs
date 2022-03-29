@@ -55,7 +55,7 @@
 											<img src={{team1image}} alt="{{team1}}" style="width: 40px;" id="match:{{team1id}}:{{team2id}}:{{index}}_team1image">
 										</div>
 										<div class="px-2 w-2/3 md:w-3/5">
-											<div id="match:{{team1id}}:{{team2id}}:{{index}}_slider" style="height: 1px; top:48px;" class="flex items-center justify-center w-full"></div>
+											<div id="match:{{team1id}}:{{team2id}}:{{index}}_slider" style="height: 1px; top:48px;" class="flex items-center justify-center w-full" data-guessed="{{#if not_guessed}}false{{else}}true{{/if}}"></div>
 											<div class="relative px-px text-center text-xs text-gray-300 select-none" style="top:37.5px">|</div>
 											<div class="relative w-full px-px text-center flex flex-col items-center justify-center select-none">
 												<div class="relative text-2xl w-1/2 items-center justify-center" style="top:12.5px; left:{{find_left average_guess}}%">
@@ -101,6 +101,9 @@
         {{#each upcoming_matches}}
             array_lengths["{{@key}}"] = {{this.length}}
         {{/each}}
+
+		let matches_predicted = {{user_submitted_totals.submitted}}
+
         function toggle_division_list(id) {
             const key_id = id.substring(0, id.indexOf('_'))
             document.getElementById(`${key_id}_toggle_button`).classList.toggle("toggle_button_animation")
@@ -191,6 +194,11 @@
         }, 1000)
 
 		function post_score(id) {
+			if (document.getElementById(id).dataset.guessed === "false") {
+				document.getElementById(id).dataset.guessed = true
+				matches_predicted += 1
+				document.getElementById("user_submitted").innerHTML = matches_predicted
+			}
 			const prob = parseInt(document.getElementById(id).noUiSlider.get())
 
 			let request = new XMLHttpRequest();
@@ -206,6 +214,7 @@
 		}
 
 		function change_score(id) {
+
 			const match_num = id.substring(0, id.indexOf("_"))
 			const prob = parseInt(document.getElementById(id).noUiSlider.get())
 			let team1_probs = (100-prob).toFixed(1)

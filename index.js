@@ -1081,23 +1081,34 @@ function get_upcoming_matches(req, res, next) {
     for (let i = 0; i < LEAGUE_IDS.length; i++) {
         res.locals.upcoming_matches[leagueid_to_name[LEAGUE_IDS[i]]] = []
     }
+    if (res.locals.user_doc !== undefined) {
+        res.locals.total_upcoming_matches = 0
+        res.locals.total_submitted_matches = 0
+    }
 
     for (const [match_id, val] of Object.entries(all_match_list)) {
         if (!val.is_completed && !val.is_live) {
             if (val.number_guesses === 0) {
                 if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]], not_guessed: true})
                 }
                 else {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": 50, "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]], not_guessed: false})
                 }
             }
             else {
                 if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] === undefined) {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": 50, "league_id": leagueid_to_name[team_to_league_id[val.team1]], not_guessed: true})
                 }
                 else {
-                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]]})
+                    res.locals.upcoming_matches[leagueid_to_name[team_to_league_id[val.team1]]].push({"team1": val.team1, "team2": val.team2, "team1id": team_to_id[val.team1], "team2id": team_to_id[val.team2], "index": val.index, "match_id": match_id, "team1image": team_to_logo[val.team1], "team2image": team_to_logo[val.team2], "start_time": val.start_time, "average_guess": Math.floor(val.total_guess / val.number_guesses), "your_guess": res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`], "league_id": leagueid_to_name[team_to_league_id[val.team1]], not_guessed: false})
+                }
+            }
+
+            res.locals.total_upcoming_matches += 1
+            if (res.locals.user_doc !== undefined) {
+                if (res.locals.user_doc[`match_${team_to_id[val.team1]}_${team_to_id[val.team2]}_${val.index}`] !== undefined) {
+                    res.locals.total_submitted_matches += 1
                 }
             }
         }
@@ -1623,7 +1634,7 @@ app.get('/upcoming_matches', [check_document_exists, get_matches_prev_day, get_u
         res.render('site_restarting')
     }
     else {
-        res.render('upcoming_matches', {user: req.user, upcoming_matches: res.locals.upcoming_matches, total_users: res.locals.total_users})
+        res.render('upcoming_matches', {user: req.user, upcoming_matches: res.locals.upcoming_matches, total_users: res.locals.total_users, user_submitted_totals: {total: res.locals.total_upcoming_matches, submitted: res.locals.total_submitted_matches}})
     }
 })
 
@@ -1673,6 +1684,7 @@ app.get('/compare', [get_list_of_users], function(req, res) {
         res.render('site_restarting')
     }
     else {
+        // console.log(curr_live_matches) TODO: live matches in compare
         const compare_order_list = {}
         for (let i = 0; i < match_order_list.length; i++) {
             compare_order_list[match_order_list[i].match_id] = {end_time: match_order_list[i].end_time,  team1: all_match_list[match_order_list[i].match_id].team1, team1logo: team_to_logo[all_match_list[match_order_list[i].match_id].team1], team1score: all_match_list[match_order_list[i].match_id].team1score, team2: all_match_list[match_order_list[i].match_id].team2, team2logo: team_to_logo[all_match_list[match_order_list[i].match_id].team2], team2score: all_match_list[match_order_list[i].match_id].team2score}

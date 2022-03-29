@@ -5,7 +5,10 @@
         {{> header page_name=""}}
 		<div class="px-4 py-2 flex flex-col flex-grow">
             <div class="w-full flex flex-col items-center justify-center">
-                <div class="w-full xl:w-2/3 flex flex-col items-center justify-center pt-2">
+                <div class="w-full font-bold text-2xl block md:hidden">
+                    Sorry, score comparisons are not supproted on mobile yet.
+                </div>
+                <div class="w-full xl:w-2/3 hidden md:flex flex-col items-center justify-center pt-2">
                     <div class="hidden md:block w-full mt-4 text-center">
                         <select class="text-black py-1 px-2 leading-normal font-base border border-black w-full mb-2 compared_users_list" required onchange="add_user()" id="user_select">
                             <option value="none" disabled selected value class="hidden">Select a User</option>
