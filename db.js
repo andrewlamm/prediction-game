@@ -40,8 +40,14 @@ async function run() {
         // result["all_match_list"]["36186"]["start_time"] = 1647806100
         // result["all_match_list"]["928205"]["start_time"] = 1648054800
 
-        result["all_match_list"]["813169"]["start_time"] = 1649178000
+        // 604800 seconds in week
+
+        // result["all_match_list"]["813169"]["start_time"] = 1649178000
+        // result["all_match_list"]["376789"]["start_time"] = 1649217600
+        // result["all_match_list"]["376789"]["is_live"] = false
         // result["all_match_list"]["160542"]["end_time"] = 1648073549
+        // result["all_match_list"]["916037"]["start_time"] = 1649390400
+        result["all_match_list"]["587906"]["start_time"] = 1649401200
 
         const update_doc = { $set : {} }
 
