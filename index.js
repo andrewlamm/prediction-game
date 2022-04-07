@@ -571,7 +571,7 @@ async function get_averages() {
                     const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
                     const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
 
-                    console.log(team1, team2, index)
+                    // console.log(team1, team2, index)
                     // console.log(match_table[team_to_league_id[team1]][team1][team2][index])
                     const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
 
