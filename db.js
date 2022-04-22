@@ -47,7 +47,24 @@ async function run() {
         // result["all_match_list"]["376789"]["is_live"] = false
         // result["all_match_list"]["160542"]["end_time"] = 1648073549
         // result["all_match_list"]["916037"]["start_time"] = 1649390400
-        result["all_match_list"]["587906"]["start_time"] = 1649401200
+        // result["all_match_list"]["587906"]["start_time"] = 1649401200
+        // result["all_match_list"]["723611"]["start_time"] = 1650448800
+        // result["all_match_list"]["200321"]["start_time"] = 1650427200
+        // result["all_match_list"]["916037"]["start_time"] = 1650610800
+
+        // result["all_match_list"]["555260"]["is_live"] = true
+        // result["all_match_list"]["615640"]["is_live"] = true
+        // result["all_match_list"]["926794"]["is_live"] = true
+        // result["all_match_list"]["17737"]["is_live"] = true
+        // result["all_match_list"]["49597"]["is_live"] = true
+        // result["all_match_list"]["684214"]["is_live"] = true
+
+        result["all_match_list"]["555260"]["end_time"] = result["all_match_list"]["555260"]["start_time"] + 40
+        result["all_match_list"]["615640"]["end_time"] = result["all_match_list"]["615640"]["start_time"] + 40
+        result["all_match_list"]["926794"]["end_time"] = result["all_match_list"]["926794"]["start_time"] + 40
+        result["all_match_list"]["17737"]["end_time"] = result["all_match_list"]["17737"]["start_time"] + 40
+        result["all_match_list"]["49597"]["end_time"] = result["all_match_list"]["49597"]["start_time"] + 40
+        result["all_match_list"]["684214"]["end_time"] = result["all_match_list"]["684214"]["start_time"] + 40
 
         const update_doc = { $set : {} }
 

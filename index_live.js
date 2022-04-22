@@ -300,6 +300,11 @@ hbs.registerHelper('check_empty', function(s) {
     return false
 })
 
+hbs.registerHelper('check_set_empty', function(s) {
+    if (s.size === 0) return true
+    return false
+})
+
 function turn_to_ordinal(num) {
     let ones = num % 10
     let tens = num % 100
@@ -361,8 +366,8 @@ const team_to_logo = {}
 let match_table = {}
 let all_match_list = {}
 const dota_match_id_to_match = {}
-const team_to_league_id = {}
-const team_to_id = {}
+let team_to_league_id = {}
+let team_to_id = {}
 const id_to_team = {}
 let curr_id = 0
 
@@ -398,7 +403,6 @@ async function find_teams() {
                     }
                     if (team1 === "Omega Esports") continue
                     if (team1 === "King of Kings") team1 = "APU King of Kings"
-                    if (team1 === "Gaimin Gladiators") team1 = "Gladiators"
 
                     match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1] = {}
 
@@ -423,8 +427,6 @@ async function find_teams() {
                         }
                         if (team2 === "Omega Esports") continue
                         if (team2 === "King of Kings") team2 = "APU King of Kings"
-                        if (team2 === "Gaimin Gladiators") team2 = "Gladiators"
-
                         match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2] = []
                     }
                     team_to_league_id[team1] = LEAGUE_IDS[divisions_j*6+region_i]
@@ -435,6 +437,16 @@ async function find_teams() {
         resolve(1)
     })
 }
+
+// async function find_teams() {
+//     return new Promise(async function(resolve, reject) {
+//         for (const [team1, team_id] of Object.entries(team_to_id)) {
+//             id_to_team[team_id] = team1
+//             // team_to_logo[team1] = `https://liquipedia.net${logo_list[i].contents[0].contents[0].contents[0].attrs.src}`
+//         }
+//         resolve(1)
+//     })
+// }
 
 async function loop_leagues() {
     return new Promise(async function(resolve, reject) {
@@ -571,8 +583,6 @@ async function get_averages() {
                     const team2 = id_to_team[parseInt(key.substring(key.indexOf("_", 6)+1, key.indexOf("_", key.indexOf("_", 6)+1)))]
                     const index = parseInt(key.substring(key.indexOf("_", key.indexOf("_", 6)+1)+1))
 
-                    // console.log(team1, team2, index)
-                    // console.log(match_table[team_to_league_id[team1]][team1][team2][index])
                     const match_id = match_table[team_to_league_id[team1]][team1][team2][index]
 
                     all_match_list[match_id].number_guesses += 1
@@ -600,6 +610,8 @@ async function start_get_match_data() {
 
         match_table = result["match_table"]
         all_match_list = result["all_match_list"]
+        team_to_id = result["team_to_id"]
+        team_to_league_id = result["team_to_league_id"]
 
         for (const [key, val] of Object.entries(all_match_list)) {
             all_match_list[key].total_guess = 0
@@ -620,16 +632,22 @@ async function start_get_match_data() {
 
 async function start() {
     await connect_to_db()
+    await start_get_match_data()
     await find_teams()
     await loop_leagues()
-    await start_get_match_data()
+    const query = {"_id": "matches_data"}
+
+    const update_doc = { $set : {"team_to_id": team_to_id, "team_to_league_id": team_to_league_id} }
+
+    const result = await collection.updateOne(query, update_doc);
+    console.log("match data updated!");
     // console.log("complete, waiting 30 seconds")
     // await new Promise(resolve => setTimeout(resolve, 30000))
     // for (let i = 0; i < LEAGUE_IDS.length; i++)
     //     console.log(match_table[LEAGUE_IDS[i]])
     // console.log(match_table)
-    // console.log(team_to_id)
-    // console.log(team_to_league_id)
+    console.log(team_to_id)
+    console.log(team_to_league_id)
     // console.log(match_order_list)
     await start_find_live_matches()
     await get_averages()
@@ -721,9 +739,6 @@ async function get_live_matches() {
                     if (team1 === "King of Kings") team1 = "APU King of Kings"
                     if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                    if (team1 === "Gaimin Gladiators") team1 = "Gladiators"
-                    if (team2 === "Gaimin Gladiators") team2 = "Gladiators"
-
                     if (team1 === "TBD" || team2 === "TBD") {
                         // console.log(team1, team2)
                         continue
@@ -811,9 +826,6 @@ async function completed_matches_data(game_id) {
                     if (team1 === "King of Kings") team1 = "APU King of Kings"
                     if (team2 === "King of Kings") team2 = "APU King of Kings"
 
-                    if (team1 === "Gaimin Gladiators") team1 = "Gladiators"
-                    if (team2 === "Gaimin Gladiators") team2 = "Gladiators"
-
                     if (team1 === "ChubbyBoiz") continue
                     if (team2 === "ChubbyBoiz") continue
 
@@ -834,11 +846,11 @@ async function completed_matches_data(game_id) {
 
                         const timestamp = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
                         if (timestamp !== all_match_list[match_id].start_time) {
-                            console.log("different timestamp spotted, skipping ... ")
-                            continue
+                            // console.log("different timestamp spotted, skipping ... ")
+                            // continue
 
-                            // console.log("different timestamp spotted, but not skipping now ")
-                            // all_match_list[match_id].start_time = timestamp
+                            console.log("different timestamp spotted, but not skipping now ")
+                            all_match_list[match_id].start_time = timestamp
                         }
 
                         if (curr_live_matches.has(match_id)) {
@@ -1698,7 +1710,11 @@ app.get('/compare', [get_list_of_users], function(req, res) {
         for (let i = 0; i < match_order_list.length; i++) {
             compare_order_list[match_order_list[i].match_id] = {end_time: match_order_list[i].end_time,  team1: all_match_list[match_order_list[i].match_id].team1, team1logo: team_to_logo[all_match_list[match_order_list[i].match_id].team1], team1score: all_match_list[match_order_list[i].match_id].team1score, team2: all_match_list[match_order_list[i].match_id].team2, team2logo: team_to_logo[all_match_list[match_order_list[i].match_id].team2], team2score: all_match_list[match_order_list[i].match_id].team2score}
         }
-        res.render('compare_users', {user: req.user, user_list: res.locals.user_list, compare_order_list: compare_order_list})
+        const live_matches = {}
+        curr_live_matches.forEach((val) => {
+            live_matches[val] = {team1: all_match_list[val].team1, team1logo: team_to_logo[all_match_list[val].team1], team2: all_match_list[val].team2, team2logo: team_to_logo[all_match_list[val].team2]}
+        })
+        res.render('compare_users', {user: req.user, user_list: res.locals.user_list, compare_order_list: compare_order_list, live_match_list: live_matches})
     }
 })
 
