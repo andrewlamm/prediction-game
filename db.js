@@ -59,12 +59,27 @@ async function run() {
         // result["all_match_list"]["49597"]["is_live"] = true
         // result["all_match_list"]["684214"]["is_live"] = true
 
-        result["all_match_list"]["555260"]["end_time"] = result["all_match_list"]["555260"]["start_time"] + 40
-        result["all_match_list"]["615640"]["end_time"] = result["all_match_list"]["615640"]["start_time"] + 40
-        result["all_match_list"]["926794"]["end_time"] = result["all_match_list"]["926794"]["start_time"] + 40
-        result["all_match_list"]["17737"]["end_time"] = result["all_match_list"]["17737"]["start_time"] + 40
-        result["all_match_list"]["49597"]["end_time"] = result["all_match_list"]["49597"]["start_time"] + 40
+        // result["all_match_list"]["555260"]["end_time"] = result["all_match_list"]["555260"]["start_time"] + 40
+        // result["all_match_list"]["615640"]["end_time"] = result["all_match_list"]["615640"]["start_time"] + 40
+        // result["all_match_list"]["926794"]["end_time"] = result["all_match_list"]["926794"]["start_time"] + 40
+        // result["all_match_list"]["17737"]["end_time"] = result["all_match_list"]["17737"]["start_time"] + 40
+        // result["all_match_list"]["49597"]["end_time"] = result["all_match_list"]["49597"]["start_time"] + 40
+        // result["all_match_list"]["684214"]["end_time"] = result["all_match_list"]["684214"]["start_time"] + 40
+
+        result["all_match_list"]["684214"]["team1score"] = 2
+        result["all_match_list"]["684214"]["team2score"] = 1
+        result["all_match_list"]["684214"]["is_completed"] = true
         result["all_match_list"]["684214"]["end_time"] = result["all_match_list"]["684214"]["start_time"] + 40
+
+        result["all_match_list"]["519299"]["team1score"] = "FF"
+        result["all_match_list"]["519299"]["team2score"] = "W"
+        result["all_match_list"]["519299"]["is_completed"] = true
+        result["all_match_list"]["519299"]["end_time"] = result["all_match_list"]["519299"]["start_time"] + 1
+
+        // result["all_match_list"]["889290"]["team1score"] = "FF"
+        // result["all_match_list"]["889290"]["team2score"] = "W"
+        // result["all_match_list"]["889290"]["is_completed"] = true
+        // result["all_match_list"]["889290"]["end_time"] = result["all_match_list"]["889290"]["start_time"] + 1
 
         const update_doc = { $set : {} }
 
@@ -76,17 +91,17 @@ async function run() {
 
         // console.log(result)
 
-        // Object.defineProperty(result["match_table"]['10'], "RSG", Object.getOwnPropertyDescriptor(result["match_table"]['10'], "ChubbyBoiz"))
-        // delete result["match_table"]['10']["ChubbyBoiz"]
+        // Object.defineProperty(result["match_table"]['5'], "BB Team", Object.getOwnPropertyDescriptor(result["match_table"]['5'], "Winstrike Team"))
+        // delete result["match_table"]['5']["Winstrike Team"]
 
-        // for (const [key, val] of Object.entries(result["match_table"]['10'])) {
+        // for (const [key, val] of Object.entries(result["match_table"]['5'])) {
         //     // console.log(key)
-        //     if (key === "RSG") continue
-        //     Object.defineProperty(result["match_table"][10][key], "RSG", Object.getOwnPropertyDescriptor(result["match_table"][10][key], "ChubbyBoiz"))
-        //     delete result["match_table"][10][key]["ChubbyBoiz"]
+        //     if (key === "BB Team") continue
+        //     Object.defineProperty(result["match_table"][5][key], "BB Team", Object.getOwnPropertyDescriptor(result["match_table"][5][key], "Winstrike Team"))
+        //     delete result["match_table"][5][key]["Winstrike Team"]
         // }
 
-        // console.log(result["match_table"]['10'])
+        // console.log(result["match_table"]['5'])
 
         // const update_doc = { $set : {} }
 

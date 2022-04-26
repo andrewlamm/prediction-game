@@ -465,6 +465,8 @@ async function get_team_logos(id) {
     team_to_logo["Mind Games"] = "/imgs/dota/mindgames.png"
     team_to_logo["CIS Rejects"] = "/imgs/dota/cisrejects.png"
     team_to_logo["Winstrike Team"] = "/imgs/dota/winstrike.png"
+    team_to_logo["Outsiders"] = "/imgs/dota/outsiders.png"
+    team_to_logo["BB Team"] = "/imgs/dota/bbteam.png"
 
     team_to_logo["PSG.LGD"] = "/imgs/dota/lgd.png"
     team_to_logo["Team Aster"] = "/imgs/dota/aster.png"
@@ -833,7 +835,7 @@ async function completed_matches_data(game_id) {
                         const match_id = match_table[team_to_league_id[team1]][team1][team2][match_index]
 
                         const timestamp = parseInt(match_list.contents[1].contents[2].contents[i].contents[0].contents[1].contents[0].contents[0].contents[0].attrs["data-timestamp"])
-                        if (timestamp !== all_match_list[match_id].start_time) {
+                        if (!(timestamp < all_match_list[match_id].start_time + 900 && timestamp > all_match_list[match_id].start_time - 900)) {
                             console.log("different timestamp spotted, skipping ... ")
                             continue
 
