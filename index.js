@@ -399,6 +399,7 @@ async function find_teams() {
                     if (team1 === "Omega Esports") continue
                     if (team1 === "King of Kings") team1 = "APU King of Kings"
                     if (team1 === "Gaimin Gladiators") team1 = "Gladiators"
+                    if (team1 === "BetBoom Team") team1 = "BB Team"
 
                     match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1] = {}
 
@@ -424,6 +425,7 @@ async function find_teams() {
                         if (team2 === "Omega Esports") continue
                         if (team2 === "King of Kings") team2 = "APU King of Kings"
                         if (team2 === "Gaimin Gladiators") team2 = "Gladiators"
+                        if (team2 === "BetBoom Team") team2 = "BB Team"
 
                         match_table[LEAGUE_IDS[divisions_j*6+region_i]][team1][team2] = []
                     }
@@ -726,6 +728,9 @@ async function get_live_matches() {
                     if (team1 === "Gaimin Gladiators") team1 = "Gladiators"
                     if (team2 === "Gaimin Gladiators") team2 = "Gladiators"
 
+                    if (team1 === "BetBoom Team") team1 = "BB Team"
+                    if (team2 === "BetBoom Team") team2 = "BB Team"
+
                     if (team1 === "TBD" || team2 === "TBD") {
                         // console.log(team1, team2)
                         continue
@@ -815,6 +820,9 @@ async function completed_matches_data(game_id) {
 
                     if (team1 === "Gaimin Gladiators") team1 = "Gladiators"
                     if (team2 === "Gaimin Gladiators") team2 = "Gladiators"
+
+                    if (team1 === "BetBoom Team") team1 = "BB Team"
+                    if (team2 === "BetBoom Team") team2 = "BB Team"
 
                     if (team1 === "ChubbyBoiz") continue
                     if (team2 === "ChubbyBoiz") continue
